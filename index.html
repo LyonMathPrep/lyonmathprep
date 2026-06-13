@@ -77,6 +77,11 @@
             padding: 8px 0;
         }
 
+        .nav-links a.highlight {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
         .nav-links a:hover {
             color: var(--primary);
         }
@@ -236,6 +241,223 @@
             letter-spacing: 0.3px;
         }
 
+        /* Mission Section */
+        .mission-section {
+            background: var(--primary);
+            color: var(--white);
+            border-top: 2px solid var(--border);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .mission-content {
+            max-width: 720px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .mission-section h2 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -0.5px;
+        }
+
+        .mission-section p {
+            font-size: 17px;
+            line-height: 1.8;
+            opacity: 0.95;
+        }
+
+        /* Tutors Section */
+        .tutors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 24px;
+        }
+
+        .tutor-card {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 28px 24px;
+            text-align: center;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            will-change: transform;
+        }
+
+        .tutor-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 5px 5px 0 var(--border);
+        }
+
+        .tutor-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-light);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            margin: 0 auto 16px;
+        }
+        
+        .tutor-avatar svg {
+            color: var(--primary);
+        }
+
+        .tutor-card h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .tutor-grade {
+            font-size: 13px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tutor-subjects {
+            font-size: 13px;
+            color: var(--text-light);
+            line-height: 1.5;
+        }
+
+        /* Dual CTA Section */
+        .dual-cta-section {
+            background: var(--primary-light);
+            border-top: 2px solid var(--border);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .dual-cta-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 32px;
+        }
+
+        .cta-box {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 40px 32px;
+            text-align: center;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .cta-box:hover {
+            transform: translateY(-4px);
+            box-shadow: 8px 8px 0 var(--border);
+        }
+
+        .cta-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--primary-light);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            margin: 0 auto 20px;
+        }
+
+        .cta-box h3 {
+            font-size: 22px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+        }
+
+        .cta-box p {
+            color: var(--text-light);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        /* FAQ Section */
+        .faq-list {
+            max-width: 720px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 24px 28px;
+            margin-bottom: 16px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .faq-item:hover {
+            transform: translateX(4px);
+            box-shadow: 4px 4px 0 var(--border);
+        }
+
+        .faq-item h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .faq-item p {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        /* Impact Stats */
+        .impact-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border-top: 2px solid var(--border);
+            border-bottom: 2px solid var(--border);
+            text-align: center;
+        }
+
+        .impact-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            max-width: 960px;
+            margin: 40px auto 0;
+        }
+
+        .impact-stat {
+            text-align: center;
+        }
+
+        .impact-number {
+            font-size: 42px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -1.5px;
+        }
+
+        .impact-label {
+            font-size: 15px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .impact-section h2 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .impact-section .section-sub {
+            color: var(--white);
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
         .hero h1 {
             font-size: clamp(32px, 6vw, 52px);
             font-weight: 800;
@@ -348,6 +570,10 @@
             font-size: 22px;
             margin-bottom: 16px;
         }
+        
+        .feature-icon svg {
+            color: var(--primary);
+        }
 
         .feature-card h3 {
             font-size: 18px;
@@ -363,8 +589,9 @@
 
         /* Subjects */
         .subjects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 24px;
         }
 
@@ -377,6 +604,8 @@
             transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
             cursor: default;
             will-change: transform;
+            width: 200px;
+            flex-shrink: 0;
         }
 
         .subject-card:hover {
@@ -388,6 +617,13 @@
         .subject-card .emoji {
             font-size: 30px;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .subject-card .emoji svg {
+            color: var(--primary);
         }
 
         .subject-card h3 {
@@ -546,6 +782,33 @@
             color: var(--text-light);
         }
 
+        /* Contact List */
+        .contact-list {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .contact-list-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .contact-list-item svg {
+            color: var(--primary);
+        }
+
+        .contact-list-item:hover {
+            color: var(--primary);
+        }
+
         .footer-copy .heart {
             color: var(--primary);
         }
@@ -600,14 +863,48 @@
             }
         }
 
-        /* Scroll animations - includes hover transition properties so they aren't overridden */
+        /* Scroll animations - properly combined with hover effects */
         .animate-on-scroll {
             opacity: 0;
-            transition: opacity 0.5s ease, transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
         }
 
         .animate-on-scroll.visible {
             opacity: 1;
+        }
+        
+        /* Ensure cards have proper transitions for both scroll and hover */
+        .feature-card.animate-on-scroll {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, opacity 0.5s ease;
+        }
+        
+        .subject-card.animate-on-scroll {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, opacity 0.5s ease;
+        }
+        
+        .testimonial-card.animate-on-scroll {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
+        }
+        
+        /* Other elements with scroll animation only */
+        .section-title.animate-on-scroll,
+        .section-sub.animate-on-scroll,
+        .step.animate-on-scroll,
+        .cta-section.animate-on-scroll,
+        .mission-content.animate-on-scroll,
+        .impact-stat.animate-on-scroll {
+            transition: opacity 0.5s ease;
+        }
+
+        .tutor-card.animate-on-scroll {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
+        }
+
+        .cta-box.animate-on-scroll {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
+        }
+
+        .faq-item.animate-on-scroll {
+            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
         }
     </style>
 </head>
@@ -621,8 +918,8 @@
         <nav>
             <ul class="nav-links">
                 <li><a href="#about">About</a></li>
-                <li><a href="#subjects">Subjects</a></li>
-                <li><a href="#how">How It Works</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="#contact">Contact</a></li>
                 <li><a href="studentportal.html" class="btn btn-primary">Student Portal</a></li>
             </ul>
         </nav>
@@ -635,19 +932,31 @@
 
     <div class="mobile-menu" id="mobileMenu">
         <a href="#about" onclick="toggleMenu()">About</a>
-        <a href="#subjects" onclick="toggleMenu()">Subjects</a>
-        <a href="#how" onclick="toggleMenu()">How It Works</a>
+        <a href="#faq" onclick="toggleMenu()">FAQ</a>
+        <a href="#contact" onclick="toggleMenu()">Contact</a>
         <a href="studentportal.html" onclick="toggleMenu()">Student Portal</a>
     </div>
 
     <!-- Hero -->
     <section class="hero">
         <div class="hero-mascot"><img src="compass.png" alt="Compass mascot"></div>
-        <div class="hero-badge">🎓 100% Free · Non-Profit</div>
+        <div class="hero-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+            </svg>
+            Student-Run · 100% Free · Non-Profit
+        </div>
         <h1>Math made simple, for <span class="accent">every student.</span></h1>
-        <p>Free, personalized math tutoring for middle and high school students. Live classes, practice problems, and real support.</p>
+        <p>Free, personalized math tutoring for middle and high school students — taught by students, for students. Live classes, practice problems, and real support.</p>
         <div class="hero-buttons">
-            <a href="studentportal.html" class="btn btn-primary">Open Student Portal →</a>
+            <a href="studentportal.html" class="btn btn-primary">
+                Open Student Portal 
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-left: 4px;">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </a>
             <a href="#how" class="btn btn-outline">Learn More</a>
         </div>
     </section>
@@ -662,11 +971,17 @@
             <div class="stat-number">15+</div>
             <div class="stat-label">Volunteer Tutors</div>
         </div>
-        <div class="stat">
-            <div class="stat-number">6</div>
-            <div class="stat-label">Subjects Covered</div>
-        </div>
     </div>
+
+    <!-- Mission Section -->
+    <section class="mission-section">
+        <div class="section">
+            <div class="mission-content animate-on-scroll">
+                <h2>Built by students, for students.</h2>
+                <p>Lyon Math Prep is a 100% student-run, non-profit organization dedicated to making high-quality math education accessible to everyone. Our volunteer tutors are high school and college students who are passionate about helping their peers succeed. We believe that when students teach students, everyone wins.</p>
+            </div>
+        </div>
+    </section>
 
     <!-- About / Features -->
     <section class="section" id="about">
@@ -674,32 +989,66 @@
         <p class="section-sub animate-on-scroll">We believe every student deserves the chance to succeed in math.</p>
         <div class="features-grid">
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">📹</div>
-                <h3>Live 1-on-1 Classes</h3>
-                <p>Meet with a tutor via Google Meet for personalized help tailored to your pace and learning style.</p>
+                <div class="feature-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M23 7l-7 5 7 5V7z"></path>
+                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                    </svg>
+                </div>
+                <h3>Live Small Group Classes</h3>
+                <p>Join small group sessions via Google Meet with 3-5 students for personalized help and collaborative learning.</p>
             </div>
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">📝</div>
+                <div class="feature-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                    </svg>
+                </div>
                 <h3>Practice Problems</h3>
                 <p>Work through curated problem sets in your student portal to reinforce what you've learned in class.</p>
             </div>
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">📊</div>
+                <div class="feature-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                </div>
                 <h3>Track Your Progress</h3>
                 <p>See your completed units, upcoming classes, and how far you've come — all in one place.</p>
             </div>
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">❤️</div>
+                <div class="feature-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </div>
                 <h3>Always Free</h3>
                 <p>We're a non-profit. No hidden fees, no premium tiers. Every student gets the same great experience.</p>
             </div>
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">📅</div>
+                <div class="feature-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                </div>
                 <h3>Flexible Scheduling</h3>
                 <p>Classes fit around your schedule. See your upcoming sessions right in your portal calendar.</p>
             </div>
             <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">🤝</div>
+                <div class="feature-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
                 <h3>Patient Tutors</h3>
                 <p>Our volunteer tutors are trained to be encouraging, clear, and patient — no question is too simple.</p>
             </div>
@@ -712,32 +1061,77 @@
         <p class="section-sub animate-on-scroll">From 6th grade math through Pre-Calculus foundations.</p>
         <div class="subjects-grid">
             <div class="subject-card animate-on-scroll">
-                <div class="emoji">🔢</div>
+                <div class="emoji">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="9" x2="19" y2="9"></line>
+                        <line x1="5" y1="15" x2="19" y2="15"></line>
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                    </svg>
+                </div>
                 <h3>Pre-Algebra</h3>
                 <p>Grades 6–7</p>
             </div>
             <div class="subject-card animate-on-scroll">
-                <div class="emoji">📐</div>
+                <div class="emoji">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 3v18h18"></path>
+                        <path d="M18.7 8c-1.2-2.3-3.7-4-6.7-4s-5.5 1.7-6.7 4L3 12"></path>
+                    </svg>
+                </div>
                 <h3>Algebra I</h3>
                 <p>Grades 7–9</p>
             </div>
             <div class="subject-card animate-on-scroll">
-                <div class="emoji">📏</div>
+                <div class="emoji">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Front face -->
+                        <polygon points="4 8 4 20 16 20 16 8"></polygon>
+                        <!-- Top face -->
+                        <polygon points="4 8 10 4 22 4 16 8"></polygon>
+                        <!-- Right face -->
+                        <polygon points="16 8 22 4 22 16 16 20"></polygon>
+                    </svg>
+                </div>
                 <h3>Geometry</h3>
                 <p>Grades 8–10</p>
             </div>
             <div class="subject-card animate-on-scroll">
-                <div class="emoji">📈</div>
+                <div class="emoji">
+                    <!-- Parabola / quadratic function for Algebra II -->
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Axes -->
+                        <line x1="3" y1="21" x2="3" y2="3"></line>
+                        <line x1="3" y1="21" x2="21" y2="21"></line>
+                        <!-- Parabola curve (opening upward) -->
+                        <path d="M4 18 Q7 2 12 10 Q17 18 20 4" fill="none"></path>
+                    </svg>
+                </div>
                 <h3>Algebra II</h3>
                 <p>Grades 9–11</p>
             </div>
             <div class="subject-card animate-on-scroll">
-                <div class="emoji">📊</div>
+                <div class="emoji">
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="20" x2="12" y2="10"></line>
+                        <line x1="18" y1="20" x2="18" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="16"></line>
+                    </svg>
+                </div>
                 <h3>Statistics & Probability</h3>
                 <p>Grades 9–11</p>
             </div>
             <div class="subject-card animate-on-scroll">
-                <div class="emoji">🧮</div>
+                <div class="emoji">
+                    <!-- Integral symbol for Pre-Calculus -->
+                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Integral sign (∫) drawn as an elongated S-curve -->
+                        <path d="M15 3c-1.5 0-2.5 1-2.8 2.5L9.8 18.5C9.5 20 8.5 21 7 21" fill="none"></path>
+                        <!-- Top serif -->
+                        <path d="M13 3h4" fill="none"></path>
+                        <!-- Bottom serif -->
+                        <path d="M5 21h4" fill="none"></path>
+                    </svg>
+                </div>
                 <h3>Pre-Calculus</h3>
                 <p>Grades 10–12</p>
             </div>
@@ -756,13 +1150,36 @@
             </div>
             <div class="step animate-on-scroll">
                 <div class="step-number">2</div>
-                <h3>Get Matched</h3>
-                <p>We'll pair you with a volunteer tutor who fits your schedule and can teach the subjects you need.</p>
+                <h3>Join a Class</h3>
+                <p>We'll place you in a small group class that fits your schedule and covers the subjects you need help with.</p>
             </div>
             <div class="step animate-on-scroll">
                 <div class="step-number">3</div>
                 <h3>Start Learning</h3>
-                <p>Join your live sessions via Google Meet, practice problems in your portal, and watch your skills grow.</p>
+                <p>Attend your live small group sessions via Google Meet, practice problems in your portal, and watch your skills grow.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Stats -->
+    <section class="impact-section">
+        <div class="section">
+            <h2 class="animate-on-scroll">Our impact so far</h2>
+            <p class="section-sub animate-on-scroll">Together, we're changing lives through education.</p>
+            <div class="impact-stats">
+                <div class="impact-stat animate-on-scroll">
+                    <div class="impact-number">200+</div>
+                    <div class="impact-label">Students Helped</div>
+                </div>
+                <div class="impact-stat animate-on-scroll">
+                    <div class="impact-number">15+</div>
+                    <div class="impact-label">Volunteer Tutors</div>
+                </div>
+                <div class="impact-stat animate-on-scroll">
+                    <div class="impact-number">500+</div>
+                    <div class="impact-label">Hours Tutored</div>
+                </div>
+
             </div>
         </div>
     </section>
@@ -796,7 +1213,60 @@
     <section class="cta-section animate-on-scroll">
         <h2>Ready to get started?</h2>
         <p>Join hundreds of students who are building confidence in math — completely free.</p>
-        <a href="studentportal.html" class="btn btn-primary">Go to Student Portal →</a>
+        <a href="studentportal.html" class="btn btn-primary">
+            Go to Student Portal 
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-left: 4px;">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </a>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+        <h2 class="section-title animate-on-scroll">Frequently asked questions</h2>
+        <p class="section-sub animate-on-scroll">Everything you need to know about Lyon Math Prep.</p>
+        <div class="faq-list">
+            <div class="faq-item animate-on-scroll">
+                <h3>Is this really completely free?</h3>
+                <p>Yes! Lyon Math Prep is a 100% non-profit organization. We don't charge anything, ever. All our tutors are volunteers who want to help students succeed.</p>
+            </div>
+            <div class="faq-item animate-on-scroll">
+                <h3>Who are the tutors?</h3>
+                <p>Our tutors are high school and college students who excel in math and are passionate about teaching. They're trained and supervised to ensure quality instruction in our small group classes.</p>
+            </div>
+            <div class="faq-item animate-on-scroll">
+                <h3>How do I sign up?</h3>
+                <p>Click "Student Portal" in the menu, create an account, and fill out a quick form about your needs. We'll match you with a tutor within 2-3 days.</p>
+            </div>
+            <div class="faq-item animate-on-scroll">
+                <h3>What if I need to cancel a class?</h3>
+                <p>No problem! Just let us know at least 24 hours in advance through the student portal messaging system. You can join another scheduled class that fits your availability.</p>
+            </div>
+            <div class="faq-item animate-on-scroll">
+                <h3>How many students are in each class?</h3>
+                <p>We keep our classes small with 3-5 students per session. This allows for personalized attention while also creating a collaborative learning environment.</p>
+            </div>
+            <div class="faq-item animate-on-scroll">
+                <h3>How long are tutoring sessions?</h3>
+                <p>Standard sessions are 45-60 minutes, but we can adjust based on your needs and schedule. Most students attend 1-2 classes per week.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section" id="contact">
+        <h2 class="section-title animate-on-scroll">Contact us</h2>
+        <p class="section-sub animate-on-scroll">Have a question? Reach out anytime.</p>
+        <div class="contact-list animate-on-scroll">
+            <a href="mailto:mathprepmi@gmail.com" class="contact-list-item">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                mathprepmi@gmail.com
+            </a>
+        </div>
     </section>
 
     <!-- Footer -->
@@ -804,11 +1274,16 @@
         <div class="footer-content">
             <div class="footer-links">
                 <a href="#about">About</a>
-                <a href="#subjects">Subjects</a>
-                <a href="#how">How It Works</a>
+                <a href="#faq">FAQ</a>
                 <a href="studentportal.html">Student Portal</a>
+                <a href="mailto:mathprepmi@gmail.com">Contact</a>
             </div>
-            <p class="footer-copy">© 2024 Lyon Math Prep. A non-profit organization. Made with <span class="heart">♥</span> for students everywhere.</p>
+            <p class="footer-copy">© 2024 Lyon Math Prep. A student-run, non-profit organization. Made with 
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display: inline-block; vertical-align: middle; color: var(--primary);">
+                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                </svg>
+                by students, for students.
+            </p>
         </div>
     </footer>
 
