@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lyon Math Prep | Free Math Tutoring for Students</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #e63946;
+            --primary-light: #fde8ea;
+            --primary-dark: #c1121f;
+            --text: #000000;
+            --text-light: #555555;
+            --bg: #ffffff;
+            --white: #ffffff;
+            --border: #000000;
+            --border-light: #e8e8e8;
+            --accent: #c1121f;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Top Bar */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-bottom: 2px solid var(--border);
+            z-index: 1000;
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--primary);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-mark {
+            width: 32px;
+            height: 32px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--white);
+            font-size: 16px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s;
+            padding: 8px 0;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            min-height: 44px;
+            min-width: 44px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--border);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #fbd5d9;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background: var(--text);
+            color: var(--white);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+            min-height: 44px;
+            min-width: 44px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .hamburger span {
+            width: 22px;
+            height: 2px;
+            background: var(--text);
+            transition: all 0.3s;
+            border-radius: 2px;
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 64px;
+            left: 0;
+            right: 0;
+            background: var(--white);
+            border-bottom: 2px solid var(--border);
+            padding: 16px 24px;
+            z-index: 999;
+            animation: slideDown 0.25s ease;
+        }
+
+        .mobile-menu.active {
+            display: block;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 14px 0;
+            text-decoration: none;
+            color: var(--text);
+            font-size: 16px;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .mobile-menu a:last-child {
+            border-bottom: none;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hero */
+        .hero {
+            margin-top: 64px;
+            padding: 80px 24px 40px;
+            text-align: center;
+            max-width: 760px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: fadeUp 0.6s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-mascot {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 24px;
+            display: block;
+            animation: bounce 2.5s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: var(--white);
+            color: var(--primary);
+            padding: 6px 16px;
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: 0.3px;
+        }
+
+        .hero h1 {
+            font-size: clamp(32px, 6vw, 52px);
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -1.5px;
+            margin-bottom: 20px;
+            color: var(--text);
+        }
+
+        .hero h1 .accent {
+            color: var(--primary);
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: var(--text-light);
+            max-width: 520px;
+            margin: 0 auto 36px;
+            line-height: 1.7;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            padding: 40px 24px 60px;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeUp 0.6s ease 0.15s both;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: -1px;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-light);
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        /* Sections */
+        .section {
+            padding: 60px 24px;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .section-sub {
+            text-align: center;
+            color: var(--text-light);
+            margin-bottom: 48px;
+            font-size: 16px;
+        }
+
+        /* Feature Cards */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 32px 28px;
+            transition: all 0.25s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 6px 6px 0 var(--border);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 16px;
+        }
+
+        .feature-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Subjects */
+        .subjects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .subject-card {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.25s ease;
+            cursor: default;
+        }
+
+        .subject-card:hover {
+            background: var(--primary-light);
+            transform: translateY(-3px);
+            box-shadow: 4px 4px 0 var(--border);
+        }
+
+        .subject-card .emoji {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .subject-card h3 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .subject-card p {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        /* How it Works */
+        .steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 32px;
+            counter-reset: step;
+        }
+
+        .step {
+            text-align: center;
+            position: relative;
+        }
+
+        .step-number {
+            width: 48px;
+            height: 48px;
+            background: var(--primary);
+            color: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            margin: 0 auto 16px;
+        }
+
+        .step h3 {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .step p {
+            font-size: 14px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+
+        /* Testimonial */
+        .testimonial-section {
+            background: var(--primary-light);
+            border-top: 2px solid var(--border);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .testimonial-card {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 28px;
+        }
+
+        .testimonial-card p {
+            font-size: 15px;
+            color: var(--text);
+            line-height: 1.7;
+            margin-bottom: 16px;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .testimonial-role {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        /* CTA */
+        .cta-section {
+            text-align: center;
+            padding: 80px 24px;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        .cta-section h2 {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .cta-section p {
+            color: var(--text-light);
+            margin-bottom: 32px;
+            font-size: 16px;
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 2px solid var(--border);
+            padding: 40px 24px;
+            text-align: center;
+            background: var(--white);
+        }
+
+        .footer-content {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .footer-links a {
+            color: var(--text);
+            text-decoration: none;
+            font-size: 14px;
+            padding: 4px;
+            font-weight: 500;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .footer-copy {
+            font-size: 13px;
+            color: var(--text-light);
+        }
+
+        .footer-copy .heart {
+            color: var(--primary);
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .hero {
+                padding: 60px 20px 20px;
+            }
+
+            .hero-mascot {
+                width: 110px;
+                height: 110px;
+            }
+
+            .stats {
+                gap: 24px;
+            }
+
+            .stat-number {
+                font-size: 26px;
+            }
+
+            .section {
+                padding: 48px 20px;
+            }
+
+            .section-title {
+                font-size: 26px;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .hero-buttons .btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* Scroll animations */
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Mascot SVG container */
+        .mascot-svg {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Mascot SVG (reusable) -->
+    <svg width="0" height="0" style="position:absolute">
+        <defs>
+            <symbol id="mascot" viewBox="0 0 200 200">
+                <!-- Top knob -->
+                <rect x="95" y="10" width="10" height="20" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
+                <!-- Top cap -->
+                <rect x="80" y="28" width="40" height="22" rx="3" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
+                <!-- Body -->
+                <rect x="70" y="48" width="60" height="70" rx="6" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
+                <!-- Eyebrows -->
+                <path d="M 78 58 Q 86 53 94 58" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                <path d="M 106 58 Q 114 53 122 58" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
+                <!-- Eyes (white) -->
+                <circle cx="86" cy="75" r="13" fill="#fff" stroke="#000" stroke-width="2.5"/>
+                <circle cx="114" cy="75" r="13" fill="#fff" stroke="#000" stroke-width="2.5"/>
+                <!-- Pupils -->
+                <circle cx="88" cy="77" r="6" fill="#2a1f4a"/>
+                <circle cx="116" cy="77" r="6" fill="#2a1f4a"/>
+                <!-- Eye shine -->
+                <circle cx="90" cy="74" r="2" fill="#fff"/>
+                <circle cx="118" cy="74" r="2" fill="#fff"/>
+                <!-- Smile -->
+                <path d="M 88 98 Q 100 108 112 98" fill="#e63946" stroke="#000" stroke-width="2"/>
+                <!-- Hinge/joints -->
+                <circle cx="75" cy="125" r="6" fill="#f4c430" stroke="#000" stroke-width="2"/>
+                <circle cx="125" cy="125" r="6" fill="#f4c430" stroke="#000" stroke-width="2"/>
+                <!-- Legs (compass) -->
+                <path d="M 90 120 L 75 195 L 80 195 Z" fill="#c0c0c0" stroke="#000" stroke-width="2"/>
+                <path d="M 110 120 L 125 195 L 120 195 Z" fill="#c0c0c0" stroke="#000" stroke-width="2"/>
+                <!-- Pencil tips -->
+                <circle cx="77" cy="192" r="3" fill="#000"/>
+                <polygon points="122,192 128,192 125,198" fill="#000"/>
+            </symbol>
+        </defs>
+    </svg>
+
+    <!-- Top Bar -->
+    <header class="topbar">
+        <a href="#" class="logo">
+            <span class="logo-mark"><svg class="mascot-svg" viewBox="0 0 200 200"><use href="#mascot"/></svg></span>
+            Lyon Math Prep
+        </a>
+        <nav>
+            <ul class="nav-links">
+                <li><a href="#about">About</a></li>
+                <li><a href="#subjects">Subjects</a></li>
+                <li><a href="#how">How It Works</a></li>
+                <li><a href="portal.html" class="btn btn-primary">Student Portal</a></li>
+            </ul>
+        </nav>
+        <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </header>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#about" onclick="toggleMenu()">About</a>
+        <a href="#subjects" onclick="toggleMenu()">Subjects</a>
+        <a href="#how" onclick="toggleMenu()">How It Works</a>
+        <a href="portal.html" onclick="toggleMenu()">Student Portal</a>
+    </div>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="hero-mascot"><svg class="mascot-svg" viewBox="0 0 200 200"><use href="#mascot"/></svg></div>
+        <div class="hero-badge">🎓 100% Free · Non-Profit</div>
+        <h1>Math made simple, for <span class="accent">every student.</span></h1>
+        <p>Free, personalized math tutoring for middle and high school students. Live classes, practice problems, and real support.</p>
+        <div class="hero-buttons">
+            <a href="portal.html" class="btn btn-primary">Open Student Portal →</a>
+            <a href="#how" class="btn btn-outline">Learn More</a>
+        </div>
+    </section>
+
+    <!-- Stats -->
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-number">200+</div>
+            <div class="stat-label">Students Helped</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">15+</div>
+            <div class="stat-label">Volunteer Tutors</div>
+        </div>
+        <div class="stat">
+            <div class="stat-number">6</div>
+            <div class="stat-label">Subjects Covered</div>
+        </div>
+    </div>
+
+    <!-- About / Features -->
+    <section class="section" id="about">
+        <h2 class="section-title animate-on-scroll">Why students love Lyon Math Prep</h2>
+        <p class="section-sub animate-on-scroll">We believe every student deserves the chance to succeed in math.</p>
+        <div class="features-grid">
+            <div class="feature-card animate-on-scroll">
+                <div class="feature-icon">📹</div>
+                <h3>Live 1-on-1 Classes</h3>
+                <p>Meet with a tutor via Google Meet for personalized help tailored to your pace and learning style.</p>
+            </div>
+            <div class="feature-card animate-on-scroll">
+                <div class="feature-icon">📝</div>
+                <h3>Practice Problems</h3>
+                <p>Work through curated problem sets in your student portal to reinforce what you've learned in class.</p>
+            </div>
+            <div class="feature-card animate-on-scroll">
+                <div class="feature-icon">📊</div>
+                <h3>Track Your Progress</h3>
+                <p>See your completed units, upcoming classes, and how far you've come — all in one place.</p>
+            </div>
+            <div class="feature-card animate-on-scroll">
+                <div class="feature-icon">❤️</div>
+                <h3>Always Free</h3>
+                <p>We're a non-profit. No hidden fees, no premium tiers. Every student gets the same great experience.</p>
+            </div>
+            <div class="feature-card animate-on-scroll">
+                <div class="feature-icon">📅</div>
+                <h3>Flexible Scheduling</h3>
+                <p>Classes fit around your schedule. See your upcoming sessions right in your portal calendar.</p>
+            </div>
+            <div class="feature-card animate-on-scroll">
+                <div class="feature-icon">🤝</div>
+                <h3>Patient Tutors</h3>
+                <p>Our volunteer tutors are trained to be encouraging, clear, and patient — no question is too simple.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Subjects -->
+    <section class="section" id="subjects">
+        <h2 class="section-title animate-on-scroll">Subjects we cover</h2>
+        <p class="section-sub animate-on-scroll">From 6th grade math through Pre-Calculus foundations.</p>
+        <div class="subjects-grid">
+            <div class="subject-card animate-on-scroll">
+                <div class="emoji">🔢</div>
+                <h3>Pre-Algebra</h3>
+                <p>Grades 6–7</p>
+            </div>
+            <div class="subject-card animate-on-scroll">
+                <div class="emoji">📐</div>
+                <h3>Algebra I</h3>
+                <p>Grades 7–9</p>
+            </div>
+            <div class="subject-card animate-on-scroll">
+                <div class="emoji">📏</div>
+                <h3>Geometry</h3>
+                <p>Grades 8–10</p>
+            </div>
+            <div class="subject-card animate-on-scroll">
+                <div class="emoji">📈</div>
+                <h3>Algebra II</h3>
+                <p>Grades 9–11</p>
+            </div>
+            <div class="subject-card animate-on-scroll">
+                <div class="emoji">📊</div>
+                <h3>Statistics & Probability</h3>
+                <p>Grades 9–11</p>
+            </div>
+            <div class="subject-card animate-on-scroll">
+                <div class="emoji">🧮</div>
+                <h3>Pre-Calculus</h3>
+                <p>Grades 10–12</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works -->
+    <section class="section" id="how">
+        <h2 class="section-title animate-on-scroll">How it works</h2>
+        <p class="section-sub animate-on-scroll">Getting started takes less than 5 minutes.</p>
+        <div class="steps">
+            <div class="step animate-on-scroll">
+                <div class="step-number">1</div>
+                <h3>Sign Up</h3>
+                <p>Fill out a short form telling us your grade level, what subjects you need help with, and your availability.</p>
+            </div>
+            <div class="step animate-on-scroll">
+                <div class="step-number">2</div>
+                <h3>Get Matched</h3>
+                <p>We'll pair you with a volunteer tutor who fits your schedule and can teach the subjects you need.</p>
+            </div>
+            <div class="step animate-on-scroll">
+                <div class="step-number">3</div>
+                <h3>Start Learning</h3>
+                <p>Join your live sessions via Google Meet, practice problems in your portal, and watch your skills grow.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonial-section">
+        <div class="section">
+            <h2 class="section-title animate-on-scroll">What students say</h2>
+            <p class="section-sub animate-on-scroll">Real stories from real students.</p>
+            <div class="testimonials-grid">
+                <div class="testimonial-card animate-on-scroll">
+                    <p>"I went from a C- to a B+ in Algebra. My tutor explains things in a way that actually makes sense."</p>
+                    <div class="testimonial-author">Sarah M.</div>
+                    <div class="testimonial-role">8th Grade · Algebra I</div>
+                </div>
+                <div class="testimonial-card animate-on-scroll">
+                    <p>"I was scared of math before. Now I actually enjoy doing the practice problems. It feels like a game."</p>
+                    <div class="testimonial-author">James K.</div>
+                    <div class="testimonial-role">7th Grade · Pre-Algebra</div>
+                </div>
+                <div class="testimonial-card animate-on-scroll">
+                    <p>"The fact that this is free is amazing. My family couldn't afford a tutor and this changed everything for me."</p>
+                    <div class="testimonial-author">Maria L.</div>
+                    <div class="testimonial-role">10th Grade · Geometry</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section animate-on-scroll">
+        <h2>Ready to get started?</h2>
+        <p>Join hundreds of students who are building confidence in math — completely free.</p>
+        <a href="portal.html" class="btn btn-primary">Go to Student Portal →</a>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#about">About</a>
+                <a href="#subjects">Subjects</a>
+                <a href="#how">How It Works</a>
+                <a href="portal.html">Student Portal</a>
+            </div>
+            <p class="footer-copy">© 2024 Lyon Math Prep. A non-profit organization. Made with <span class="heart">♥</span> for students everywhere.</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            document.getElementById('mobileMenu').classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('mobileMenu');
+            const hamburger = document.querySelector('.hamburger');
+            if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.animate-on-scroll').forEach(el => {
+            observer.observe(el);
+        });
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
