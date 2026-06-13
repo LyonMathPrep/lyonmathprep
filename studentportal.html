@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -59,25 +60,16 @@
         }
 
         .logo {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--primary);
-            text-decoration: none;
-            letter-spacing: -0.5px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            text-decoration: none;
+            height: 48px;
         }
 
-        .logo-mark {
-            width: 32px;
-            height: 32px;
-            border: 2px solid var(--border);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--white);
+        .logo img {
+            height: 100%;
+            width: auto;
+            display: block;
         }
 
         .topbar-right {
@@ -1140,76 +1132,11 @@
 </head>
 <body>
 
-    <!-- Mascot SVG (reusable) -->
-    <svg width="0" height="0" style="position:absolute">
-        <defs>
-            <symbol id="mascot" viewBox="0 0 200 200">
-                <rect x="95" y="10" width="10" height="20" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
-                <rect x="80" y="28" width="40" height="22" rx="3" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
-                <rect x="70" y="48" width="60" height="70" rx="6" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
-                <path d="M 78 58 Q 86 53 94 58" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 106 58 Q 114 53 122 58" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-                <circle cx="86" cy="75" r="13" fill="#fff" stroke="#000" stroke-width="2.5"/>
-                <circle cx="114" cy="75" r="13" fill="#fff" stroke="#000" stroke-width="2.5"/>
-                <circle cx="88" cy="77" r="6" fill="#2a1f4a"/>
-                <circle cx="116" cy="77" r="6" fill="#2a1f4a"/>
-                <circle cx="90" cy="74" r="2" fill="#fff"/>
-                <circle cx="118" cy="74" r="2" fill="#fff"/>
-                <path d="M 88 98 Q 100 108 112 98" fill="#e63946" stroke="#000" stroke-width="2"/>
-                <circle cx="75" cy="125" r="6" fill="#f4c430" stroke="#000" stroke-width="2"/>
-                <circle cx="125" cy="125" r="6" fill="#f4c430" stroke="#000" stroke-width="2"/>
-                <path d="M 90 120 L 75 195 L 80 195 Z" fill="#c0c0c0" stroke="#000" stroke-width="2"/>
-                <path d="M 110 120 L 125 195 L 120 195 Z" fill="#c0c0c0" stroke="#000" stroke-width="2"/>
-                <circle cx="77" cy="192" r="3" fill="#000"/>
-                <polygon points="122,192 128,192 125,198" fill="#000"/>
-            </symbol>
-            <!-- Happy variant (bigger smile) -->
-            <symbol id="mascot-happy" viewBox="0 0 200 200">
-                <rect x="95" y="10" width="10" height="20" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
-                <rect x="80" y="28" width="40" height="22" rx="3" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
-                <rect x="70" y="48" width="60" height="70" rx="6" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
-                <path d="M 78 58 Q 86 50 94 58" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 106 58 Q 114 50 122 58" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-                <circle cx="86" cy="75" r="13" fill="#fff" stroke="#000" stroke-width="2.5"/>
-                <circle cx="114" cy="75" r="13" fill="#fff" stroke="#000" stroke-width="2.5"/>
-                <path d="M 80 75 Q 86 70 92 75" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 108 75 Q 114 70 120 75" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 82 95 Q 100 115 118 95 Q 118 100 100 102 Q 82 100 82 95 Z" fill="#e63946" stroke="#000" stroke-width="2"/>
-                <circle cx="75" cy="125" r="6" fill="#f4c430" stroke="#000" stroke-width="2"/>
-                <circle cx="125" cy="125" r="6" fill="#f4c430" stroke="#000" stroke-width="2"/>
-                <path d="M 90 120 L 75 195 L 80 195 Z" fill="#c0c0c0" stroke="#000" stroke-width="2"/>
-                <path d="M 110 120 L 125 195 L 120 195 Z" fill="#c0c0c0" stroke="#000" stroke-width="2"/>
-                <circle cx="77" cy="192" r="3" fill="#000"/>
-                <polygon points="122,192 128,192 125,198" fill="#000"/>
-            </symbol>
-            <!-- Sad variant -->
-            <symbol id="mascot-sad" viewBox="0 0 200 200">
-                <rect x="95" y="10" width="10" height="20" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
-                <rect x="80" y="28" width="40" height="22" rx="3" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
-                <rect x="70" y="48" width="60" height="70" rx="6" fill="#f4c430" stroke="#000" stroke-width="2.5"/>
-                <path d="M 78 60 Q 86 64 94 60" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-                <path d="M 106 60 Q 114 64 122 60" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round"/>
-                <circle cx="86" cy="78" r="13" fill="#fff" stroke="#000" stroke-width="2.5"/>
-                <circle cx="114" cy="78" r="13" fill="#fff" stroke="#000" stroke-width="2.5"/>
-                <circle cx="86" cy="80" r="5" fill="#2a1f4a"/>
-                <circle cx="114" cy="80" r="5" fill="#2a1f4a"/>
-                <path d="M 88 108 Q 100 98 112 108" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round"/>
-                <circle cx="75" cy="125" r="6" fill="#f4c430" stroke="#000" stroke-width="2"/>
-                <circle cx="125" cy="125" r="6" fill="#f4c430" stroke="#000" stroke-width="2"/>
-                <path d="M 90 120 L 75 195 L 80 195 Z" fill="#c0c0c0" stroke="#000" stroke-width="2"/>
-                <path d="M 110 120 L 125 195 L 120 195 Z" fill="#c0c0c0" stroke="#000" stroke-width="2"/>
-                <circle cx="77" cy="192" r="3" fill="#000"/>
-                <polygon points="122,192 128,192 125,198" fill="#000"/>
-            </symbol>
-        </defs>
-    </svg>
-
     <!-- Top Bar -->
     <header class="topbar">
         <a href="index.html" class="logo">
-            <span class="logo-mark"><svg class="mascot-svg" viewBox="0 0 200 200"><use href="#mascot"/></svg></span>
-            Lyon Math Prep
-        </a>
+    <img src="logo.png" alt="Lyon Math Prep">
+</a>
         <nav>
             <ul class="nav-links">
                 <li><button onclick="showPage('dashboard')" class="nav-btn active" data-page="dashboard">Dashboard</button></li>
