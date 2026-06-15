@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal | Lyon Math Prep</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --primary: #e63946;
+            --primary-light: #fde8ea;
+            --primary-dark: #c1121f;
+            --text: #000000;
+            --text-light: #555555;
+            --bg: #ffffff;
+            --white: #ffffff;
+            --border: #000000;
+            --border-light: #e8e8e8;
+            --accent: #c1121f;
+            --green: #2d7a3a;
+            --green-light: #e6f4ea;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ==================== AUTH SCREEN ==================== */
+        #authScreen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+        #authScreen.hidden { display: none; }
+
+        .auth-logo { height: 48px; margin-bottom: 24px; }
+        .auth-logo img { height: 100%; width: auto; display: block; }
+
+        .auth-card {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 420px;
+            overflow: hidden;
+            animation: fadeUp 0.5s ease;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .auth-mascot { width: 90px; height: 90px; margin: 28px auto 8px; display: block; }
+        .auth-mascot img { width: 100%; height: 100%; object-fit: contain; }
+
+        .auth-tabs { display: flex; border-bottom: 2px solid var(--border); }
+
+        .auth-tab {
+            flex: 1;
+            padding: 16px;
+            background: var(--white);
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .auth-tab:first-child { border-right: 2px solid var(--border); }
+        .auth-tab.active {
+            color: var(--primary);
+            background: var(--primary-light);
+            border-bottom-color: var(--primary);
+        }
+
+        .auth-body { padding: 28px 32px 32px; }
+        .auth-body h1 { font-size: 22px; font-weight: 800; text-align: center; letter-spacing: -0.5px; margin-bottom: 4px; }
+        .auth-body .subtitle { text-align: center; color: var(--text-light); font-size: 14px; margin-bottom: 24px; }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .auth-submit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            min-height: 50px;
+            font-family: inherit;
+            background: var(--primary);
+            color: var(--white);
+            margin-top: 4px;
+        }
+        .auth-submit:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .auth-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .message {
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .message.error { display: block; background: var(--primary-light); color: var(--primary-dark); border: 2px solid var(--primary); }
+        .message.success { display: block; background: var(--green-light); color: var(--green); border: 2px solid var(--green); }
+
+        .auth-home-link { margin-top: 24px; font-size: 14px; color: var(--text-light); text-decoration: none; }
+        .auth-home-link:hover { color: var(--primary); }
+
+        /* ==================== PORTAL ==================== */
+        #portalScreen { display: none; }
+        #portalScreen.active { display: block; }
+
+        .topbar {
+            position: fixed; top: 0; left: 0; right: 0;
+            background: var(--white);
+            border-bottom: 2px solid var(--border);
+            z-index: 1000; padding: 0 24px; height: 64px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .logo { display: flex; align-items: center; text-decoration: none; height: 48px; }
+        .logo img { height: 100%; width: auto; display: block; }
+        .topbar-right { display: flex; align-items: center; gap: 16px; }
+
+        .nav-links { display: flex; align-items: center; gap: 8px; list-style: none; }
+        .nav-links a, .nav-links button {
+            text-decoration: none; color: var(--text); font-size: 14px; font-weight: 500;
+            transition: all 0.2s; padding: 8px 16px; border-radius: 8px;
+            border: none; background: none; cursor: pointer; min-height: 44px;
+            display: flex; align-items: center; font-family: inherit;
+        }
+        .nav-links a:hover, .nav-links button:hover { color: var(--primary); background: var(--primary-light); }
+        .nav-links .active { color: var(--primary); background: var(--primary-light); font-weight: 700; }
+
+        .user-avatar {
+            width: 38px; height: 38px; background: var(--primary);
+            border: 2px solid var(--border); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--white); font-weight: 800; font-size: 14px;
+        }
+
+        .hamburger {
+            display: none; flex-direction: column; gap: 5px;
+            background: none; border: none; cursor: pointer; padding: 8px;
+            min-height: 44px; min-width: 44px; justify-content: center; align-items: center;
+        }
+        .hamburger span { width: 22px; height: 2px; background: var(--text); border-radius: 2px; transition: all 0.3s; }
+
+        .mobile-menu {
+            display: none; position: fixed; top: 64px; left: 0; right: 0;
+            background: var(--white); border-bottom: 2px solid var(--border);
+            padding: 8px 16px; z-index: 999; animation: slideDown 0.25s ease;
+        }
+        .mobile-menu.active { display: block; }
+        .mobile-menu a, .mobile-menu button {
+            display: block; width: 100%; padding: 14px 8px; text-decoration: none;
+            color: var(--text); font-size: 16px; font-weight: 500; border: none;
+            background: none; text-align: left; cursor: pointer;
+            border-bottom: 1px solid var(--border-light); font-family: inherit;
+        }
+        .mobile-menu a:last-child, .mobile-menu button:last-child { border-bottom: none; }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main { margin-top: 64px; padding: 32px 24px; max-width: 1080px; margin-left: auto; margin-right: auto; }
+
+        .page { display: none; animation: fadeIn 0.3s ease; }
+        .page.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .welcome-header { margin-bottom: 32px; }
+        .welcome-header h1 { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+        .welcome-header p { color: var(--text-light); font-size: 15px; }
+
+        .next-class-card {
+            background: var(--white); border: 2px solid var(--border); border-radius: 14px;
+            padding: 28px; margin-bottom: 28px; display: flex; align-items: center;
+            justify-content: space-between; gap: 20px; flex-wrap: wrap; transition: all 0.25s;
+        }
+        .next-class-card:hover { box-shadow: 6px 6px 0 var(--border); }
+        .next-class-info { flex: 1; min-width: 200px; }
+        .next-class-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--primary); margin-bottom: 8px; }
+        .next-class-title { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+        .next-class-time { font-size: 14px; color: var(--text-light); }
+        .next-class-time strong { color: var(--text); }
+
+        .btn {
+            display: inline-flex; align-items: center; justify-content: center;
+            padding: 12px 24px; border-radius: 8px; font-size: 15px; font-weight: 600;
+            text-decoration: none; transition: all 0.2s ease; cursor: pointer;
+            border: 2px solid var(--border); min-height: 48px; min-width: 48px; gap: 8px;
+            background: var(--white); color: var(--text); font-family: inherit;
+        }
+        .btn-primary { background: var(--primary); color: var(--white); }
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-secondary { background: var(--primary-light); color: var(--primary); }
+        .btn-secondary:hover { background: #fbd5d9; }
+        .btn-meet { background: var(--primary); color: var(--white); }
+        .btn-meet:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+
+        .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .section-header h2 { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; }
+
+        .subject-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 32px; }
+        .subject-card {
+            background: var(--white); border: 2px solid var(--border); border-radius: 12px;
+            padding: 20px 24px; display: flex; align-items: center; gap: 16px;
+            cursor: pointer; transition: all 0.25s; text-decoration: none; color: inherit;
+        }
+        .subject-card:hover { transform: translateY(-3px); box-shadow: 4px 4px 0 var(--border); }
+        .subject-icon {
+            width: 48px; height: 48px; background: var(--primary-light); border: 2px solid var(--border);
+            border-radius: 12px; display: flex; align-items: center; justify-content: center;
+            font-size: 22px; flex-shrink: 0;
+        }
+        .subject-details { flex: 1; min-width: 0; }
+        .subject-name { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+        .subject-units { font-size: 13px; color: var(--text-light); }
+        .subject-progress { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
+        .progress-bar { width: 100px; height: 8px; background: var(--white); border: 2px solid var(--border); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.4s ease; }
+        .progress-text { font-size: 13px; font-weight: 700; color: var(--primary); white-space: nowrap; }
+        .arrow-icon { color: var(--text); font-size: 20px; flex-shrink: 0; font-weight: 700; }
+
+        .unit-list { display: flex; flex-direction: column; gap: 10px; }
+        .unit-card {
+            background: var(--white); border: 2px solid var(--border); border-radius: 10px;
+            padding: 16px 20px; display: flex; align-items: center; justify-content: space-between;
+            transition: all 0.2s;
+        }
+        .unit-card.completed { opacity: 0.7; }
+        .unit-left { display: flex; align-items: center; gap: 12px; }
+        .unit-status {
+            width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--border);
+            display: flex; align-items: center; justify-content: center; font-size: 14px;
+            flex-shrink: 0; font-weight: 700; background: var(--white);
+        }
+        .unit-status.done { background: var(--primary); color: var(--white); }
+        .unit-status.current { background: var(--primary-light); color: var(--primary); }
+        .unit-name { font-size: 15px; font-weight: 600; }
+        .unit-badge { font-size: 12px; padding: 4px 12px; border-radius: 12px; font-weight: 700; border: 2px solid var(--border); }
+        .badge-done { background: var(--white); color: var(--text); }
+        .badge-start { background: var(--primary); color: var(--white); }
+        .badge-locked { background: var(--white); color: var(--text-light); }
+
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px; background: none; border: none;
+            color: var(--text); font-size: 14px; font-weight: 600; cursor: pointer;
+            padding: 8px 0; margin-bottom: 24px; min-height: 44px; transition: color 0.2s; font-family: inherit;
+        }
+        .back-btn:hover { color: var(--primary); }
+
+        /* Empty state for units */
+        .empty-state {
+            background: var(--white); border: 2px solid var(--border); border-radius: 14px;
+            padding: 48px 32px; text-align: center;
+        }
+        .empty-state .emoji { font-size: 48px; margin-bottom: 16px; }
+        .empty-state h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+        .empty-state p { color: var(--text-light); font-size: 15px; }
+
+        .calendar-container { background: var(--white); border: 2px solid var(--border); border-radius: 14px; overflow: hidden; margin-bottom: 28px; }
+        .calendar-header { display: flex; align-items: center; justify-content: space-between; padding: 20px 24px; border-bottom: 2px solid var(--border); }
+        .calendar-header h3 { font-size: 17px; font-weight: 800; }
+        .calendar-nav { display: flex; gap: 6px; }
+        .calendar-nav button {
+            width: 38px; height: 38px; border: 2px solid var(--border); background: var(--white);
+            border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+            color: var(--text); min-height: 44px; min-width: 44px;
+        }
+        .calendar-nav button:hover { background: var(--primary); color: var(--white); }
+        .calendar-grid { padding: 16px; }
+        .calendar-weekdays { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; margin-bottom: 8px; }
+        .calendar-weekdays span { font-size: 12px; font-weight: 700; color: var(--text); padding: 8px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+        .calendar-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .calendar-day {
+            aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border-radius: 10px; font-size: 14px; font-weight: 600; cursor: default; transition: all 0.2s;
+            position: relative; min-height: 44px; border: 2px solid transparent;
+        }
+        .calendar-day.other-month { color: #c0c0c0; }
+        .calendar-day.today { background: var(--text); color: var(--white); font-weight: 800; }
+        .calendar-day.has-class { background: var(--primary-light); color: var(--primary); font-weight: 800; cursor: pointer; border-color: var(--border); }
+        .calendar-day.has-class:hover { background: var(--primary); color: var(--white); }
+        .calendar-day.has-class.today { background: var(--primary); color: var(--white); border-color: var(--border); }
+        .class-dot { width: 5px; height: 5px; background: var(--primary); border-radius: 50%; margin-top: 2px; }
+        .calendar-day.today .class-dot, .calendar-day.has-class:hover .class-dot { background: var(--white); }
+
+        .meet-section { background: var(--white); border: 2px solid var(--border); border-radius: 14px; padding: 24px; }
+        .meet-section h3 { font-size: 17px; font-weight: 800; margin-bottom: 16px; }
+        .meet-item {
+            display: flex; align-items: center; justify-content: space-between; padding: 14px;
+            background: var(--white); border: 2px solid var(--border); border-radius: 10px;
+            margin-bottom: 10px; gap: 12px; flex-wrap: wrap;
+        }
+        .meet-item:last-child { margin-bottom: 0; }
+        .meet-info { flex: 1; min-width: 180px; }
+        .meet-info .title { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+        .meet-info .time { font-size: 13px; color: var(--text-light); }
+        .meet-link {
+            font-size: 13px; color: var(--white); text-decoration: none; padding: 8px 16px;
+            border-radius: 6px; background: var(--primary); border: 2px solid var(--border);
+            font-weight: 700; transition: all 0.2s; min-height: 40px; display: inline-flex;
+            align-items: center; gap: 6px; white-space: nowrap;
+        }
+        .meet-link:hover { background: var(--primary-dark); }
+
+        .day-detail { display: none; background: var(--white); border: 2px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 16px; animation: fadeIn 0.2s ease; }
+        .day-detail.active { display: block; }
+        .day-detail h4 { font-size: 15px; font-weight: 800; margin-bottom: 12px; }
+
+        .upcoming-list { display: flex; flex-direction: column; gap: 10px; }
+        .upcoming-card {
+            background: var(--white); border: 2px solid var(--border); border-radius: 10px;
+            padding: 16px 20px; display: flex; align-items: center; gap: 16px; transition: all 0.2s;
+        }
+        .upcoming-card:hover { transform: translateY(-2px); box-shadow: 4px 4px 0 var(--border); }
+        .upcoming-date { text-align: center; min-width: 48px; padding: 6px; background: var(--primary-light); border: 2px solid var(--border); border-radius: 8px; }
+        .upcoming-date .day { font-size: 20px; font-weight: 800; color: var(--primary); line-height: 1; }
+        .upcoming-date .month { font-size: 10px; color: var(--text); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; margin-top: 2px; }
+        .upcoming-info { flex: 1; }
+        .upcoming-info .title { font-size: 15px; font-weight: 700; margin-bottom: 2px; }
+        .upcoming-info .time { font-size: 13px; color: var(--text-light); }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hamburger { display: flex; }
+            .main { padding: 24px 16px; }
+            .grid-2 { grid-template-columns: 1fr; }
+            .welcome-header h1 { font-size: 24px; }
+            .next-class-card { padding: 20px; }
+            .next-class-title { font-size: 18px; }
+            .subject-card { padding: 16px; }
+            .progress-bar { width: 60px; }
+            .meet-item { flex-direction: column; align-items: flex-start; }
+            .calendar-day { font-size: 13px; }
+        }
+        @media (max-width: 480px) {
+            .subject-progress { display: none; }
+            .auth-body { padding: 24px 22px 28px; }
+        }
+
+        .toast {
+            position: fixed; bottom: 24px; left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: var(--text); color: var(--white); padding: 14px 24px;
+            border: 2px solid var(--border); border-radius: 10px; font-size: 14px;
+            font-weight: 700; z-index: 2000; transition: transform 0.3s ease; white-space: nowrap;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== AUTH SCREEN ==================== -->
+    <div id="authScreen">
+        <a href="index.html" class="auth-logo"><img src="logo.png" alt="Lyon Math Prep"></a>
+
+        <div class="auth-card">
+            <div class="auth-mascot"><img src="compass.png" alt="Mascot"></div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="tabLogin" type="button">Log In</button>
+                <button class="auth-tab" id="tabSignup" type="button">Sign Up</button>
+            </div>
+
+            <div class="auth-body">
+                <h1 id="authTitle">Welcome back 👋</h1>
+                <p class="subtitle" id="authSubtitle">Log in to your student portal</p>
+
+                <div class="message" id="authMessage"></div>
+
+                <form id="authForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="authEmail">Email</label>
+                        <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="authPassword">Password</label>
+                        <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" required>
+                    </div>
+                    <button class="auth-submit" id="authSubmit" type="button">Log In</button>
+                </form>
+            </div>
+        </div>
+
+        <a href="index.html" class="auth-home-link">← Back to Home</a>
+    </div>
+
+    <!-- ==================== PORTAL SCREEN ==================== -->
+    <div id="portalScreen">
+        <header class="topbar">
+            <a href="index.html" class="logo"><img src="logo.png" alt="Lyon Math Prep"></a>
+            <nav>
+                <ul class="nav-links">
+                    <li><button onclick="showPage('dashboard')" class="nav-btn active" data-page="dashboard">Dashboard</button></li>
+                    <li><button onclick="showPage('calendar')" class="nav-btn" data-page="calendar">Calendar</button></li>
+                    <li><a href="index.html">Home</a></li>
+                    <li><button onclick="logout()">Log Out</button></li>
+                </ul>
+            </nav>
+            <div class="topbar-right">
+                <div class="user-avatar" id="userAvatar">B</div>
+                <button class="hamburger" onclick="toggleMobile()" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </header>
+
+        <div class="mobile-menu" id="mobileMenu">
+            <button onclick="showPage('dashboard'); toggleMobile();">Dashboard</button>
+            <button onclick="showPage('calendar'); toggleMobile();">Calendar</button>
+            <a href="index.html">Home</a>
+            <button onclick="logout()">Log Out</button>
+        </div>
+
+        <main class="main">
+
+            <!-- DASHBOARD -->
+            <div class="page active" id="page-dashboard">
+                <div class="welcome-header">
+                    <h1 id="welcomeName">Welcome back 👋</h1>
+                    <p>Keep up the great work! Here's what's coming up.</p>
+                </div>
+
+                <div class="next-class-card">
+                    <div class="next-class-info">
+                        <div class="next-class-label">📅 Next Class</div>
+                        <div class="next-class-title">Algebra I — Solving Equations</div>
+                        <div class="next-class-time">
+                            <strong id="nextClassDate">Tuesday, Jan 14</strong> · 4:00 PM – 5:00 PM
+                        </div>
+                    </div>
+                    <a href="https://meet.google.com/abc-defg-hij" target="_blank" class="btn btn-meet">📹 Join Google Meet</a>
+                </div>
+
+                <div class="section-header"><h2>Your Subjects</h2></div>
+                <div class="subject-list">
+                    <div class="subject-card" onclick="openSubject('algebra1')">
+                        <div class="subject-icon">📐</div>
+                        <div class="subject-details">
+                            <div class="subject-name">Algebra I</div>
+                            <div class="subject-units">8 units · 3 completed</div>
+                        </div>
+                        <div class="subject-progress">
+                            <div class="progress-bar"><div class="progress-fill" style="width: 37%"></div></div>
+                            <div class="progress-text">37%</div>
+                        </div>
+                        <div class="arrow-icon">›</div>
+                    </div>
+
+                    <div class="subject-card" onclick="openSubject('prealgebra')">
+                        <div class="subject-icon">🔢</div>
+                        <div class="subject-details">
+                            <div class="subject-name">Pre-Algebra</div>
+                            <div class="subject-units">6 units · 6 completed</div>
+                        </div>
+                        <div class="subject-progress">
+                            <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
+                            <div class="progress-text">100%</div>
+                        </div>
+                        <div class="arrow-icon">›</div>
+                    </div>
+
+                    <div class="subject-card" onclick="openSubject('geometry')">
+                        <div class="subject-icon">📏</div>
+                        <div class="subject-details">
+                            <div class="subject-name">Geometry</div>
+                            <div class="subject-units">7 units · 0 completed</div>
+                        </div>
+                        <div class="subject-progress">
+                            <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+                            <div class="progress-text">0%</div>
+                        </div>
+                        <div class="arrow-icon">›</div>
+                    </div>
+                </div>
+
+                <div class="section-header"><h2>Upcoming Classes</h2></div>
+                <div class="upcoming-list">
+                    <div class="upcoming-card">
+                        <div class="upcoming-date"><div class="day">14</div><div class="month">Jan</div></div>
+                        <div class="upcoming-info">
+                            <div class="title">Algebra I — Solving Equations</div>
+                            <div class="time">Tuesday · 4:00 PM – 5:00 PM</div>
+                        </div>
+                        <a href="https://meet.google.com/abc-defg-hij" target="_blank" class="meet-link">📹 Join</a>
+                    </div>
+                    <div class="upcoming-card">
+                        <div class="upcoming-date"><div class="day">16</div><div class="month">Jan</div></div>
+                        <div class="upcoming-info">
+                            <div class="title">Algebra I — Inequalities</div>
+                            <div class="time">Thursday · 4:00 PM – 5:00 PM</div>
+                        </div>
+                        <a href="https://meet.google.com/abc-defg-hij" target="_blank" class="meet-link">📹 Join</a>
+                    </div>
+                    <div class="upcoming-card">
+                        <div class="upcoming-date"><div class="day">21</div><div class="month">Jan</div></div>
+                        <div class="upcoming-info">
+                            <div class="title">Geometry — Intro to Angles</div>
+                            <div class="time">Tuesday · 5:30 PM – 6:30 PM</div>
+                        </div>
+                        <a href="https://meet.google.com/xyz-abcd-efg" target="_blank" class="meet-link">📹 Join</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SUBJECT -->
+            <div class="page" id="page-subject">
+                <button class="back-btn" onclick="showPage('dashboard')">← Back to Dashboard</button>
+                <div class="welcome-header">
+                    <h1 id="subjectTitle">Algebra I</h1>
+                    <p id="subjectDesc">Work through each unit in order.</p>
+                </div>
+                <div class="unit-list" id="unitList"></div>
+            </div>
+
+            <!-- CALENDAR -->
+            <div class="page" id="page-calendar">
+                <div class="welcome-header">
+                    <h1>📅 Class Calendar</h1>
+                    <p>View your upcoming classes and join sessions directly.</p>
+                </div>
+
+                <div class="grid-2">
+                    <div>
+                        <div class="calendar-container">
+                            <div class="calendar-header">
+                                <h3 id="calendarTitle">January 2025</h3>
+                                <div class="calendar-nav">
+                                    <button onclick="changeMonth(-1)">‹</button>
+                                    <button onclick="changeMonth(1)">›</button>
+                                </div>
+                            </div>
+                            <div class="calendar-grid">
+                                <div class="calendar-weekdays">
+                                    <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                                </div>
+                                <div class="calendar-days" id="calendarDays"></div>
+                            </div>
+                        </div>
+                        <div class="day-detail" id="dayDetail">
+                            <h4 id="dayDetailTitle">Classes on this day</h4>
+                            <div id="dayDetailContent"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="meet-section">
+                            <h3>🔗 Your Google Meet Links</h3>
+                            <div class="meet-item">
+                                <div class="meet-info">
+                                    <div class="title">Algebra I Sessions</div>
+                                    <div class="time">Tuesdays & Thursdays · 4:00 PM</div>
+                                </div>
+                                <a href="https://meet.google.com/abc-defg-hij" target="_blank" class="meet-link">📹 Join</a>
+                            </div>
+                            <div class="meet-item">
+                                <div class="meet-info">
+                                    <div class="title">Geometry Sessions</div>
+                                    <div class="time">Tuesdays · 5:30 PM</div>
+                                </div>
+                                <a href="https://meet.google.com/xyz-abcd-efg" target="_blank" class="meet-link">📹 Join</a>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 24px;">
+                            <div class="section-header"><h2>Upcoming</h2></div>
+                            <div class="upcoming-list">
+                                <div class="upcoming-card">
+                                    <div class="upcoming-date"><div class="day">14</div><div class="month">Jan</div></div>
+                                    <div class="upcoming-info"><div class="title">Algebra I — Solving Equations</div><div class="time">Tue · 4:00 – 5:00 PM</div></div>
+                                </div>
+                                <div class="upcoming-card">
+                                    <div class="upcoming-date"><div class="day">16</div><div class="month">Jan</div></div>
+                                    <div class="upcoming-info"><div class="title">Algebra I — Inequalities</div><div class="time">Thu · 4:00 – 5:00 PM</div></div>
+                                </div>
+                                <div class="upcoming-card">
+                                    <div class="upcoming-date"><div class="day">21</div><div class="month">Jan</div></div>
+                                    <div class="upcoming-info"><div class="title">Geometry — Intro to Angles</div><div class="time">Tue · 5:30 – 6:30 PM</div></div>
+                                </div>
+                                <div class="upcoming-card">
+                                    <div class="upcoming-date"><div class="day">23</div><div class="month">Jan</div></div>
+                                    <div class="upcoming-info"><div class="title">Algebra I — Graphing Lines</div><div class="time">Thu · 4:00 – 5:00 PM</div></div>
+                                </div>
+                                <div class="upcoming-card">
+                                    <div class="upcoming-date"><div class="day">28</div><div class="month">Jan</div></div>
+                                    <div class="upcoming-info"><div class="title">Geometry — Triangle Properties</div><div class="time">Tue · 5:30 – 6:30 PM</div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ========================================
+        // SUPABASE CONFIG
+        // ========================================
+        const SUPABASE_URL = 'https://iqoyhcnxcsvjpvjousbd.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_zYGBG5c-E9AcyIHXZMSpBw_dRJCQ2dc';
+
+        const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // ---------- AUTH ----------
+        let authMode = 'login';
+        const authMsg = document.getElementById('authMessage');
+        const authSubmit = document.getElementById('authSubmit');
+
+        function showAuthMessage(text, type) {
+            authMsg.textContent = text;
+            authMsg.className = 'message ' + type;
+        }
+        function clearAuthMessage() { authMsg.className = 'message'; }
+
+        function switchTab(mode) {
+            authMode = mode;
+            clearAuthMessage();
+
+            document.getElementById('tabLogin').classList.toggle('active', mode === 'login');
+            document.getElementById('tabSignup').classList.toggle('active', mode === 'signup');
+
+            if (mode === 'signup') {
+                document.getElementById('authTitle').textContent = 'Create your account';
+                document.getElementById('authSubtitle').textContent = 'Sign up to access the student portal';
+                authSubmit.textContent = 'Sign Up';
+                document.getElementById('authPassword').setAttribute('autocomplete', 'new-password');
+            } else {
+                document.getElementById('authTitle').textContent = 'Welcome back 👋';
+                document.getElementById('authSubtitle').textContent = 'Log in to your student portal';
+                authSubmit.textContent = 'Log In';
+                document.getElementById('authPassword').setAttribute('autocomplete', 'current-password');
+            }
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value;
+
+            if (!email || !password) {
+                showAuthMessage('Please enter your email and password.', 'error');
+                return;
+            }
+            if (authMode === 'signup' && password.length < 6) {
+                showAuthMessage('Password must be at least 6 characters.', 'error');
+                return;
+            }
+
+            authSubmit.disabled = true;
+            authSubmit.textContent = authMode === 'signup' ? 'Creating account...' : 'Logging in...';
+
+            let result;
+            if (authMode === 'signup') {
+                result = await sb.auth.signUp({ email, password });
+            } else {
+                result = await sb.auth.signInWithPassword({ email, password });
+            }
+
+            authSubmit.disabled = false;
+            authSubmit.textContent = authMode === 'signup' ? 'Sign Up' : 'Log In';
+
+            if (result.error) {
+                showAuthMessage(result.error.message, 'error');
+            } else if (result.data.session) {
+                enterPortal(result.data.session.user);
+            } else {
+                showAuthMessage('Account created! Please log in.', 'success');
+                switchTab('login');
+            }
+        }
+
+        async function logout() {
+            await sb.auth.signOut();
+            document.getElementById('portalScreen').classList.remove('active');
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('authEmail').value = '';
+            document.getElementById('authPassword').value = '';
+            switchTab('login');
+            window.scrollTo(0, 0);
+        }
+
+        function enterPortal(user) {
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('portalScreen').classList.add('active');
+
+            const name = (user && user.email) ? user.email.split('@')[0] : 'Student';
+            const displayName = name.charAt(0).toUpperCase() + name.slice(1);
+            document.getElementById('welcomeName').textContent = `Welcome back, ${displayName} 👋`;
+            document.getElementById('userAvatar').textContent = displayName.charAt(0).toUpperCase();
+
+            setNextClassDate();
+            showPage('dashboard');
+            window.scrollTo(0, 0);
+        }
+
+        // Tab + button listeners
+        document.getElementById('tabLogin').addEventListener('click', () => switchTab('login'));
+        document.getElementById('tabSignup').addEventListener('click', () => switchTab('signup'));
+        document.getElementById('authSubmit').addEventListener('click', handleAuth);
+
+        // Enter key submits
+        document.getElementById('authPassword').addEventListener('keypress', e => { if (e.key === 'Enter') handleAuth(); });
+        document.getElementById('authEmail').addEventListener('keypress', e => { if (e.key === 'Enter') handleAuth(); });
+
+        // Check existing session on load
+        (async function init() {
+            const { data } = await sb.auth.getSession();
+            if (data.session) enterPortal(data.session.user);
+        })();
+
+        // ---------- PORTAL ----------
+        let currentSubject = null;
+
+        function showPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            const activeBtn = document.querySelector(`.nav-btn[data-page="${page}"]`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            if (page === 'subject') {
+                const dashBtn = document.querySelector('.nav-btn[data-page="dashboard"]');
+                if (dashBtn) dashBtn.classList.add('active');
+            }
+            if (page === 'calendar') renderCalendar();
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toggleMobile() {
+            document.getElementById('mobileMenu').classList.toggle('active');
+        }
+
+        document.addEventListener('click', function(e) {
+            const menu = document.getElementById('mobileMenu');
+            const hamburger = document.querySelector('.hamburger');
+            if (menu && hamburger && !menu.contains(e.target) && !hamburger.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        const subjects = {
+            algebra1: {
+                name: 'Algebra I', icon: '📐',
+                desc: 'Master the fundamentals of algebra — from expressions to equations to functions.',
+                units: [
+                    { name: 'Expressions & Variables', status: 'done' },
+                    { name: 'Order of Operations', status: 'done' },
+                    { name: 'Solving One-Step Equations', status: 'done' },
+                    { name: 'Solving Two-Step Equations', status: 'current' },
+                    { name: 'Inequalities', status: 'locked' },
+                    { name: 'Graphing Linear Equations', status: 'locked' },
+                    { name: 'Slope & Rate of Change', status: 'locked' },
+                    { name: 'Systems of Equations', status: 'locked' },
+                ]
+            },
+            prealgebra: {
+                name: 'Pre-Algebra', icon: '🔢',
+                desc: 'Build a strong foundation with numbers, fractions, decimals, and basic operations.',
+                units: [
+                    { name: 'Whole Numbers & Place Value', status: 'done' },
+                    { name: 'Fractions', status: 'done' },
+                    { name: 'Decimals', status: 'done' },
+                    { name: 'Ratios & Proportions', status: 'done' },
+                    { name: 'Percentages', status: 'done' },
+                    { name: 'Integers & Absolute Value', status: 'done' },
+                ]
+            },
+            geometry: {
+                name: 'Geometry', icon: '📏',
+                desc: 'Explore shapes, angles, area, volume, and geometric reasoning.',
+                units: [
+                    { name: 'Points, Lines & Planes', status: 'current' },
+                    { name: 'Angles & Angle Pairs', status: 'locked' },
+                    { name: 'Triangles', status: 'locked' },
+                    { name: 'Quadrilaterals & Polygons', status: 'locked' },
+                    { name: 'Area & Perimeter', status: 'locked' },
+                    { name: 'Volume & Surface Area', status: 'locked' },
+                    { name: 'Pythagorean Theorem', status: 'locked' },
+                ]
+            }
+        };
+
+        function openSubject(subjectId) {
+            currentSubject = subjectId;
+            const subject = subjects[subjectId];
+
+            document.getElementById('subjectTitle').textContent = subject.icon + ' ' + subject.name;
+            document.getElementById('subjectDesc').textContent = subject.desc;
+
+            const unitList = document.getElementById('unitList');
+            unitList.innerHTML = '';
+
+            subject.units.forEach((unit) => {
+                const card = document.createElement('div');
+                card.className = 'unit-card' + (unit.status === 'done' ? ' completed' : '');
+
+                let statusHTML = '', badgeHTML = '';
+                if (unit.status === 'done') {
+                    statusHTML = '<div class="unit-status done">✓</div>';
+                    badgeHTML = '<span class="unit-badge badge-done">Completed</span>';
+                } else if (unit.status === 'current') {
+                    statusHTML = '<div class="unit-status current">→</div>';
+                    badgeHTML = '<span class="unit-badge badge-start">Current</span>';
+                } else {
+                    statusHTML = '<div class="unit-status">🔒</div>';
+                    badgeHTML = '<span class="unit-badge badge-locked">Locked</span>';
+                }
+
+                card.innerHTML = `<div class="unit-left">${statusHTML}<span class="unit-name">${unit.name}</span></div>${badgeHTML}`;
+                unitList.appendChild(card);
+            });
+
+            showPage('subject');
+        }
+
+        // ---------- CALENDAR ----------
+        let calendarMonth = 0;
+        let calendarYear = 2025;
+
+        const classSchedule = {
+            '2025-01-07': [{ title: 'Algebra I — Expressions Review', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
+            '2025-01-09': [{ title: 'Algebra I — Order of Operations', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
+            '2025-01-14': [{ title: 'Algebra I — Solving Equations', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
+            '2025-01-16': [{ title: 'Algebra I — Inequalities', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
+            '2025-01-21': [
+                { title: 'Algebra I — Graphing Lines', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' },
+                { title: 'Geometry — Intro to Angles', time: '5:30 – 6:30 PM', meet: 'https://meet.google.com/xyz-abcd-efg' }
+            ],
+            '2025-01-23': [{ title: 'Algebra I — Graphing Lines', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
+            '2025-01-28': [
+                { title: 'Algebra I — Slope', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' },
+                { title: 'Geometry — Triangle Properties', time: '5:30 – 6:30 PM', meet: 'https://meet.google.com/xyz-abcd-efg' }
+            ],
+            '2025-01-30': [{ title: 'Algebra I — Slope Practice', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
+            '2025-02-04': [{ title: 'Algebra I — Systems Intro', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
+            '2025-02-06': [{ title: 'Algebra I — Systems Practice', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
+            '2025-02-11': [
+                { title: 'Algebra I — Review', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' },
+                { title: 'Geometry — Quadrilaterals', time: '5:30 – 6:30 PM', meet: 'https://meet.google.com/xyz-abcd-efg' }
+            ],
+            '2025-02-13': [{ title: 'Algebra I — Test Prep', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
+            '2025-02-18': [{ title: 'Geometry — Area & Perimeter', time: '5:30 – 6:30 PM', meet: 'https://meet.google.com/xyz-abcd-efg' }],
+            '2025-02-25': [{ title: 'Geometry — Volume', time: '5:30 – 6:30 PM', meet: 'https://meet.google.com/xyz-abcd-efg' }],
+        };
+
+        function renderCalendar() {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('calendarTitle').textContent = `${months[calendarMonth]} ${calendarYear}`;
+
+            const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+            const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+            const daysInPrevMonth = new Date(calendarYear, calendarMonth, 0).getDate();
+            const today = new Date();
+            const container = document.getElementById('calendarDays');
+            container.innerHTML = '';
+
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const d = document.createElement('div');
+                d.className = 'calendar-day other-month';
+                d.textContent = daysInPrevMonth - i;
+                container.appendChild(d);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const d = document.createElement('div');
+                d.className = 'calendar-day';
+                const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = today.getFullYear() === calendarYear && today.getMonth() === calendarMonth && today.getDate() === day;
+                const hasClass = classSchedule[dateStr];
+
+                if (isToday) d.classList.add('today');
+                if (hasClass) {
+                    d.classList.add('has-class');
+                    d.onclick = () => showDayDetail(dateStr, day);
+                }
+                d.innerHTML = `${day}${hasClass ? '<div class="class-dot"></div>' : ''}`;
+                container.appendChild(d);
+            }
+
+            const totalCells = firstDay + daysInMonth;
+            const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+            for (let i = 1; i <= remaining; i++) {
+                const d = document.createElement('div');
+                d.className = 'calendar-day other-month';
+                d.textContent = i;
+                container.appendChild(d);
+            }
+
+            document.getElementById('dayDetail').classList.remove('active');
+        }
+
+        function changeMonth(dir) {
+            calendarMonth += dir;
+            if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+            if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
+            renderCalendar();
+        }
+
+        function showDayDetail(dateStr, day) {
+            const classes = classSchedule[dateStr];
+            if (!classes) return;
+
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const detail = document.getElementById('dayDetail');
+            document.getElementById('dayDetailTitle').textContent = `📅 ${months[calendarMonth]} ${day}, ${calendarYear}`;
+
+            let html = '';
+            classes.forEach(c => {
+                html += `<div class="meet-item" style="margin-bottom: 8px;">
+                    <div class="meet-info"><div class="title">${c.title}</div><div class="time">${c.time}</div></div>
+                    <a href="${c.meet}" target="_blank" class="meet-link">📹 Join</a>
+                </div>`;
+            });
+
+            document.getElementById('dayDetailContent').innerHTML = html;
+            detail.classList.add('active');
+        }
+
+        function setNextClassDate() {
+            const now = new Date();
+            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            let next = new Date(now);
+            while (next.getDay() !== 2 && next.getDay() !== 4) next.setDate(next.getDate() + 1);
+            const dateEl = document.getElementById('nextClassDate');
+            if (dateEl) dateEl.textContent = `${days[next.getDay()]}, ${months[next.getMonth()]} ${next.getDate()}`;
+        }
+    </script>
+
+</body>
+</html>
