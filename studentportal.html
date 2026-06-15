@@ -306,7 +306,8 @@
 
     .subject-footer { display:flex; justify-content:space-between; align-items:center; gap:10px; }
     .pill { font-size:12px; font-weight:900; border:2px solid var(--border); border-radius:999px; padding:4px 10px; white-space:nowrap; }
-    .pill.approved { background: var(--primary); color: var(--white); }
+    .pill.active-level { background: var(--primary); color: var(--white); }
+    .pill.finished { background: var(--green); color: var(--white); border-color: var(--green); }
     .pill.locked { background: var(--white); color: var(--text-light); }
 
     .unit-list { display:flex; flex-direction:column; gap:10px; }
@@ -318,24 +319,26 @@
       gap:12px; transition: .18s ease;
     }
     .unit-card.clickable { cursor:pointer; }
-    .unit-card.clickable:hover { background: var(--primary-light); }
+    .unit-card.clickable:hover { background: var(--primary-light); transform: translateY(-1px); box-shadow: 3px 3px 0 var(--border); }
 
     .unit-left { display:flex; align-items:center; gap:12px; min-width:0; }
     .unit-status {
-      width:32px; height:32px; border:2px solid var(--border);
+      width:36px; height:36px; border:2px solid var(--border);
       border-radius:50%; display:flex; align-items:center; justify-content:center;
-      flex-shrink:0; background:var(--white); font-weight:900;
+      flex-shrink:0; background:var(--white); font-weight:900; font-size:15px;
     }
-    .unit-status.done { background: var(--primary); color: var(--white); }
-    .unit-status.current { background: var(--primary-light); color: var(--primary); }
+    .unit-status.done { background: var(--green); color: var(--white); border-color: var(--green); }
+    .unit-status.current { background: var(--primary); color: var(--white); border-color: var(--primary); }
+    .unit-status.locked { background: var(--border-light); color: var(--text-light); }
 
-    .unit-name { font-weight:800; }
-    .unit-meta { font-size:13px; color:var(--text-light); }
-    .unit-badge { font-size:12px; font-weight:900; border:2px solid var(--border); border-radius:999px; padding:4px 10px; white-space:nowrap; }
-    .unit-badge.approved { background: var(--primary); color: var(--white); }
+    .unit-name { font-weight:800; font-size:16px; }
+    .unit-meta { font-size:13px; color:var(--text-light); margin-top:2px; }
+    .unit-badge { font-size:12px; font-weight:900; border:2px solid var(--border); border-radius:999px; padding:5px 12px; white-space:nowrap; }
+    .unit-badge.active-level { background: var(--primary); color: var(--white); border-color: var(--primary); }
+    .unit-badge.finished { background: var(--green); color: var(--white); border-color: var(--green); }
     .unit-badge.locked { background: var(--white); color: var(--text-light); }
 
-    .back-btn { border:none; background:none; cursor:pointer; font:inherit; font-weight:800; padding:8px 0; margin-bottom:20px; display:flex; align-items:center; gap:6px; }
+    .back-btn { border:none; background:none; cursor:pointer; font:inherit; font-weight:800; padding:8px 0; margin-bottom:20px; display:flex; align-items:center; gap:6px; font-size:15px; }
     .back-btn:hover { color: var(--primary); }
 
     .empty-state { padding: 36px 24px; text-align:center; }
@@ -345,13 +348,13 @@
 
     /* ==================== QUIZ ==================== */
     .quiz-container {
-      max-width: 680px;
+      max-width: 720px;
     }
 
-    .quiz-progress {
+    .quiz-header-bar {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
       margin-bottom: 24px;
     }
 
@@ -366,6 +369,12 @@
 
     .quiz-progress-text { font-size: 14px; font-weight: 800; color: var(--text-light); white-space: nowrap; }
 
+    .quiz-level-label {
+      font-size: 12px; font-weight: 900; text-transform: uppercase; letter-spacing: .6px;
+      border: 2px solid var(--border); border-radius: 999px; padding: 4px 12px;
+      background: var(--primary-light); color: var(--primary); white-space: nowrap;
+    }
+
     .quiz-card {
       border: 2px solid var(--border);
       border-radius: 16px;
@@ -374,12 +383,13 @@
     }
 
     .quiz-card-header {
-      padding: 18px 20px;
+      padding: 20px 22px;
       border-bottom: 2px solid var(--border);
       background: var(--primary-light);
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
+    }
+
+    .quiz-meta {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;
     }
 
     .quiz-badge {
@@ -387,23 +397,25 @@
       letter-spacing: .6px; border: 2px solid var(--border);
       border-radius: 999px; padding: 3px 10px;
       background: var(--white); color: var(--primary);
-      white-space: nowrap; flex-shrink: 0; margin-top: 2px;
+      white-space: nowrap;
     }
 
+    .quiz-badge.type { color: var(--text); }
+
     .quiz-question {
-      font-size: 18px; font-weight: 800; line-height: 1.5;
+      font-size: 19px; font-weight: 800; line-height: 1.5;
     }
 
     .quiz-image {
-      width: 100%; max-height: 260px;
+      width: 100%; max-height: 280px;
       object-fit: contain;
       border-bottom: 2px solid var(--border);
       background: #f8f8f8;
-      padding: 12px;
+      padding: 16px;
     }
 
     .quiz-choices {
-      padding: 16px 20px;
+      padding: 18px 22px;
       display: flex; flex-direction: column; gap: 10px;
     }
 
@@ -418,10 +430,11 @@
     }
 
     .choice-letter {
-      width: 30px; height: 30px; border: 2px solid var(--border);
+      width: 32px; height: 32px; border: 2px solid var(--border);
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
       font-weight: 900; font-size: 13px; flex-shrink: 0;
       background: var(--primary-light); color: var(--primary);
+      transition: all .15s ease;
     }
 
     .choice-btn:hover:not(:disabled) { background: var(--primary-light); border-color: var(--primary); }
@@ -434,38 +447,39 @@
     .choice-btn:disabled { cursor: default; }
 
     .quiz-feedback {
-      margin: 0 20px 16px;
-      padding: 12px 16px;
+      margin: 0 22px 16px;
+      padding: 13px 16px;
       border: 2px solid var(--border);
       border-radius: 10px;
       font-weight: 700;
       font-size: 14px;
       display: none;
+      line-height: 1.5;
     }
     .quiz-feedback.correct { display: block; background: var(--green-light); color: var(--green); border-color: var(--green); }
     .quiz-feedback.wrong { display: block; background: var(--primary-light); color: var(--primary-dark); }
 
     .quiz-next-btn {
       display: none;
-      margin: 0 20px 20px;
+      margin: 0 22px 22px;
       padding: 14px 18px;
       border: 2px solid var(--border);
       border-radius: 10px;
       background: var(--primary);
       color: var(--white);
       font: inherit; font-size: 15px; font-weight: 800;
-      cursor: pointer; width: calc(100% - 40px);
+      cursor: pointer; width: calc(100% - 44px);
     }
     .quiz-next-btn:hover { background: var(--primary-dark); }
     .quiz-next-btn.visible { display: block; }
 
     .quiz-results {
       border: 2px solid var(--border); border-radius: 16px;
-      padding: 36px 28px; text-align: center;
+      padding: 40px 28px; text-align: center; max-width: 520px;
     }
 
     .quiz-results .score-circle {
-      width: 100px; height: 100px;
+      width: 110px; height: 110px;
       border: 4px solid var(--border);
       border-radius: 50%;
       background: var(--primary-light);
@@ -474,21 +488,21 @@
       margin: 0 auto 20px;
     }
 
-    .score-number { font-size: 28px; font-weight: 900; color: var(--primary); line-height: 1; }
+    .score-number { font-size: 30px; font-weight: 900; color: var(--primary); line-height: 1; }
     .score-label { font-size: 12px; font-weight: 700; color: var(--text-light); }
 
-    .quiz-results h2 { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
-    .quiz-results p { color: var(--text-light); margin-bottom: 24px; }
+    .quiz-results h2 { font-size: 26px; font-weight: 900; margin-bottom: 8px; }
+    .quiz-results p { color: var(--text-light); margin-bottom: 24px; font-size: 15px; }
 
     .quiz-results-row {
-      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px;
+      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 28px;
     }
 
     .quiz-stat {
       border: 2px solid var(--border); border-radius: 10px;
-      padding: 12px 20px; text-align: center; min-width: 90px;
+      padding: 14px 22px; text-align: center; min-width: 90px;
     }
-    .quiz-stat .stat-val { font-size: 22px; font-weight: 900; }
+    .quiz-stat .stat-val { font-size: 24px; font-weight: 900; }
     .quiz-stat .stat-key { font-size: 12px; color: var(--text-light); font-weight: 700; }
     .quiz-stat.green .stat-val { color: var(--green); }
     .quiz-stat.red .stat-val { color: var(--primary); }
@@ -563,6 +577,10 @@
     @media (max-width: 480px) {
       .subject-grid { grid-template-columns: 1fr; }
       .auth-body { padding: 24px 18px 22px; }
+      .quiz-choices { padding: 14px 16px; }
+      .quiz-card-header { padding: 16px; }
+      .quiz-next-btn { margin: 0 16px 16px; width: calc(100% - 32px); }
+      .quiz-feedback { margin: 0 16px 14px; }
     }
   </style>
 </head>
@@ -606,7 +624,6 @@
     <nav>
       <ul class="nav-links">
         <li><button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')">Dashboard</button></li>
-        <li><button class="nav-btn" data-page="practice" onclick="showPage('practice')">Practice</button></li>
         <li><button class="nav-btn" data-page="calendar" onclick="showPage('calendar')">Calendar</button></li>
         <li><button onclick="logout()">Log Out</button></li>
       </ul>
@@ -622,7 +639,6 @@
 
   <div class="mobile-menu" id="mobileMenu">
     <button onclick="showPage('dashboard'); toggleMobile();">Dashboard</button>
-    <button onclick="showPage('practice'); toggleMobile();">Practice</button>
     <button onclick="showPage('calendar'); toggleMobile();">Calendar</button>
     <button onclick="logout()">Log Out</button>
   </div>
@@ -632,7 +648,7 @@
     <section class="page active" id="page-dashboard">
       <div class="welcome-header">
         <h1 id="welcomeName">Welcome back 👋</h1>
-        <p>Only approved modules are unlocked for your account.</p>
+        <p>Click any available level to start practising. Locked levels are waiting for instructor approval.</p>
       </div>
 
       <div class="next-class-card" id="nextClassCard">
@@ -652,31 +668,21 @@
 
     <!-- SUBJECT DETAIL -->
     <section class="page" id="page-subject">
-      <button class="back-btn" onclick="showPage('dashboard')">← Back to Dashboard</button>
+      <button class="back-btn" id="subjectBackBtn" onclick="showPage('dashboard')">← Back to Dashboard</button>
       <div class="welcome-header">
         <h1 id="subjectTitle">Subject</h1>
-        <p id="subjectDesc">Approved levels will be shown below.</p>
+        <p id="subjectDesc">Select an available level to begin practising.</p>
       </div>
       <div class="unit-list" id="unitList"></div>
     </section>
 
-    <!-- PRACTICE -->
-    <section class="page" id="page-practice">
+    <!-- QUIZ -->
+    <section class="page" id="page-quiz">
+      <button class="back-btn" id="quizBackBtn">← Back to Levels</button>
       <div class="welcome-header">
-        <h1>🧠 Practice Questions</h1>
-        <p>Test your knowledge across all subjects.</p>
+        <h1 id="quizPageTitle">Level Practice</h1>
+        <p id="quizPageSubtitle">Answer every question to complete this session.</p>
       </div>
-
-      <!-- Filter bar -->
-      <div id="practiceFilters" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;">
-        <button class="btn btn-primary" onclick="startQuiz('all')">All Questions</button>
-        <button class="btn" onclick="startQuiz('Algebra 1')">Algebra I</button>
-        <button class="btn" onclick="startQuiz('Alebgra 2')">Algebra II</button>
-        <button class="btn" onclick="startQuiz('Geometry')">Geometry</button>
-        <button class="btn" onclick="startQuiz('Statistics')">Statistics</button>
-        <button class="btn" onclick="startQuiz('Pre-algebra')">Pre-Algebra</button>
-      </div>
-
       <div id="quizArea" class="quiz-container"></div>
     </section>
 
@@ -733,33 +739,40 @@
 
 <script>
 // =========================
-// CONFIG — update these sheet URLs
+// CONFIG
 // =========================
-const USERS_URL       = 'https://opensheet.elk.sh/1S9wcSH4fzhnZqJB2ZnC8HEBw49VynN9vHozA7SoTMHg/Sheet1';
-const APPROVALS_URL   = 'https://opensheet.elk.sh/1KJ2lWZ3kj5q36_768I6s_-fDxWiVrmciRScV9ZwvXhc/Sheet1';
-const MEETINGS_URL    = 'https://opensheet.elk.sh/1Bpho-NecP90LqdYoxfvUxblsCoSuwQT3KYFAvonOZ10/Sheet1';
-const QUESTIONS_URL   = 'https://opensheet.elk.sh/1f8VdEO7bv6hNrul0i8rHTvzpFPYo0jNmZeRri_OLMv4/Sheet1';
+const USERS_URL     = 'https://opensheet.elk.sh/1S9wcSH4fzhnZqJB2ZnC8HEBw49VynN9vHozA7SoTMHg/Sheet1';
+const APPROVALS_URL = 'https://opensheet.elk.sh/1KJ2lWZ3kj5q36_768I6s_-fDxWiVrmciRScV9ZwvXhc/Sheet1';
+const MEETINGS_URL  = 'https://opensheet.elk.sh/1Bpho-NecP90LqdYoxfvUxblsCoSuwQT3KYFAvonOZ10/Sheet1';
+const QUESTIONS_URL = 'https://opensheet.elk.sh/1f8VdEO7bv6hNrul0i8rHTvzpFPYo0jNmZeRri_OLMv4/Sheet1';
 
 // =========================
 // State
 // =========================
-let currentUser = null;
-let approvedSet = new Set();
-let meetingCache = [];
+let currentUser    = null;
+let meetingCache   = [];
 let questionsCache = [];
 let calendarEventMap = {};
-let quizState = null;
+let quizState      = null;
+
+// New approval data model:
+// activeLevels  = Set of "SubjectSheetKey-lvlN" strings the student CAN do right now
+// finishedLevels = Set of "SubjectSheetKey-lvlN" strings already completed
+let activeLevels   = new Set();
+let finishedLevels = new Set();
 
 const nowInit = new Date();
 let calendarMonth = nowInit.getMonth();
 let calendarYear  = nowInit.getFullYear();
 
+// Subject catalog — sheetKey must match what's in the Google Sheet "Question type" column
+// and also the prefix used in "Subject and level" / "Finished levels" columns
 const subjectCatalog = {
-  algebra1:   { label: 'Algebra I',    icon: '📐', desc: 'Linear equations, expressions, inequalities, and functions.', sheetKey: 'Algebra 1'    },
-  prealgebra: { label: 'Pre-Algebra',  icon: '🔢', desc: 'Whole numbers, fractions, decimals, and ratios.',            sheetKey: 'Pre-algebra'  },
-  geometry:   { label: 'Geometry',     icon: '📏', desc: 'Angles, triangles, shapes, area, and volume.',               sheetKey: 'Geometry'     },
-  algebra2:   { label: 'Algebra II',   icon: '🧮', desc: 'Quadratics, roots, and advanced algebra skills.',            sheetKey: 'Alebgra 2'   },
-  statistics: { label: 'Statistics',   icon: '📊', desc: 'Data, mean, probability, and interpretation.',              sheetKey: 'Statistics'   }
+  algebra1:   { label: 'Algebra I',   icon: '📐', desc: 'Linear equations, expressions, inequalities, and functions.', sheetKey: 'Algebra 1'   },
+  prealgebra: { label: 'Pre-Algebra', icon: '🔢', desc: 'Whole numbers, fractions, decimals, and ratios.',            sheetKey: 'Pre-algebra' },
+  geometry:   { label: 'Geometry',    icon: '📏', desc: 'Angles, triangles, shapes, area, and volume.',               sheetKey: 'Geometry'    },
+  algebra2:   { label: 'Algebra II',  icon: '🧮', desc: 'Quadratics, roots, and advanced algebra skills.',            sheetKey: 'Alebgra 2'  },
+  statistics: { label: 'Statistics',  icon: '📊', desc: 'Data, mean, probability, and interpretation.',              sheetKey: 'Statistics'  }
 };
 
 const daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -770,14 +783,16 @@ const daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday',
 function norm(v) { return String(v ?? '').trim().toLowerCase().replace(/\s+/g,' '); }
 
 function esc(str) {
-  return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  return String(str ?? '').replace(/[&<>"']/g, m =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])
+  );
 }
 
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2400);
+  setTimeout(() => t.classList.remove('show'), 2600);
 }
 
 function capitalizeName(n) {
@@ -829,6 +844,51 @@ function parseSpecificDate(text) {
 }
 
 // =========================
+// Parse approval data from new format
+//
+// Each row: { Username, "Subject and level": "Algebra 1-lvl2", "Finished levels": "Algebra 1-lvl1" }
+// Multiple active or finished levels can be comma-separated within the same row,
+// or spread across multiple rows for the same user.
+//
+// Returns { activeLevels: Set, finishedLevels: Set }
+// Each entry in the sets is a normalised string like "algebra 1-lvl2"
+// =========================
+function parseApprovalRows(rows, username) {
+  const active   = new Set();
+  const finished = new Set();
+
+  const myRows = (rows||[]).filter(r => norm(r.Username) === norm(username));
+
+  myRows.forEach(row => {
+    // "Subject and level" — may be comma-separated
+    const activeStr = String(row['Subject and level'] || '').trim();
+    if (activeStr) {
+      activeStr.split(',').forEach(s => {
+        const v = s.trim();
+        if (v) active.add(norm(v));
+      });
+    }
+
+    // "Finished levels" — may be comma-separated
+    const finishedStr = String(row['Finished levels'] || '').trim();
+    if (finishedStr) {
+      finishedStr.split(',').forEach(s => {
+        const v = s.trim();
+        if (v) finished.add(norm(v));
+      });
+    }
+  });
+
+  return { active, finished };
+}
+
+// Build a normalised key from a subject sheetKey + level number
+// e.g. "Algebra 1" + 2  →  "algebra 1-lvl2"
+function makeApprovalKey(sheetKey, level) {
+  return norm(`${sheetKey}-lvl${level}`);
+}
+
+// =========================
 // Google Sheets Data Loaders
 // =========================
 async function fetchSheet(url) {
@@ -845,8 +905,10 @@ async function loadUsers() {
 async function loadApprovals(username) {
   try {
     const rows = await fetchSheet(APPROVALS_URL);
-    return (rows||[]).filter(r => norm(r.Username) === norm(username));
-  } catch (e) { return []; }
+    return parseApprovalRows(rows, username);
+  } catch (e) {
+    return { active: new Set(), finished: new Set() };
+  }
 }
 
 async function loadMeetings() {
@@ -900,8 +962,8 @@ function nextOccurrence(meeting, from=new Date()) {
 }
 
 function meetingCardHTML(meeting, nextDate) {
-  const day   = nextDate.getDate();
-  const month = new Intl.DateTimeFormat('en-US',{month:'short'}).format(nextDate);
+  const day      = nextDate.getDate();
+  const month    = new Intl.DateTimeFormat('en-US',{month:'short'}).format(nextDate);
   const timeRange = extractTimeRange(meeting.dateAndTime);
   return `
     <div class="upcoming-card">
@@ -939,7 +1001,6 @@ async function handleAuth() {
   try {
     const users = await loadUsers();
 
-    // Find user row (case-insensitive username match)
     const userRow = users.find(r =>
       norm(r.Username) === norm(username) || norm(r.username) === norm(username)
     );
@@ -949,20 +1010,15 @@ async function handleAuth() {
     const storedPass = String(userRow.Password || userRow.password || '').trim();
     if (storedPass !== password) { showAuthMsg('Incorrect password.','error'); return; }
 
-    // Logged in!
     currentUser = {
       username: String(userRow.Username || userRow.username || username).trim(),
       displayName: String(userRow.DisplayName || userRow['Display Name'] || username).trim()
     };
 
     // Load approvals
-    approvedSet = new Set();
     const approvals = await loadApprovals(currentUser.username);
-    approvals.forEach(r => {
-      const subKey  = String(r.Subject || r.subject || '').trim().toLowerCase().replace(/\s+/g,'');
-      const level   = String(r.Level   || r.level   || '').trim();
-      if (subKey && level) approvedSet.add(`${subKey}:${level}`);
-    });
+    activeLevels   = approvals.active;
+    finishedLevels = approvals.finished;
 
     // Load meetings + questions in parallel
     await Promise.all([loadMeetings(), loadQuestions()]);
@@ -977,9 +1033,11 @@ async function handleAuth() {
 }
 
 function logout() {
-  currentUser = null;
-  approvedSet = new Set();
-  meetingCache = [];
+  currentUser    = null;
+  activeLevels   = new Set();
+  finishedLevels = new Set();
+  meetingCache   = [];
+  questionsCache = [];
   document.getElementById('portalScreen').classList.remove('active');
   document.getElementById('authScreen').classList.remove('hidden');
   document.getElementById('authUsername').value = '';
@@ -1025,27 +1083,28 @@ function showPage(page) {
   const activeBtn = document.querySelector(`.nav-btn[data-page="${page}"]`);
   if (activeBtn) activeBtn.classList.add('active');
 
-  if (page === 'subject') {
+  // Keep Dashboard nav highlighted when on subject/quiz pages
+  if (page === 'subject' || page === 'quiz') {
     const dashBtn = document.querySelector('.nav-btn[data-page="dashboard"]');
     if (dashBtn) dashBtn.classList.add('active');
   }
 
   if (page === 'calendar')  renderCalendar();
-  if (page === 'practice')  renderPracticeHome();
-  if (page === 'dashboard' || page === 'calendar') renderMeetingsUI();
+  if (page === 'dashboard') renderMeetingsUI();
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 // =========================
-// Dashboard + Subjects
+// Dashboard Subject Cards
 // =========================
-function approvedCountForSubject(subjectKey) {
-  let count = 0;
-  for (let i=1;i<=10;i++) {
-    if (approvedSet.has(`${subjectKey}:${i}`)) count++;
-  }
-  return count;
+function getLevelStatus(subjectKey, level) {
+  const subject = subjectCatalog[subjectKey];
+  if (!subject) return 'locked';
+  const key = makeApprovalKey(subject.sheetKey, level);
+  if (finishedLevels.has(key)) return 'finished';
+  if (activeLevels.has(key))   return 'active';
+  return 'locked';
 }
 
 function renderDashboard() {
@@ -1054,8 +1113,18 @@ function renderDashboard() {
   container.innerHTML = '';
 
   Object.entries(subjectCatalog).forEach(([key, subject]) => {
-    const approved = approvedCountForSubject(key);
-    const pct = Math.round((approved/10)*100);
+    let finishedCount = 0, activeCount = 0;
+    for (let i=1; i<=10; i++) {
+      const s = getLevelStatus(key, i);
+      if (s === 'finished') finishedCount++;
+      if (s === 'active')   activeCount++;
+    }
+    const totalDone = finishedCount; // for progress bar
+    const pct = Math.round((totalDone / 10) * 100);
+
+    let pillClass = 'locked', pillText = 'Locked';
+    if (finishedCount > 0 && activeCount === 0) { pillClass = 'finished'; pillText = `${finishedCount} Done`; }
+    else if (activeCount > 0)                   { pillClass = 'active-level'; pillText = `${activeCount} Active`; }
 
     const card = document.createElement('div');
     card.className = 'subject-card';
@@ -1065,13 +1134,13 @@ function renderDashboard() {
         <div class="subject-icon">${subject.icon}</div>
         <div>
           <div class="subject-name">${subject.label}</div>
-          <div class="subject-sub">${approved} approved level${approved===1?'':'s'}</div>
+          <div class="subject-sub">${finishedCount} completed · ${activeCount} active</div>
         </div>
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
       <div class="subject-footer">
         <div class="subject-sub">${subject.desc}</div>
-        <span class="pill ${approved?'approved':'locked'}">${approved?'Approved':'Locked'}</span>
+        <span class="pill ${pillClass}">${pillText}</span>
       </div>
     `;
     container.appendChild(card);
@@ -1080,45 +1149,232 @@ function renderDashboard() {
   renderMeetingsUI();
 }
 
+// =========================
+// Subject Detail Page (levels list)
+// =========================
+let currentSubjectKey = null;
+
 function openSubject(subjectKey) {
   const subject = subjectCatalog[subjectKey];
   if (!subject) return;
+  currentSubjectKey = subjectKey;
 
   document.getElementById('subjectTitle').textContent = `${subject.icon} ${subject.label}`;
-  document.getElementById('subjectDesc').textContent  = subject.desc + ' Approved levels can be opened; locked levels are waiting for staff approval.';
+  document.getElementById('subjectDesc').textContent  = 'Click any available or active level to start practising. Finished levels are complete.';
 
   const list = document.getElementById('unitList');
   list.innerHTML = '';
 
   for (let level=1; level<=10; level++) {
-    // Match by level number against the sheet "Level" column
-    const approved = approvedSet.has(`${subjectKey.replace(/\s+/g,'').toLowerCase()}:${level}`)
-                  || [...approvedSet].some(k => {
-                      const [sk, lv] = k.split(':');
-                      return (sk === subjectKey.replace(/\s+/g,'').toLowerCase() || sk === norm(subject.sheetKey)) && lv === String(level);
-                    });
+    const status = getLevelStatus(subjectKey, level);
+    const isClickable = (status === 'active' || status === 'finished');
+
+    const statusIconMap  = { active: '▶', finished: '✓', locked: '🔒' };
+    const statusClassMap = { active: 'current', finished: 'done', locked: 'locked' };
+    const badgeTextMap   = { active: 'Practice', finished: 'Done', locked: 'Locked' };
+    const badgeClassMap  = { active: 'active-level', finished: 'finished', locked: 'locked' };
+    const metaTextMap    = {
+      active: 'Available — click to practise',
+      finished: 'Completed',
+      locked: 'Awaiting instructor approval'
+    };
 
     const row = document.createElement('div');
-    row.className = 'unit-card' + (approved?' clickable':'');
+    row.className = 'unit-card' + (isClickable ? ' clickable' : '');
     row.innerHTML = `
       <div class="unit-left">
-        <div class="unit-status ${approved?'current':''}">${approved?'✓':'🔒'}</div>
+        <div class="unit-status ${statusClassMap[status]}">${statusIconMap[status]}</div>
         <div>
           <div class="unit-name">Level ${level}</div>
-          <div class="unit-meta">${approved?'Approved by staff':'Awaiting approval'}</div>
+          <div class="unit-meta">${metaTextMap[status]}</div>
         </div>
       </div>
-      <div class="unit-badge ${approved?'approved':'locked'}">${approved?'Open':'Locked'}</div>
+      <div class="unit-badge ${badgeClassMap[status]}">${badgeTextMap[status]}</div>
     `;
 
-    if (approved) {
-      row.onclick = () => showToast(`Level ${level} is approved! 🎉`);
+    if (isClickable) {
+      row.onclick = () => startLevelQuiz(subjectKey, level);
     }
 
     list.appendChild(row);
   }
 
   showPage('subject');
+}
+
+// =========================
+// Quiz for a specific subject + level
+// =========================
+function startLevelQuiz(subjectKey, level) {
+  const subject = subjectCatalog[subjectKey];
+  if (!subject) return;
+
+  // Filter questions by subject (Question type) and level
+  const pool = questionsCache.filter(q => {
+    const matchSubject = norm(q['Question type']) === norm(subject.sheetKey);
+    const qLevel = parseInt(String(q.Level || '0').trim(), 10);
+    return matchSubject && qLevel === level;
+  });
+
+  if (!pool.length) {
+    showToast(`No questions yet for ${subject.label} Level ${level}.`);
+    return;
+  }
+
+  // Shuffle
+  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+
+  quizState = {
+    subjectKey,
+    subjectLabel: subject.label,
+    level,
+    questions: shuffled,
+    current: 0,
+    correct: 0,
+    wrong: 0,
+    answered: false
+  };
+
+  // Set up back button to return to subject page
+  document.getElementById('quizBackBtn').onclick = () => openSubject(subjectKey);
+  document.getElementById('quizPageTitle').textContent = `${subject.icon} ${subject.label} — Level ${level}`;
+  document.getElementById('quizPageSubtitle').textContent = `${shuffled.length} question${shuffled.length===1?'':'s'} · Answer them all to see your results.`;
+
+  showPage('quiz');
+  renderQuizQuestion();
+}
+
+function parseChoices(choiceStr) {
+  if (!choiceStr) return [];
+  const regex = /([A-E]):\s*(.+?)(?=\s+[A-E]:|$)/g;
+  const choices = [];
+  let m;
+  while ((m = regex.exec(String(choiceStr))) !== null) {
+    choices.push({ letter: m[1], text: m[2].trim() });
+  }
+  return choices;
+}
+
+function renderQuizQuestion() {
+  const area  = document.getElementById('quizArea');
+  const state = quizState;
+
+  if (!state || state.current >= state.questions.length) {
+    renderQuizResults();
+    return;
+  }
+
+  const q      = state.questions[state.current];
+  const choices = parseChoices(q['Answer Choices']);
+  const total   = state.questions.length;
+  const idx     = state.current;
+  const pct     = Math.round((idx / total) * 100);
+
+  const skillBadge = q.Skill ? `<span class="quiz-badge">${esc(q.Skill)}</span>` : '';
+  const imageHTML  = q['Image (optional)']
+    ? `<img src="${esc(q['Image (optional)'])}" class="quiz-image" alt="Question image" loading="lazy" />`
+    : '';
+
+  const choicesHTML = choices.map(c => `
+    <button class="choice-btn" onclick="selectChoice(this, '${esc(c.letter)}')">
+      <span class="choice-letter">${esc(c.letter)}</span>
+      <span>${esc(c.text)}</span>
+    </button>
+  `).join('');
+
+  area.innerHTML = `
+    <div class="quiz-header-bar">
+      <span class="quiz-level-label">Level ${state.level}</span>
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
+      <span class="quiz-progress-text">${idx+1} / ${total}</span>
+    </div>
+
+    <div class="quiz-card">
+      <div class="quiz-card-header">
+        <div class="quiz-meta">${skillBadge}</div>
+        <div class="quiz-question">${esc(q.Question)}</div>
+      </div>
+      ${imageHTML}
+      <div class="quiz-choices" id="quizChoices">${choicesHTML}</div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <button class="quiz-next-btn" id="quizNextBtn" onclick="nextQuizQuestion()">
+        ${idx + 1 < total ? 'Next Question →' : 'See Results 🎉'}
+      </button>
+    </div>
+  `;
+
+  state.answered = false;
+}
+
+function selectChoice(btn, letter) {
+  if (quizState.answered) return;
+  quizState.answered = true;
+
+  const correctFull   = String(quizState.questions[quizState.current]['Correct Answer'] || '').trim();
+  const correctLetter = correctFull.split(':')[0].trim().toUpperCase();
+  const isCorrect     = letter.toUpperCase() === correctLetter;
+
+  document.querySelectorAll('#quizChoices .choice-btn').forEach(b => {
+    b.disabled = true;
+    const l = b.querySelector('.choice-letter').textContent.trim().toUpperCase();
+    if (l === correctLetter) b.classList.add('correct');
+  });
+
+  if (!isCorrect) {
+    btn.classList.add('wrong');
+    quizState.wrong++;
+  } else {
+    quizState.correct++;
+  }
+
+  const feedback = document.getElementById('quizFeedback');
+  if (isCorrect) {
+    feedback.textContent = '✅ Correct! Well done.';
+    feedback.className   = 'quiz-feedback correct';
+  } else {
+    feedback.textContent = `❌ Not quite — the correct answer is ${correctFull}.`;
+    feedback.className   = 'quiz-feedback wrong';
+  }
+
+  const nextBtn = document.getElementById('quizNextBtn');
+  if (nextBtn) nextBtn.classList.add('visible');
+}
+
+function nextQuizQuestion() {
+  quizState.current++;
+  renderQuizQuestion();
+}
+
+function renderQuizResults() {
+  const { correct, wrong, questions, subjectKey, subjectLabel, level } = quizState;
+  const total = questions.length;
+  const pct   = Math.round((correct / total) * 100);
+
+  let emoji = '😅', msg = 'Keep practising — you\'ve got this!';
+  if (pct >= 90) { emoji = '🏆'; msg = 'Outstanding! Perfect score territory!'; }
+  else if (pct >= 70) { emoji = '🎉'; msg = 'Great work! Keep it up!'; }
+  else if (pct >= 50) { emoji = '💪'; msg = 'Good effort! Review and try again.'; }
+
+  document.getElementById('quizArea').innerHTML = `
+    <div class="quiz-results">
+      <div class="score-circle">
+        <div class="score-number">${pct}%</div>
+        <div class="score-label">Score</div>
+      </div>
+      <div style="font-size:40px;margin-bottom:8px;">${emoji}</div>
+      <h2>Level ${level} Complete!</h2>
+      <p>${msg}</p>
+      <div class="quiz-results-row">
+        <div class="quiz-stat green"><div class="stat-val">${correct}</div><div class="stat-key">Correct</div></div>
+        <div class="quiz-stat red"><div class="stat-val">${wrong}</div><div class="stat-key">Wrong</div></div>
+        <div class="quiz-stat"><div class="stat-val">${total}</div><div class="stat-key">Total</div></div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="startLevelQuiz('${esc(subjectKey)}', ${level})">Try Again</button>
+        <button class="btn" onclick="openSubject('${esc(subjectKey)}')">Back to Levels</button>
+      </div>
+    </div>
+  `;
 }
 
 // =========================
@@ -1181,214 +1437,17 @@ function renderMeetingsUI() {
 }
 
 // =========================
-// QUIZ / PRACTICE
-// =========================
-function renderPracticeHome() {
-  const area = document.getElementById('quizArea');
-  if (questionsCache.length === 0) {
-    area.innerHTML = `<div class="empty-state"><div class="emoji">📭</div><h3>No questions loaded</h3><p>Questions couldn't be fetched. Please refresh.</p></div>`;
-    return;
-  }
-  area.innerHTML = `
-    <div class="empty-state" style="text-align:left;padding:28px;">
-      <div class="emoji">👆</div>
-      <h3>Pick a topic above to start!</h3>
-      <p>${questionsCache.length} question${questionsCache.length===1?'':'s'} available across all subjects.</p>
-    </div>
-  `;
-}
-
-function startQuiz(filter) {
-  let pool = questionsCache;
-
-  if (filter !== 'all') {
-    pool = pool.filter(q => norm(q['Question type']) === norm(filter));
-  }
-
-  // Filter by approved levels
-  if (filter !== 'all') {
-    const subjectKey = Object.keys(subjectCatalog).find(
-      key => norm(subjectCatalog[key].sheetKey) === norm(filter)
-    );
-    if (subjectKey) {
-      const maxApprovedLevel = approvedCountForSubject(subjectKey);
-      pool = pool.filter(q => {
-        const questionLevel = parseInt(q.Level || '0', 10);
-        return questionLevel <= maxApprovedLevel;
-      });
-    }
-  }
-
-  if (!pool.length) {
-    showToast('No questions found for that topic and level.');
-    return;
-  }
-
-  // Shuffle
-  pool = [...pool].sort(() => Math.random() - .5);
-
-  quizState = {
-    questions: pool,
-    current: 0,
-    correct: 0,
-    wrong: 0,
-    answered: false
-  };
-
-  renderQuestion();
-}
-
-function parseChoices(choiceStr) {
-  if (!choiceStr) return [];
-  // Matches "A: text B: text" or "A: text\nB: text"
-  const regex = /([A-E]):\s*(.+?)(?=\s+[A-E]:|$)/g;
-  const choices = [];
-  let m;
-  while ((m = regex.exec(String(choiceStr))) !== null) {
-    choices.push({ letter: m[1], text: m[2].trim() });
-  }
-  return choices;
-}
-
-function renderQuestion() {
-  const area  = document.getElementById('quizArea');
-  const state = quizState;
-
-  if (!state || state.current >= state.questions.length) {
-    renderResults();
-    return;
-  }
-
-  const q = state.questions[state.current];
-  const choices = parseChoices(q['Answer Choices']);
-  const total = state.questions.length;
-  const idx   = state.current;
-  const pct   = Math.round((idx / total) * 100);
-
-  const skillBadge = q.Skill ? `<span class="quiz-badge">${esc(q.Skill)}</span>` : '';
-  const typeBadge  = q['Question type'] ? `<span class="quiz-badge" style="color:var(--text)">${esc(q['Question type'])}</span>` : '';
-  const imageHTML  = q['Image (optional)']
-    ? `<img src="${esc(q['Image (optional)'])}" class="quiz-image" alt="Question image" loading="lazy" />`
-    : '';
-
-  const choicesHTML = choices.map(c => `
-    <button class="choice-btn" onclick="selectChoice(this, '${esc(c.letter)}')">
-      <span class="choice-letter">${esc(c.letter)}</span>
-      <span>${esc(c.text)}</span>
-    </button>
-  `).join('');
-
-  area.innerHTML = `
-    <div class="quiz-progress">
-      <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
-      <span class="quiz-progress-text">${idx+1} / ${total}</span>
-    </div>
-
-    <div class="quiz-card">
-      <div class="quiz-card-header">
-        <div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">${typeBadge}${skillBadge}</div>
-          <div class="quiz-question">${esc(q.Question)}</div>
-        </div>
-      </div>
-      ${imageHTML}
-      <div class="quiz-choices" id="quizChoices">${choicesHTML}</div>
-      <div class="quiz-feedback" id="quizFeedback"></div>
-      <button class="quiz-next-btn" id="quizNextBtn" onclick="nextQuestion()">
-        ${state.current + 1 < total ? 'Next Question →' : 'See Results 🎉'}
-      </button>
-    </div>
-  `;
-
-  state.answered = false;
-}
-
-function selectChoice(btn, letter) {
-  if (quizState.answered) return;
-  quizState.answered = true;
-
-  const correctFull = String(quizState.questions[quizState.current]['Correct Answer'] || '').trim();
-  const correctLetter = correctFull.split(':')[0].trim().toUpperCase();
-  const isCorrect = letter.toUpperCase() === correctLetter;
-
-  // Mark all buttons
-  const buttons = document.querySelectorAll('#quizChoices .choice-btn');
-  buttons.forEach(b => {
-    b.disabled = true;
-    const l = b.querySelector('.choice-letter').textContent.trim().toUpperCase();
-    if (l === correctLetter) b.classList.add('correct');
-  });
-
-  if (!isCorrect) {
-    btn.classList.add('wrong');
-    quizState.wrong++;
-  } else {
-    quizState.correct++;
-  }
-
-  const feedback = document.getElementById('quizFeedback');
-  if (isCorrect) {
-    feedback.textContent = '✅ Correct! Great job.';
-    feedback.className = 'quiz-feedback correct';
-  } else {
-    feedback.textContent = `❌ Not quite. The correct answer is ${correctFull}.`;
-    feedback.className = 'quiz-feedback wrong';
-  }
-
-  const nextBtn = document.getElementById('quizNextBtn');
-  if (nextBtn) nextBtn.classList.add('visible');
-}
-
-function nextQuestion() {
-  quizState.current++;
-  renderQuestion();
-}
-
-function renderResults() {
-  const { correct, wrong, questions } = quizState;
-  const total  = questions.length;
-  const pct    = Math.round((correct / total) * 100);
-
-  let emoji = '😅';
-  let msg   = 'Keep practicing — you\'ve got this!';
-  if (pct >= 90) { emoji = '🏆'; msg = 'Outstanding! Perfect score territory!'; }
-  else if (pct >= 70) { emoji = '🎉'; msg = 'Great work! Keep it up!'; }
-  else if (pct >= 50) { emoji = '💪'; msg = 'Good effort! Review and try again.'; }
-
-  document.getElementById('quizArea').innerHTML = `
-    <div class="quiz-results">
-      <div class="score-circle">
-        <div class="score-number">${pct}%</div>
-        <div class="score-label">Score</div>
-      </div>
-      <div style="font-size:40px;margin-bottom:8px;">${emoji}</div>
-      <h2>Quiz Complete!</h2>
-      <p>${msg}</p>
-      <div class="quiz-results-row">
-        <div class="quiz-stat green"><div class="stat-val">${correct}</div><div class="stat-key">Correct</div></div>
-        <div class="quiz-stat red"><div class="stat-val">${wrong}</div><div class="stat-key">Wrong</div></div>
-        <div class="quiz-stat"><div class="stat-val">${total}</div><div class="stat-key">Total</div></div>
-      </div>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="startQuiz('all')">Try Again (All)</button>
-        <button class="btn" onclick="renderPracticeHome()">Back to Topics</button>
-      </div>
-    </div>
-  `;
-}
-
-// =========================
 // Calendar
 // =========================
 function buildCalendarEventMap(year, month) {
-  const map = {};
+  const map  = {};
   const seen = new Set();
   const meetings = getUserMeetings();
   const daysInMonth = new Date(year, month+1, 0).getDate();
 
   function push(dateObj, meeting) {
     const key = dateKey(dateObj);
-    const u = `${key}|${norm(meeting.username)}|${norm(meeting.topic)}|${norm(meeting.link)}`;
+    const u   = `${key}|${norm(meeting.username)}|${norm(meeting.topic)}|${norm(meeting.link)}`;
     if (seen.has(u)) return;
     seen.add(u);
     if (!map[key]) map[key] = [];
@@ -1421,11 +1480,11 @@ function renderCalendar() {
   document.getElementById('calendarTitle').textContent = `${months[calendarMonth]} ${calendarYear}`;
   calendarEventMap = buildCalendarEventMap(calendarYear, calendarMonth);
 
-  const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+  const firstDay    = new Date(calendarYear, calendarMonth, 1).getDay();
   const daysInMonth = new Date(calendarYear, calendarMonth+1, 0).getDate();
   const daysInPrev  = new Date(calendarYear, calendarMonth, 0).getDate();
-  const today = new Date();
-  const container = document.getElementById('calendarDays');
+  const today       = new Date();
+  const container   = document.getElementById('calendarDays');
   container.innerHTML = '';
 
   for (let i=firstDay-1; i>=0; i--) {
@@ -1436,21 +1495,21 @@ function renderCalendar() {
   }
 
   for (let day=1; day<=daysInMonth; day++) {
-    const d=document.createElement('div');
-    d.className='calendar-day';
-    const dateObj=new Date(calendarYear,calendarMonth,day);
-    const dateStr=dateKey(dateObj);
-    const isToday=today.getFullYear()===calendarYear&&today.getMonth()===calendarMonth&&today.getDate()===day;
-    const hasCls=!!(calendarEventMap[dateStr]?.length);
+    const d       = document.createElement('div');
+    d.className   = 'calendar-day';
+    const dateObj = new Date(calendarYear,calendarMonth,day);
+    const dateStr = dateKey(dateObj);
+    const isToday = today.getFullYear()===calendarYear&&today.getMonth()===calendarMonth&&today.getDate()===day;
+    const hasCls  = !!(calendarEventMap[dateStr]?.length);
     if (isToday) d.classList.add('today');
-    if (hasCls) { d.classList.add('has-class'); d.onclick=()=>showDayDetail(dateStr,day); }
+    if (hasCls)  { d.classList.add('has-class'); d.onclick=()=>showDayDetail(dateStr,day); }
     d.innerHTML=`${day}${hasCls?'<div class="class-dot"></div>':''}`;
     container.appendChild(d);
   }
 
-  const totalCells=firstDay+daysInMonth;
-  const remaining=totalCells%7===0?0:7-(totalCells%7);
-  for (let i=1;i<=remaining;i++){
+  const totalCells = firstDay+daysInMonth;
+  const remaining  = totalCells%7===0?0:7-(totalCells%7);
+  for (let i=1; i<=remaining; i++){
     const d=document.createElement('div');
     d.className='calendar-day other-month';
     d.textContent=i;
@@ -1460,7 +1519,7 @@ function renderCalendar() {
 }
 
 function changeMonth(dir) {
-  calendarMonth+=dir;
+  calendarMonth += dir;
   if (calendarMonth>11){calendarMonth=0;calendarYear++;}
   if (calendarMonth<0){calendarMonth=11;calendarYear--;}
   renderCalendar();
@@ -1487,7 +1546,7 @@ document.getElementById('authSubmit').addEventListener('click', handleAuth);
 document.getElementById('authPassword').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
 document.getElementById('authUsername').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
 
-// Pre-load questions in background on page load
+// Pre-load questions in background
 loadQuestions();
 </script>
 </body>
