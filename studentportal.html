@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -762,7 +761,7 @@ const nowInit = new Date();
 let calendarMonth = nowInit.getMonth();
 let calendarYear  = nowInit.getFullYear();
 
-// FIX 1 & 3: Corrected spelling and removed spaces from sheetKeys for bulletproof matching
+// FIX: Corrected spelling to 'Algebra 2' and prepared values for the space-immune norm engine
 const subjectCatalog = {
   algebra1:   { label: 'Algebra I',   icon: '📐', desc: 'Linear equations, expressions, inequalities, and functions.', sheetKey: 'Algebra1'   },
   prealgebra: { label: 'Pre-Algebra', icon: '🔢', desc: 'Whole numbers, fractions, decimals, and ratios.',            sheetKey: 'Pre-algebra' },
@@ -777,7 +776,7 @@ const daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday',
 // Utilities
 // =========================
 
-// FIX 2: norm() now completely strips all spaces to prevent spreadsheet spacing typos from breaking the app
+// FIX: Aggressive normalization that strips spaces entirely to make spreadsheet data entry bulletproof
 function norm(v) { 
   return String(v ?? '').toLowerCase().replace(/\s+/g, ''); 
 }
@@ -790,7 +789,6 @@ function esc(str) {
 
 function showToast(msg) {
   const t = document.getElementById('toast');
-  if (!t) return;
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2600);
@@ -975,7 +973,6 @@ const authMsg    = document.getElementById('authMessage');
 const authSubmit = document.getElementById('authSubmit');
 
 function showAuthMsg(text, type) {
-  if (!authMsg) return;
   authMsg.textContent = text;
   authMsg.className = 'message ' + type;
 }
@@ -1031,10 +1028,8 @@ function logout() {
   document.getElementById('authScreen').classList.remove('hidden');
   document.getElementById('authUsername').value = '';
   document.getElementById('authPassword').value = '';
-  if (authMsg) {
-    authMsg.className = 'message';
-    authMsg.textContent = '';
-  }
+  authMsg.className = 'message';
+  authMsg.textContent = '';
   window.scrollTo(0,0);
 }
 
@@ -1043,12 +1038,8 @@ function enterPortal() {
   document.getElementById('portalScreen').classList.add('active');
 
   const displayName = capitalizeName(currentUser.displayName || currentUser.username);
-  
-  const welcomeEl = document.getElementById('welcomeName');
-  if (welcomeEl) welcomeEl.textContent = `Welcome back, ${displayName} 👋`;
-  
-  const avatarEl = document.getElementById('userAvatar');
-  if (avatarEl) avatarEl.textContent  = displayName.charAt(0).toUpperCase();
+  document.getElementById('welcomeName').textContent = `Welcome back, ${displayName} 👋`;
+  document.getElementById('userAvatar').textContent  = displayName.charAt(0).toUpperCase();
 
   renderDashboard();
   showPage('dashboard');
@@ -1058,8 +1049,7 @@ function enterPortal() {
 // Navigation
 // =========================
 function toggleMobile() {
-  const menu = document.getElementById('mobileMenu');
-  if (menu) menu.classList.toggle('active');
+  document.getElementById('mobileMenu').classList.toggle('active');
 }
 
 document.addEventListener('click', (e) => {
@@ -1154,14 +1144,10 @@ function openSubject(subjectKey) {
   if (!subject) return;
   currentSubjectKey = subjectKey;
 
-  const titleEl = document.getElementById('subjectTitle');
-  if (titleEl) titleEl.textContent = `${subject.icon} ${subject.label}`;
-  
-  const descEl = document.getElementById('subjectDesc');
-  if (descEl) descEl.textContent  = 'Click any available or active level to start practising. Finished levels are complete.';
+  document.getElementById('subjectTitle').textContent = `${subject.icon} ${subject.label}`;
+  document.getElementById('subjectDesc').textContent  = 'Click any available or active level to start practising. Finished levels are complete.';
 
   const list = document.getElementById('unitList');
-  if (!list) return;
   list.innerHTML = '';
 
   for (let level=1; level<=10; level++) {
@@ -1209,7 +1195,6 @@ function startLevelQuiz(subjectKey, level) {
   if (!subject) return;
 
   const pool = questionsCache.filter(q => {
-    // We norm() both sides just to be extra safe
     const matchSubject = norm(q['Question type']) === norm(subject.sheetKey);
     const qLevel = parseInt(String(q.Level || '0').trim(), 10);
     return matchSubject && qLevel === level;
@@ -1233,14 +1218,9 @@ function startLevelQuiz(subjectKey, level) {
     answered: false
   };
 
-  const backBtn = document.getElementById('quizBackBtn');
-  if (backBtn) backBtn.onclick = () => openSubject(subjectKey);
-  
-  const titleEl = document.getElementById('quizPageTitle');
-  if (titleEl) titleEl.textContent = `${subject.icon} ${subject.label} — Level ${level}`;
-  
-  const subEl = document.getElementById('quizPageSubtitle');
-  if (subEl) subEl.textContent = `${shuffled.length} question${shuffled.length===1?'':'s'} · Answer them all to see your results.`;
+  document.getElementById('quizBackBtn').onclick = () => openSubject(subjectKey);
+  document.getElementById('quizPageTitle').textContent = `${subject.icon} ${subject.label} — Level ${level}`;
+  document.getElementById('quizPageSubtitle').textContent = `${shuffled.length} question${shuffled.length===1?'':'s'} · Answer them all to see your results.`;
 
   showPage('quiz');
   renderQuizQuestion();
@@ -1259,7 +1239,6 @@ function parseChoices(choiceStr) {
 
 function renderQuizQuestion() {
   const area  = document.getElementById('quizArea');
-  if (!area) return;
   const state = quizState;
 
   if (!state || state.current >= state.questions.length) {
@@ -1348,41 +1327,6 @@ function nextQuizQuestion() {
   renderQuizQuestion();
 }
 
-function renderQuizResults() {
-  const { correct, wrong, questions, subjectKey, subjectLabel, level } = quizState;
-  const total = questions.length;
-  const pct   = Math.round((correct / total) * 100);
-
-  let emoji = '😅', msg = 'Keep practising — you\'ve got this!';
-  if (pct >= 90) { emoji = '🏆'; msg = 'Outstanding! Perfect score territory!'; }
-  else if (pct >= 70) { emoji = '🎉'; msg = 'Great work! Keep it up!'; }
-  else if (pct >= 50) { emoji = '💪'; msg = 'Good effort! Review and try again.'; }
-
-  const area = document.getElementById('quizArea');
-  if (!area) return;
-  
-  area.innerHTML = `
-    <div class="quiz-results">
-      <div class="score-circle">
-        <div class="score-number">${pct}%</div>
-        <div class="score-label">Score</div>
-      </div>
-      <div style="font-size:40px;margin-bottom:8px;">${emoji}</div>
-      <h2>Level ${level} Complete!</h2>
-      <p>${msg}</p>
-      <div class="quiz-results-row">
-        <div class="quiz-stat green"><div class="stat-val">${correct}</div><div class="stat-key">Correct</div></div>
-        <div class="quiz-stat red"><div class="stat-val">${wrong}</div><div class="stat-key">Wrong</div></div>
-        <div class="quiz-stat"><div class="stat-val">${total}</div><div class="stat-key">Total</div></div>
-      </div>
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="startLevelQuiz('${esc(subjectKey)}', ${level})">Try Again</button>
-        <button class="btn" onclick="openSubject('${esc(subjectKey)}')">Back to Levels</button>
-      </div>
-    </div>
-  `;
-}
-
 // =========================
 // Meetings UI
 // =========================
@@ -1423,114 +1367,166 @@ function renderMeetingsUI() {
       : `<div class="empty-state"><div class="emoji">📭</div><h3>No upcoming meetings</h3><p>Once staff adds meetings for your username, they'll show up here.</p></div>`;
   }
 
+  const calMeetings = document.getElementById('calendarMeetings');
+  if (calMeetings) {
+    calMeetings.innerHTML = meetings.length
+      ? `<h3>🔗 Your Meetings</h3>${meetings.map(m=>`
+          <div class="meet-item">
+            <div class="meet-info"><div class="title">${esc(m.topic)}</div><div class="time">${esc(m.dateAndTime)}${m.userClass?` · ${esc(m.userClass)}`:''}</div></div>
+            <a href="${esc(m.link)}" target="_blank" class="meet-link">📹 Join</a>
+          </div>`).join('')}`
+      : `<h3>🔗 Your Meetings</h3><div class="empty-state"><div class="emoji">📭</div><h3>No meetings yet</h3><p>Staff hasn't added any meetings for your username.</p></div>`;
+  }
+
   const calList = document.getElementById('calendarUpcomingList');
   if (calList) {
     calList.innerHTML = upcoming.length
-      ? upcoming.slice(0,5).map(m => meetingCardHTML(m, m.next)).join('')
-      : `<div class="empty-state"><div class="emoji">📭</div><h3>No upcoming meetings</h3><p>Once staff adds meetings for your username, they'll show up here.</p></div>`;
+      ? upcoming.slice(0,5).map(m => meetingCardHTML(m,m.next)).join('')
+      : `<div class="empty-state"><div class="emoji">📭</div><h3>No upcoming classes</h3><p>Once staff adds meetings, they will appear here.</p></div>`;
   }
 }
 
+function renderQuizResults() {
+  const { correct, wrong, questions, subjectKey, subjectLabel, level } = quizState;
+  const total = questions.length;
+  const pct   = Math.round((correct / total) * 100);
+
+  let emoji = '😅', msg = 'Keep practising — you\'ve got this!';
+  if (pct >= 90) { emoji = '🏆'; msg = 'Outstanding! Perfect score territory!'; }
+  else if (pct >= 70) { emoji = '🎉'; msg = 'Great work! Keep it up!'; }
+  else if (pct >= 50) { emoji = '💪'; msg = 'Good effort! Review and try again.'; }
+
+  document.getElementById('quizArea').innerHTML = `
+    <div class="quiz-results">
+      <div class="score-circle">
+        <div class="score-number">${pct}%</div>
+        <div class="score-label">Score</div>
+      </div>
+      <div style="font-size:40px;margin-bottom:8px;">${emoji}</div>
+      <h2>Level ${level} Complete!</h2>
+      <p>${msg}</p>
+      <div class="quiz-results-row">
+        <div class="quiz-stat green"><div class="stat-val">${correct}</div><div class="stat-key">Correct</div></div>
+        <div class="quiz-stat red"><div class="stat-val">${wrong}</div><div class="stat-key">Wrong</div></div>
+        <div class="quiz-stat"><div class="stat-val">${total}</div><div class="stat-key">Total</div></div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="startLevelQuiz('${esc(subjectKey)}', ${level})">Try Again</button>
+        <button class="btn" onclick="openSubject('${esc(subjectKey)}')">Back to Levels</button>
+      </div>
+    </div>
+  `;
+}
+
 // =========================
-// Calendar Logic
+// Original Working Calendar
 // =========================
-function renderCalendar() {
-  const daysEl = document.getElementById('calendarDays');
-  const titleEl = document.getElementById('calendarTitle');
-  if (!daysEl || !titleEl) return;
-
-  daysEl.innerHTML = '';
-  const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
-  const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
-
-  const monthName = new Intl.DateTimeFormat('en-US', { month: 'long' }).format(new Date(calendarYear, calendarMonth, 1));
-  titleEl.textContent = `${monthName} ${calendarYear}`;
-
-  // Empty slots for days before the 1st
-  for (let i = 0; i < firstDay; i++) {
-    const emptyDiv = document.createElement('div');
-    emptyDiv.className = 'calendar-day empty';
-    daysEl.appendChild(emptyDiv);
-  }
-
+function buildCalendarEventMap(year, month) {
+  const map  = {};
+  const seen = new Set();
   const meetings = getUserMeetings();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
 
-  for (let i = 1; i <= daysInMonth; i++) {
-    const currentDate = new Date(calendarYear, calendarMonth, i);
-    const dateStr = dateKey(currentDate);
-
-    // Check if this day has a meeting
-    const dayMeetings = meetings.filter(m => {
-      if (m.specificDate && dateKey(m.specificDate) === dateStr) return true;
-      if (m.weekdays && m.weekdays.length) {
-        const dow = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(currentDate);
-        return m.weekdays.includes(dow);
-      }
-      return false;
-    });
-
-    const hasMeeting = dayMeetings.length > 0;
-    const todayStr = dateKey(new Date());
-    const isToday = dateStr === todayStr;
-
-    const dayDiv = document.createElement('div');
-    // Using inline styling classes based on your existing structure
-    dayDiv.className = `calendar-day ${isToday ? 'today' : ''} ${hasMeeting ? 'has-event' : ''}`;
-    dayDiv.textContent = i;
-    
-    // Quick inline styling fallback just in case CSS classes are missing for interactive states
-    dayDiv.style.cursor = 'pointer';
-    if (isToday) dayDiv.style.fontWeight = 'bold';
-    
-    dayDiv.onclick = () => renderDayDetail(i);
-    daysEl.appendChild(dayDiv);
+  function push(dateObj, meeting) {
+    const key = dateKey(dateObj);
+    const u   = `${key}|${norm(meeting.username)}|${norm(meeting.topic)}|${norm(meeting.link)}`;
+    if (seen.has(u)) return;
+    seen.add(u);
+    if (!map[key]) map[key] = [];
+    map[key].push(meeting);
   }
-  
-  // Default selection
-  renderDayDetail(new Date().getDate());
+
+  meetings.forEach(m => {
+    if (m.specificDate && m.specificDate.getFullYear()===year && m.specificDate.getMonth()===month) {
+      push(m.specificDate, m);
+    }
+    (m.weekdays||[]).forEach(dayName => {
+      const targetDow = daysOfWeek.indexOf(dayName);
+      if (targetDow<0) return;
+      for (let day=1; day<=daysInMonth; day++) {
+        const d = new Date(year, month, day);
+        if (d.getDay()===targetDow) {
+          const t = parseTimeToHM(m.dateAndTime);
+          d.setHours(t.h,t.min,0,0);
+          push(d, m);
+        }
+      }
+    });
+  });
+
+  return map;
+}
+
+function renderCalendar() {
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calendarTitle').textContent = `${months[calendarMonth]} ${calendarYear}`;
+  calendarEventMap = buildCalendarEventMap(calendarYear, calendarMonth);
+
+  const firstDay    = new Date(calendarYear, calendarMonth, 1).getDay();
+  const daysInMonth = new Date(calendarYear, calendarMonth+1, 0).getDate();
+  const daysInPrev  = new Date(calendarYear, calendarMonth, 0).getDate();
+  const today       = new Date();
+  const container   = document.getElementById('calendarDays');
+  container.innerHTML = '';
+
+  for (let i=firstDay-1; i>=0; i--) {
+    const d=document.createElement('div');
+    d.className='calendar-day other-month';
+    d.textContent=daysInPrev-i;
+    container.appendChild(d);
+  }
+
+  for (let day=1; day<=daysInMonth; day++) {
+    const d       = document.createElement('div');
+    d.className   = 'calendar-day';
+    const dateObj = new Date(calendarYear,calendarMonth,day);
+    const dateStr = dateKey(dateObj);
+    const isToday = today.getFullYear()===calendarYear&&today.getMonth()===calendarMonth&&today.getDate()===day;
+    const hasCls  = !!(calendarEventMap[dateStr]?.length);
+    if (isToday) d.classList.add('today');
+    if (hasCls)  { d.classList.add('has-class'); d.onclick=()=>showDayDetail(dateStr,day); }
+    d.innerHTML=`${day}${hasCls?'<div class="class-dot"></div>':''}`;
+    container.appendChild(d);
+  }
+
+  const totalCells = firstDay+daysInMonth;
+  const remaining  = totalCells%7===0?0:7-(totalCells%7);
+  for (let i=1; i<=remaining; i++){
+    const d=document.createElement('div');
+    d.className='calendar-day other-month';
+    d.textContent=i;
+    container.appendChild(d);
+  }
+  document.getElementById('dayDetail').classList.remove('active');
 }
 
 function changeMonth(dir) {
   calendarMonth += dir;
-  if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
-  else if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
+  if (calendarMonth>11){calendarMonth=0;calendarYear++;}
+  if (calendarMonth<0){calendarMonth=11;calendarYear--;}
   renderCalendar();
+  renderMeetingsUI();
 }
 
-function renderDayDetail(day) {
-  const detailTitle = document.getElementById('dayDetailTitle');
-  const detailContent = document.getElementById('dayDetailContent');
-  if (!detailTitle || !detailContent) return;
-
-  const selectedDate = new Date(calendarYear, calendarMonth, day);
-  detailTitle.textContent = `Classes on ${formatShortDay(selectedDate)}`;
-
-  const meetings = getUserMeetings();
-  const dateStr = dateKey(selectedDate);
-  const dayMeetings = meetings.filter(m => {
-    if (m.specificDate && dateKey(m.specificDate) === dateStr) return true;
-    if (m.weekdays && m.weekdays.length) {
-      const dow = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(selectedDate);
-      return m.weekdays.includes(dow);
-    }
-    return false;
-  });
-
-  if (dayMeetings.length === 0) {
-    detailContent.innerHTML = `<div class="empty-state" style="padding: 20px 0;"><div class="emoji">📭</div><p>No classes scheduled for this day.</p></div>`;
-  } else {
-    detailContent.innerHTML = dayMeetings.map(m => meetingCardHTML(m, selectedDate)).join('');
-  }
+function showDayDetail(dateStr, day) {
+  const classes = calendarEventMap[dateStr]||[];
+  if (!classes.length) return;
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('dayDetailTitle').textContent=`📅 ${months[calendarMonth]} ${day}, ${calendarYear}`;
+  document.getElementById('dayDetailContent').innerHTML=classes.map(c=>`
+    <div class="meet-item" style="margin-bottom:8px;">
+      <div class="meet-info"><div class="title">${esc(c.topic)}</div><div class="time">${esc(c.dateAndTime)}${c.userClass?` · ${esc(c.userClass)}`:''}</div></div>
+      <a href="${esc(c.link)}" target="_blank" class="meet-link">📹 Join</a>
+    </div>`).join('');
+  document.getElementById('dayDetail').classList.add('active');
 }
 
 // =========================
 // Event Listeners
 // =========================
-if (document.getElementById('authSubmit')) {
-  document.getElementById('authSubmit').addEventListener('click', handleAuth);
-  document.getElementById('authPassword').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
-  document.getElementById('authUsername').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
-}
+document.getElementById('authSubmit').addEventListener('click', handleAuth);
+document.getElementById('authPassword').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
+document.getElementById('authUsername').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
 
 // Pre-load questions in background
 loadQuestions();
