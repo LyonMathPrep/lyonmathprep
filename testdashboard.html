@@ -736,7 +736,7 @@
 // CONFIG — update these sheet URLs
 // =========================
 const USERS_URL       = 'https://opensheet.elk.sh/1S9wcSH4fzhnZqJB2ZnC8HEBw49VynN9vHozA7SoTMHg/Sheet1';
-const APPROVALS_URL   = 'https://opensheet.elk.sh/YOUR_SHEET_ID/Approvals';
+const APPROVALS_URL   = 'https://opensheet.elk.sh/1KJ2lWZ3kj5q36_768I6s_-fDxWiVrmciRScV9ZwvXhc/Sheet1';
 const MEETINGS_URL    = 'https://opensheet.elk.sh/1Bpho-NecP90LqdYoxfvUxblsCoSuwQT3KYFAvonOZ10/Sheet1';
 const QUESTIONS_URL   = 'https://opensheet.elk.sh/1f8VdEO7bv6hNrul0i8rHTvzpFPYo0jNmZeRri_OLMv4/Sheet1';
 
@@ -1205,8 +1205,22 @@ function startQuiz(filter) {
     pool = pool.filter(q => norm(q['Question type']) === norm(filter));
   }
 
+  // Filter by approved levels
+  if (filter !== 'all') {
+    const subjectKey = Object.keys(subjectCatalog).find(
+      key => norm(subjectCatalog[key].sheetKey) === norm(filter)
+    );
+    if (subjectKey) {
+      const maxApprovedLevel = approvedCountForSubject(subjectKey);
+      pool = pool.filter(q => {
+        const questionLevel = parseInt(q.Level || '0', 10);
+        return questionLevel <= maxApprovedLevel;
+      });
+    }
+  }
+
   if (!pool.length) {
-    showToast('No questions found for that topic.');
+    showToast('No questions found for that topic and level.');
     return;
   }
 
