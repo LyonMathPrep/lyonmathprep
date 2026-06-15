@@ -1,1975 +1,1494 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Portal | Lyon Math Prep</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #e63946;
-            --primary-light: #fde8ea;
-            --primary-dark: #c1121f;
-            --text: #000000;
-            --text-light: #555555;
-            --bg: #ffffff;
-            --white: #ffffff;
-            --border: #000000;
-            --border-light: #e8e8e8;
-            --accent: #c1121f;
-            --green: #2d7a3a;
-            --green-light: #e6f4ea;
-            --red-light: #fde8ea;
-            --red: #c1121f;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.6;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        /* Mascot SVG container */
-        .mascot-svg {
-            width: 100%;
-            height: 100%;
-        }
-
-        /* Top Bar */
-        .topbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border-bottom: 2px solid var(--border);
-            z-index: 1000;
-            padding: 0 24px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            height: 48px;
-        }
-
-        .logo img {
-            height: 100%;
-            width: auto;
-            display: block;
-        }
-
-        .topbar-right {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            list-style: none;
-        }
-
-        .nav-links a, .nav-links button {
-            text-decoration: none;
-            color: var(--text);
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: none;
-            background: none;
-            cursor: pointer;
-            min-height: 44px;
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-links a:hover, .nav-links button:hover {
-            color: var(--primary);
-            background: var(--primary-light);
-        }
-
-        .nav-links .active {
-            color: var(--primary);
-            background: var(--primary-light);
-            font-weight: 700;
-        }
-
-        .user-avatar {
-            width: 38px;
-            height: 38px;
-            background: var(--primary);
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--white);
-            font-weight: 800;
-            font-size: 14px;
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            min-height: 44px;
-            min-width: 44px;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .hamburger span {
-            width: 22px;
-            height: 2px;
-            background: var(--text);
-            border-radius: 2px;
-            transition: all 0.3s;
-        }
-
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 64px;
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border-bottom: 2px solid var(--border);
-            padding: 8px 16px;
-            z-index: 999;
-            animation: slideDown 0.25s ease;
-        }
-
-        .mobile-menu.active {
-            display: block;
-        }
-
-        .mobile-menu a, .mobile-menu button {
-            display: block;
-            width: 100%;
-            padding: 14px 8px;
-            text-decoration: none;
-            color: var(--text);
-            font-size: 16px;
-            font-weight: 500;
-            border: none;
-            background: none;
-            text-align: left;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .mobile-menu a:last-child, .mobile-menu button:last-child {
-            border-bottom: none;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Main Content */
-        .main {
-            margin-top: 64px;
-            padding: 32px 24px;
-            max-width: 1080px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* Page transitions */
-        .page {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Dashboard */
-        .welcome-header {
-            margin-bottom: 32px;
-        }
-
-        .welcome-header h1 {
-            font-size: 30px;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            margin-bottom: 4px;
-        }
-
-        .welcome-header p {
-            color: var(--text-light);
-            font-size: 15px;
-        }
-
-        /* Next Class Card */
-        .next-class-card {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 14px;
-            padding: 28px;
-            margin-bottom: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 20px;
-            flex-wrap: wrap;
-            transition: all 0.25s;
-        }
-
-        .next-class-card:hover {
-            box-shadow: 6px 6px 0 var(--border);
-        }
-
-        .next-class-info {
-            flex: 1;
-            min-width: 200px;
-        }
-
-        .next-class-label {
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--primary);
-            margin-bottom: 8px;
-        }
-
-        .next-class-title {
-            font-size: 20px;
-            font-weight: 800;
-            margin-bottom: 6px;
-        }
-
-        .next-class-time {
-            font-size: 14px;
-            color: var(--text-light);
-        }
-
-        .next-class-time strong {
-            color: var(--text);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: 2px solid var(--border);
-            min-height: 48px;
-            min-width: 48px;
-            gap: 8px;
-            background: var(--white);
-            color: var(--text);
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .btn-secondary:hover {
-            background: #fbd5d9;
-        }
-
-        .btn-meet {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        .btn-meet:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 13px;
-            min-height: 40px;
-        }
-
-        /* Grid */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            margin-bottom: 32px;
-        }
-
-        /* Sections */
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .section-header h2 {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.3px;
-        }
-
-        /* Subject Cards */
-        .subject-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-
-        .subject-card {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 20px 24px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            cursor: pointer;
-            transition: all 0.25s;
-            text-decoration: none;
-            color: inherit;
-        }
-
-        .subject-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 4px 4px 0 var(--border);
-        }
-
-        .subject-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--primary-light);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            flex-shrink: 0;
-        }
-
-        .subject-details {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .subject-name {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-
-        .subject-units {
-            font-size: 13px;
-            color: var(--text-light);
-        }
-
-        .subject-progress {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .progress-bar {
-            width: 100px;
-            height: 8px;
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--primary);
-            border-radius: 0;
-            transition: width 0.4s ease;
-        }
-
-        .progress-text {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--primary);
-            white-space: nowrap;
-        }
-
-        .arrow-icon {
-            color: var(--text);
-            font-size: 20px;
-            flex-shrink: 0;
-            font-weight: 700;
-        }
-
-        /* Unit List */
-        .unit-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .unit-card {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .unit-card:hover {
-            background: var(--primary-light);
-        }
-
-        .unit-card.completed {
-            opacity: 0.7;
-        }
-
-        .unit-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .unit-status {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: 2px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            flex-shrink: 0;
-            font-weight: 700;
-            background: var(--white);
-        }
-
-        .unit-status.done {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        .unit-status.current {
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .unit-name {
-            font-size: 15px;
-            font-weight: 600;
-        }
-
-        .unit-badge {
-            font-size: 12px;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-weight: 700;
-            border: 2px solid var(--border);
-        }
-
-        .badge-done {
-            background: var(--white);
-            color: var(--text);
-        }
-
-        .badge-start {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        .badge-locked {
-            background: var(--white);
-            color: var(--text-light);
-        }
-
-        /* Back button */
-        .back-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: none;
-            border: none;
-            color: var(--text);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            padding: 8px 0;
-            margin-bottom: 24px;
-            min-height: 44px;
-            transition: color 0.2s;
-        }
-
-        .back-btn:hover {
-            color: var(--primary);
-        }
-
-        /* Quiz */
-        .quiz-container {
-            max-width: 680px;
-            margin: 0 auto;
-        }
-
-        .quiz-progress {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .quiz-progress-bar {
-            flex: 1;
-            height: 8px;
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .quiz-progress-fill {
-            height: 100%;
-            background: var(--primary);
-            transition: width 0.4s ease;
-        }
-
-        .quiz-progress-text {
-            font-size: 13px;
-            color: var(--text);
-            font-weight: 700;
-            white-space: nowrap;
-        }
-
-        /* Quiz mascot */
-        .quiz-mascot-wrap {
-            display: flex;
-            justify-content: center;
-            margin-bottom: -28px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .quiz-mascot {
-            width: 90px;
-            height: 90px;
-            transition: transform 0.3s ease;
-        }
-
-        .quiz-mascot.celebrate {
-            animation: celebrate 0.6s ease;
-        }
-
-        .quiz-mascot.sad {
-            animation: shake 0.4s ease;
-        }
-
-        @keyframes celebrate {
-            0%, 100% { transform: translateY(0) rotate(0); }
-            25% { transform: translateY(-12px) rotate(-8deg); }
-            75% { transform: translateY(-12px) rotate(8deg); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-8px); }
-            75% { transform: translateX(8px); }
-        }
-
-        .quiz-card {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 14px;
-            padding: 50px 32px 36px;
-            text-align: center;
-        }
-
-        .quiz-question-label {
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: var(--primary);
-            margin-bottom: 16px;
-        }
-
-        .quiz-question {
-            font-size: 26px;
-            font-weight: 800;
-            margin-bottom: 32px;
-            line-height: 1.4;
-            letter-spacing: -0.5px;
-        }
-
-        .quiz-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 24px;
-        }
-
-        .quiz-option {
-            width: 100%;
-            padding: 16px 20px;
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            text-align: left;
-            min-height: 52px;
-            color: var(--text);
-        }
-
-        .quiz-option:hover {
-            background: var(--primary-light);
-            transform: translateX(4px);
-        }
-
-        .quiz-option.selected {
-            background: var(--primary-light);
-            color: var(--primary);
-            font-weight: 700;
-        }
-
-        .quiz-option.correct {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        .quiz-option.incorrect {
-            background: var(--text);
-            color: var(--white);
-        }
-
-        .quiz-option:disabled {
-            cursor: default;
-            transform: none;
-        }
-
-        .quiz-feedback {
-            padding: 14px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .quiz-feedback.correct {
-            display: block;
-            background: var(--primary-light);
-            color: var(--primary);
-        }
-
-        .quiz-feedback.incorrect {
-            display: block;
-            background: var(--white);
-            color: var(--text);
-        }
-
-        .quiz-actions {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-        }
-
-        /* Quiz complete */
-        .quiz-complete {
-            text-align: center;
-            padding: 40px 20px;
-        }
-
-        .quiz-complete .complete-mascot {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 16px;
-        }
-
-        .quiz-complete h2 {
-            font-size: 26px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .quiz-complete p {
-            color: var(--text-light);
-            margin-bottom: 8px;
-        }
-
-        .quiz-score {
-            font-size: 42px;
-            font-weight: 800;
-            color: var(--primary);
-            margin: 16px 0 8px;
-        }
-
-        /* Calendar */
-        .calendar-container {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 14px;
-            overflow: hidden;
-            margin-bottom: 28px;
-        }
-
-        .calendar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 24px;
-            border-bottom: 2px solid var(--border);
-        }
-
-        .calendar-header h3 {
-            font-size: 17px;
-            font-weight: 800;
-        }
-
-        .calendar-nav {
-            display: flex;
-            gap: 6px;
-        }
-
-        .calendar-nav button {
-            width: 38px;
-            height: 38px;
-            border: 2px solid var(--border);
-            background: var(--white);
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            color: var(--text);
-            min-height: 44px;
-            min-width: 44px;
-        }
-
-        .calendar-nav button:hover {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        .calendar-grid {
-            padding: 16px;
-        }
-
-        .calendar-weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            margin-bottom: 8px;
-        }
-
-        .calendar-weekdays span {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text);
-            padding: 8px 0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .calendar-days {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 4px;
-        }
-
-        .calendar-day {
-            aspect-ratio: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: default;
-            transition: all 0.2s;
-            position: relative;
-            min-height: 44px;
-            border: 2px solid transparent;
-        }
-
-        .calendar-day.other-month {
-            color: #c0c0c0;
-        }
-
-        .calendar-day.today {
-            background: var(--text);
-            color: var(--white);
-            font-weight: 800;
-        }
-
-        .calendar-day.has-class {
-            background: var(--primary-light);
-            color: var(--primary);
-            font-weight: 800;
-            cursor: pointer;
-            border-color: var(--border);
-        }
-
-        .calendar-day.has-class:hover {
-            background: var(--primary);
-            color: var(--white);
-        }
-
-        .calendar-day.has-class.today {
-            background: var(--primary);
-            color: var(--white);
-            border-color: var(--border);
-        }
-
-        .class-dot {
-            width: 5px;
-            height: 5px;
-            background: var(--primary);
-            border-radius: 50%;
-            margin-top: 2px;
-        }
-
-        .calendar-day.today .class-dot,
-        .calendar-day.has-class:hover .class-dot {
-            background: var(--white);
-        }
-
-        /* Meet Link Section */
-        .meet-section {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 14px;
-            padding: 24px;
-        }
-
-        .meet-section h3 {
-            font-size: 17px;
-            font-weight: 800;
-            margin-bottom: 16px;
-        }
-
-        .meet-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px;
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            margin-bottom: 10px;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-
-        .meet-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .meet-info {
-            flex: 1;
-            min-width: 180px;
-        }
-
-        .meet-info .title {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-
-        .meet-info .time {
-            font-size: 13px;
-            color: var(--text-light);
-        }
-
-        .meet-link {
-            font-size: 13px;
-            color: var(--white);
-            text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            background: var(--primary);
-            border: 2px solid var(--border);
-            font-weight: 700;
-            transition: all 0.2s;
-            min-height: 40px;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-
-        .meet-link:hover {
-            background: var(--primary-dark);
-        }
-
-        /* Day detail popup */
-        .day-detail {
-            display: none;
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 16px;
-            animation: fadeIn 0.2s ease;
-        }
-
-        .day-detail.active {
-            display: block;
-        }
-
-        .day-detail h4 {
-            font-size: 15px;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-
-        /* Upcoming classes list */
-        .upcoming-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .upcoming-card {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            padding: 16px 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            transition: all 0.2s;
-        }
-
-        .upcoming-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 4px 4px 0 var(--border);
-        }
-
-        .upcoming-date {
-            text-align: center;
-            min-width: 48px;
-            padding: 6px;
-            background: var(--primary-light);
-            border: 2px solid var(--border);
-            border-radius: 8px;
-        }
-
-        .upcoming-date .day {
-            font-size: 20px;
-            font-weight: 800;
-            color: var(--primary);
-            line-height: 1;
-        }
-
-        .upcoming-date .month {
-            font-size: 10px;
-            color: var(--text);
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            margin-top: 2px;
-        }
-
-        .upcoming-info {
-            flex: 1;
-        }
-
-        .upcoming-info .title {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 2px;
-        }
-
-        .upcoming-info .time {
-            font-size: 13px;
-            color: var(--text-light);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hamburger {
-                display: flex;
-            }
-
-            .main {
-                padding: 24px 16px;
-            }
-
-            .grid-2 {
-                grid-template-columns: 1fr;
-            }
-
-            .welcome-header h1 {
-                font-size: 24px;
-            }
-
-            .next-class-card {
-                padding: 20px;
-            }
-
-            .next-class-title {
-                font-size: 18px;
-            }
-
-            .subject-card {
-                padding: 16px;
-            }
-
-            .progress-bar {
-                width: 60px;
-            }
-
-            .quiz-card {
-                padding: 44px 20px 24px;
-            }
-
-            .quiz-question {
-                font-size: 22px;
-            }
-
-            .quiz-mascot {
-                width: 75px;
-                height: 75px;
-            }
-
-            .meet-item {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .calendar-day {
-                font-size: 13px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .subject-progress {
-                display: none;
-            }
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: var(--text);
-            color: var(--white);
-            padding: 14px 24px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            z-index: 2000;
-            transition: transform 0.3s ease;
-            white-space: nowrap;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Portal | Lyon Math Prep</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --primary:#e63946;
+      --primary-light:#fde8ea;
+      --primary-dark:#c1121f;
+      --text:#000;
+      --text-light:#555;
+      --bg:#fff;
+      --white:#fff;
+      --border:#000;
+      --border-light:#e8e8e8;
+      --green:#2d7a3a;
+      --green-light:#e6f4ea;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .hidden { display:none !important; }
+
+    /* ==================== AUTH ==================== */
+    #authScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      padding: 40px 20px;
+    }
+
+    .auth-logo {
+      height: 48px;
+      margin-bottom: 22px;
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--primary);
+      letter-spacing: -0.5px;
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--white);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      animation: fadeUp .35s ease;
+    }
+
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(16px); }
+      to { opacity:1; transform: translateY(0); }
+    }
+
+    .auth-mascot {
+      font-size: 56px;
+      text-align: center;
+      margin: 26px auto 10px;
+      line-height: 1;
+    }
+
+    .auth-body { padding: 28px 30px 30px; }
+
+    .auth-body h1 {
+      font-size: 22px;
+      text-align:center;
+      font-weight:800;
+      letter-spacing:-.4px;
+    }
+
+    .auth-body p.subtitle {
+      text-align:center;
+      color:var(--text-light);
+      font-size:14px;
+      margin-top:4px;
+      margin-bottom:22px;
+    }
+
+    .form-group { margin-bottom: 14px; }
+
+    .form-group label {
+      display:block;
+      font-size:13px;
+      font-weight:800;
+      margin-bottom:6px;
+    }
+
+    .form-group input {
+      width:100%;
+      padding:14px 16px;
+      border:2px solid var(--border);
+      border-radius:10px;
+      font-size:15px;
+      font-family:inherit;
+      outline:none;
+      -webkit-appearance:none;
+    }
+
+    .form-group input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+
+    .auth-submit {
+      width:100%;
+      margin-top:4px;
+      padding:14px 16px;
+      border:2px solid var(--border);
+      border-radius:10px;
+      background: var(--primary);
+      color: var(--white);
+      font: inherit;
+      font-weight:800;
+      cursor:pointer;
+      min-height:50px;
+      font-size: 16px;
+    }
+
+    .auth-submit:hover { background: var(--primary-dark); }
+    .auth-submit:disabled { opacity:.6; cursor:not-allowed; }
+
+    .message {
+      display:none;
+      margin-bottom:14px;
+      padding:12px;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:700;
+      text-align:center;
+      border:2px solid var(--border);
+    }
+
+    .message.error { display:block; background: var(--primary-light); color: var(--primary-dark); }
+    .message.success { display:block; background: var(--green-light); color: var(--green); }
+
+    .auth-note {
+      margin-top: 16px;
+      color: var(--text-light);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    /* ==================== PORTAL ==================== */
+    #portalScreen { display:none; }
+    #portalScreen.active { display:block; }
+
+    .topbar {
+      position: fixed;
+      top:0; left:0; right:0;
+      height:64px;
+      background: var(--white);
+      border-bottom:2px solid var(--border);
+      z-index:1000;
+      padding: 0 24px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--primary);
+      text-decoration: none;
+      letter-spacing: -0.5px;
+    }
+
+    .topbar-right { display:flex; align-items:center; gap:16px; }
+
+    .nav-links { display:flex; list-style:none; align-items:center; gap:8px; }
+
+    .nav-links a, .nav-links button {
+      border:none; background:none; text-decoration:none;
+      color:var(--text); font: inherit; font-size:14px; font-weight:600;
+      padding:8px 14px; border-radius:8px; cursor:pointer;
+      min-height:44px; display:flex; align-items:center;
+    }
+
+    .nav-links a:hover, .nav-links button:hover { color: var(--primary); background: var(--primary-light); }
+    .nav-links .nav-btn.active { color:var(--primary); background:var(--primary-light); font-weight:800; }
+
+    .user-avatar {
+      width:38px; height:38px; border-radius:50%;
+      background:var(--primary); border:2px solid var(--border);
+      color:var(--white); font-weight:900;
+      display:flex; align-items:center; justify-content:center;
+      font-size: 16px;
+    }
+
+    .hamburger {
+      display:none; background:none; border:none; cursor:pointer;
+      flex-direction:column; justify-content:center; align-items:center;
+      gap:5px; padding:8px; min-height:44px; min-width:44px;
+    }
+    .hamburger span { width:22px; height:2px; background:var(--text); border-radius:2px; }
+
+    .mobile-menu {
+      display:none; position:fixed; top:64px; left:0; right:0;
+      z-index:999; background:var(--white); border-bottom:2px solid var(--border);
+      padding:8px 16px;
+    }
+    .mobile-menu.active { display:block; }
+    .mobile-menu a, .mobile-menu button {
+      display:block; width:100%; text-align:left;
+      padding:14px 8px; border:none; background:none;
+      color:var(--text); font: inherit; font-size:16px; font-weight:600;
+      cursor:pointer; border-bottom:1px solid var(--border-light);
+      text-decoration: none;
+    }
+    .mobile-menu a:last-child, .mobile-menu button:last-child { border-bottom:none; }
+
+    .main {
+      margin-top:64px;
+      max-width:1080px;
+      margin-left:auto; margin-right:auto;
+      padding: 32px 24px;
+    }
+
+    .page { display:none; animation: fadeIn .25s ease; }
+    .page.active { display:block; }
+
+    @keyframes fadeIn {
+      from { opacity:0; transform: translateY(10px); }
+      to { opacity:1; transform: translateY(0); }
+    }
+
+    .welcome-header { margin-bottom: 28px; }
+    .welcome-header h1 { font-size: 30px; font-weight: 900; letter-spacing:-.5px; }
+    .welcome-header p { color: var(--text-light); margin-top:4px; }
+
+    .card, .calendar-container, .meet-section, .day-detail, .empty-state {
+      background: var(--white); border:2px solid var(--border); border-radius:14px;
+    }
+
+    .next-class-card {
+      background: var(--white); border:2px solid var(--border); border-radius:14px;
+      padding: 24px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap: 18px; flex-wrap:wrap; margin-bottom: 26px;
+    }
+
+    .next-class-info { flex:1; min-width:200px; }
+    .next-class-label { font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.8px; color:var(--primary); margin-bottom: 6px; }
+    .next-class-title { font-size:20px; font-weight:900; margin-bottom: 4px; }
+    .next-class-time { font-size:14px; color:var(--text-light); }
+    .next-class-time strong { color: var(--text); }
+
+    .btn {
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:12px 18px; border:2px solid var(--border); border-radius:8px;
+      background:var(--white); color:var(--text); text-decoration:none;
+      font: inherit; font-weight:700; min-height:48px; cursor:pointer;
+    }
+    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-meet { background: var(--primary); color: var(--white); }
+    .btn-meet:hover { background: var(--primary-dark); }
+
+    .section-header { display:flex; align-items:center; justify-content:space-between; margin: 20px 0 14px; }
+    .section-header h2 { font-size: 22px; font-weight: 900; }
+
+    .subject-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px; margin-bottom: 24px;
+    }
+
+    .subject-card {
+      border:2px solid var(--border); border-radius:12px;
+      background:var(--white); padding:18px;
+      cursor:pointer; display:flex; flex-direction:column; gap:10px;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .subject-card:hover { transform: translateY(-2px); box-shadow: 4px 4px 0 var(--border); background: var(--primary-light); }
+
+    .subject-top { display:flex; align-items:center; gap:12px; }
+    .subject-icon {
+      width:46px; height:46px; border:2px solid var(--border); border-radius:12px;
+      background: var(--primary-light); display:flex; align-items:center;
+      justify-content:center; font-size:22px; flex-shrink:0;
+    }
+    .subject-name { font-size:16px; font-weight:900; }
+    .subject-sub { font-size:13px; color:var(--text-light); }
+
+    .progress-bar {
+      width:100%; height:8px; background:var(--white);
+      border:2px solid var(--border); border-radius:999px; overflow:hidden;
+    }
+    .progress-fill { height:100%; background:var(--primary); }
+
+    .subject-footer { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+    .pill { font-size:12px; font-weight:900; border:2px solid var(--border); border-radius:999px; padding:4px 10px; white-space:nowrap; }
+    .pill.approved { background: var(--primary); color: var(--white); }
+    .pill.locked { background: var(--white); color: var(--text-light); }
+
+    .unit-list { display:flex; flex-direction:column; gap:10px; }
+
+    .unit-card {
+      border:2px solid var(--border); border-radius:12px;
+      background:var(--white); padding:16px 18px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; transition: .18s ease;
+    }
+    .unit-card.clickable { cursor:pointer; }
+    .unit-card.clickable:hover { background: var(--primary-light); }
+
+    .unit-left { display:flex; align-items:center; gap:12px; min-width:0; }
+    .unit-status {
+      width:32px; height:32px; border:2px solid var(--border);
+      border-radius:50%; display:flex; align-items:center; justify-content:center;
+      flex-shrink:0; background:var(--white); font-weight:900;
+    }
+    .unit-status.done { background: var(--primary); color: var(--white); }
+    .unit-status.current { background: var(--primary-light); color: var(--primary); }
+
+    .unit-name { font-weight:800; }
+    .unit-meta { font-size:13px; color:var(--text-light); }
+    .unit-badge { font-size:12px; font-weight:900; border:2px solid var(--border); border-radius:999px; padding:4px 10px; white-space:nowrap; }
+    .unit-badge.approved { background: var(--primary); color: var(--white); }
+    .unit-badge.locked { background: var(--white); color: var(--text-light); }
+
+    .back-btn { border:none; background:none; cursor:pointer; font:inherit; font-weight:800; padding:8px 0; margin-bottom:20px; display:flex; align-items:center; gap:6px; }
+    .back-btn:hover { color: var(--primary); }
+
+    .empty-state { padding: 36px 24px; text-align:center; }
+    .empty-state .emoji { font-size: 44px; margin-bottom: 12px; }
+    .empty-state h3 { font-size: 20px; margin-bottom: 8px; }
+    .empty-state p { color: var(--text-light); }
+
+    /* ==================== QUIZ ==================== */
+    .quiz-container {
+      max-width: 680px;
+    }
+
+    .quiz-progress {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .quiz-progress-bar {
+      flex: 1; height: 10px;
+      background: var(--border-light);
+      border: 2px solid var(--border);
+      border-radius: 999px; overflow: hidden;
+    }
+
+    .quiz-progress-fill { height: 100%; background: var(--primary); transition: width .4s ease; }
+
+    .quiz-progress-text { font-size: 14px; font-weight: 800; color: var(--text-light); white-space: nowrap; }
+
+    .quiz-card {
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .quiz-card-header {
+      padding: 18px 20px;
+      border-bottom: 2px solid var(--border);
+      background: var(--primary-light);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .quiz-badge {
+      font-size: 11px; font-weight: 900; text-transform: uppercase;
+      letter-spacing: .6px; border: 2px solid var(--border);
+      border-radius: 999px; padding: 3px 10px;
+      background: var(--white); color: var(--primary);
+      white-space: nowrap; flex-shrink: 0; margin-top: 2px;
+    }
+
+    .quiz-question {
+      font-size: 18px; font-weight: 800; line-height: 1.5;
+    }
+
+    .quiz-image {
+      width: 100%; max-height: 260px;
+      object-fit: contain;
+      border-bottom: 2px solid var(--border);
+      background: #f8f8f8;
+      padding: 12px;
+    }
+
+    .quiz-choices {
+      padding: 16px 20px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    .choice-btn {
+      width: 100%; text-align: left;
+      padding: 14px 16px;
+      border: 2px solid var(--border); border-radius: 10px;
+      background: var(--white); color: var(--text);
+      font: inherit; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: all .15s ease;
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    .choice-letter {
+      width: 30px; height: 30px; border: 2px solid var(--border);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 13px; flex-shrink: 0;
+      background: var(--primary-light); color: var(--primary);
+    }
+
+    .choice-btn:hover:not(:disabled) { background: var(--primary-light); border-color: var(--primary); }
+    .choice-btn:hover:not(:disabled) .choice-letter { background: var(--primary); color: var(--white); border-color: var(--primary); }
+
+    .choice-btn.correct { background: var(--green-light); border-color: var(--green); color: var(--green); }
+    .choice-btn.correct .choice-letter { background: var(--green); color: var(--white); border-color: var(--green); }
+    .choice-btn.wrong { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }
+    .choice-btn.wrong .choice-letter { background: var(--primary); color: var(--white); border-color: var(--primary); }
+    .choice-btn:disabled { cursor: default; }
+
+    .quiz-feedback {
+      margin: 0 20px 16px;
+      padding: 12px 16px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      display: none;
+    }
+    .quiz-feedback.correct { display: block; background: var(--green-light); color: var(--green); border-color: var(--green); }
+    .quiz-feedback.wrong { display: block; background: var(--primary-light); color: var(--primary-dark); }
+
+    .quiz-next-btn {
+      display: none;
+      margin: 0 20px 20px;
+      padding: 14px 18px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: var(--primary);
+      color: var(--white);
+      font: inherit; font-size: 15px; font-weight: 800;
+      cursor: pointer; width: calc(100% - 40px);
+    }
+    .quiz-next-btn:hover { background: var(--primary-dark); }
+    .quiz-next-btn.visible { display: block; }
+
+    .quiz-results {
+      border: 2px solid var(--border); border-radius: 16px;
+      padding: 36px 28px; text-align: center;
+    }
+
+    .quiz-results .score-circle {
+      width: 100px; height: 100px;
+      border: 4px solid var(--border);
+      border-radius: 50%;
+      background: var(--primary-light);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+    }
+
+    .score-number { font-size: 28px; font-weight: 900; color: var(--primary); line-height: 1; }
+    .score-label { font-size: 12px; font-weight: 700; color: var(--text-light); }
+
+    .quiz-results h2 { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+    .quiz-results p { color: var(--text-light); margin-bottom: 24px; }
+
+    .quiz-results-row {
+      display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px;
+    }
+
+    .quiz-stat {
+      border: 2px solid var(--border); border-radius: 10px;
+      padding: 12px 20px; text-align: center; min-width: 90px;
+    }
+    .quiz-stat .stat-val { font-size: 22px; font-weight: 900; }
+    .quiz-stat .stat-key { font-size: 12px; color: var(--text-light); font-weight: 700; }
+    .quiz-stat.green .stat-val { color: var(--green); }
+    .quiz-stat.red .stat-val { color: var(--primary); }
+
+    /* ==================== CALENDAR ==================== */
+    .grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    .calendar-container { overflow:hidden; }
+    .calendar-header { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:2px solid var(--border); }
+    .calendar-header h3 { font-size:17px; font-weight:900; }
+    .calendar-nav { display:flex; gap:8px; }
+    .calendar-nav button { width:40px; height:40px; border:2px solid var(--border); border-radius:8px; background:var(--white); cursor:pointer; font:inherit; font-weight:900; }
+    .calendar-nav button:hover { background: var(--primary); color: var(--white); }
+    .calendar-grid { padding: 14px; }
+    .calendar-weekdays, .calendar-days { display:grid; grid-template-columns: repeat(7, 1fr); gap:4px; }
+    .calendar-weekdays span { font-size:12px; font-weight:900; text-transform:uppercase; text-align:center; padding:8px 0; }
+
+    .calendar-day {
+      min-height:44px; aspect-ratio:1;
+      display:flex; align-items:center; justify-content:center;
+      border:2px solid transparent; border-radius:10px;
+      position:relative; font-size:14px; font-weight:700;
+    }
+    .calendar-day.other-month { color:#c0c0c0; }
+    .calendar-day.today { background: var(--text); color: var(--white); }
+    .calendar-day.has-class { background: var(--primary-light); color: var(--primary); border-color: var(--border); cursor:pointer; }
+    .calendar-day.has-class:hover { background: var(--primary); color:var(--white); }
+    .class-dot { width:5px; height:5px; border-radius:50%; background:var(--primary); position:absolute; bottom:7px; }
+    .calendar-day.has-class:hover .class-dot, .calendar-day.today .class-dot { background: var(--white); }
+
+    .day-detail { display:none; padding:18px; margin-top:16px; }
+    .day-detail.active { display:block; }
+
+    .meet-section { padding:18px; }
+    .meet-section h3 { margin-bottom: 12px; font-size:17px; font-weight:900; }
+    .meet-item { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; border:2px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; }
+    .meet-item:last-child { margin-bottom:0; }
+    .meet-info { flex:1; min-width:180px; }
+    .meet-info .title { font-weight:800; }
+    .meet-info .time { font-size:13px; color:var(--text-light); }
+    .meet-link { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border:2px solid var(--border); border-radius:8px; background: var(--primary); color: var(--white); text-decoration:none; font-size:13px; font-weight:900; white-space: nowrap; }
+    .meet-link:hover { background: var(--primary-dark); }
+
+    .upcoming-list { display:flex; flex-direction:column; gap:10px; }
+    .upcoming-card { background: var(--white); border:2px solid var(--border); border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:16px; transition: all .2s; }
+    .upcoming-card:hover { transform: translateY(-2px); box-shadow: 4px 4px 0 var(--border); }
+    .upcoming-date { text-align:center; min-width:48px; padding:6px; background: var(--primary-light); border:2px solid var(--border); border-radius:8px; }
+    .upcoming-date .day { font-size:20px; font-weight:800; color: var(--primary); line-height:1; }
+    .upcoming-date .month { font-size:10px; color: var(--text); text-transform:uppercase; font-weight:700; letter-spacing:.5px; margin-top:2px; }
+    .upcoming-info { flex:1; }
+    .upcoming-info .title { font-size:15px; font-weight:700; margin-bottom:2px; }
+    .upcoming-info .time { font-size:13px; color:var(--text-light); }
+
+    .toast { position:fixed; left:50%; bottom:24px; transform: translateX(-50%) translateY(80px); background: var(--text); color: var(--white); border:2px solid var(--border); padding: 12px 18px; border-radius:10px; z-index:2000; font-size:14px; font-weight:800; transition: transform .22s ease; white-space:nowrap; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    .loading-spinner {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 48px; gap: 16px;
+    }
+    .spinner { width: 36px; height: 36px; border: 3px solid var(--border-light); border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 768px) {
+      .nav-links { display:none; }
+      .hamburger { display:flex; }
+      .main { padding: 24px 16px; }
+      .grid-2 { grid-template-columns: 1fr; }
+      .welcome-header h1 { font-size: 24px; }
+    }
+
+    @media (max-width: 480px) {
+      .subject-grid { grid-template-columns: 1fr; }
+      .auth-body { padding: 24px 18px 22px; }
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Top Bar -->
-    <header class="topbar">
-        <a href="index.html" class="logo">
-    <img src="logo.png" alt="Lyon Math Prep">
-</a>
-        <nav>
-            <ul class="nav-links">
-                <li><button onclick="showPage('dashboard')" class="nav-btn active" data-page="dashboard">Dashboard</button></li>
-                <li><button onclick="showPage('calendar')" class="nav-btn" data-page="calendar">Calendar</button></li>
-                <li><a href="index.html">Home</a></li>
-            </ul>
-        </nav>
-        <div class="topbar-right">
-            <div class="user-avatar">B</div>
-            <button class="hamburger" onclick="toggleMobile()" aria-label="Menu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
-        </div>
-    </header>
+<!-- AUTH -->
+<div id="authScreen">
+  <div class="auth-logo">🧭 Lyon Math Prep</div>
 
-    <div class="mobile-menu" id="mobileMenu">
-        <button onclick="showPage('dashboard'); toggleMobile();">Dashboard</button>
-        <button onclick="showPage('calendar'); toggleMobile();">Calendar</button>
-        <a href="index.html">Home</a>
+  <div class="auth-card">
+    <div class="auth-mascot">📐</div>
+
+    <div class="auth-body">
+      <h1>Welcome back 👋</h1>
+      <p class="subtitle">Log in to your student portal</p>
+
+      <div class="message" id="authMessage"></div>
+
+      <div class="form-group">
+        <label for="authUsername">Username</label>
+        <input id="authUsername" type="text" placeholder="Your username" autocomplete="username" />
+      </div>
+
+      <div class="form-group">
+        <label for="authPassword">Password</label>
+        <input id="authPassword" type="password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <button class="auth-submit" id="authSubmit" type="button">Log In</button>
+    </div>
+  </div>
+
+  <p class="auth-note">Ask your instructor to set up your account.</p>
+</div>
+
+<!-- PORTAL -->
+<div id="portalScreen">
+  <header class="topbar">
+    <span class="logo">🧭 Lyon Math Prep</span>
+
+    <nav>
+      <ul class="nav-links">
+        <li><button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')">Dashboard</button></li>
+        <li><button class="nav-btn" data-page="practice" onclick="showPage('practice')">Practice</button></li>
+        <li><button class="nav-btn" data-page="calendar" onclick="showPage('calendar')">Calendar</button></li>
+        <li><button onclick="logout()">Log Out</button></li>
+      </ul>
+    </nav>
+
+    <div class="topbar-right">
+      <div class="user-avatar" id="userAvatar">S</div>
+      <button class="hamburger" onclick="toggleMobile()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <button onclick="showPage('dashboard'); toggleMobile();">Dashboard</button>
+    <button onclick="showPage('practice'); toggleMobile();">Practice</button>
+    <button onclick="showPage('calendar'); toggleMobile();">Calendar</button>
+    <button onclick="logout()">Log Out</button>
+  </div>
+
+  <main class="main">
+    <!-- DASHBOARD -->
+    <section class="page active" id="page-dashboard">
+      <div class="welcome-header">
+        <h1 id="welcomeName">Welcome back 👋</h1>
+        <p>Only approved modules are unlocked for your account.</p>
+      </div>
+
+      <div class="next-class-card" id="nextClassCard">
+        <div class="next-class-info">
+          <div class="next-class-label">📅 Next Meeting</div>
+          <div class="next-class-title">No meetings yet</div>
+          <div class="next-class-time">Once staff adds a meeting for you, it will appear here.</div>
+        </div>
+      </div>
+
+      <div class="section-header"><h2>Your Modules</h2></div>
+      <div class="subject-grid" id="subjectCards"></div>
+
+      <div class="section-header"><h2>Upcoming Meetings</h2></div>
+      <div class="upcoming-list" id="dashboardUpcomingList"></div>
+    </section>
+
+    <!-- SUBJECT DETAIL -->
+    <section class="page" id="page-subject">
+      <button class="back-btn" onclick="showPage('dashboard')">← Back to Dashboard</button>
+      <div class="welcome-header">
+        <h1 id="subjectTitle">Subject</h1>
+        <p id="subjectDesc">Approved levels will be shown below.</p>
+      </div>
+      <div class="unit-list" id="unitList"></div>
+    </section>
+
+    <!-- PRACTICE -->
+    <section class="page" id="page-practice">
+      <div class="welcome-header">
+        <h1>🧠 Practice Questions</h1>
+        <p>Test your knowledge across all subjects.</p>
+      </div>
+
+      <!-- Filter bar -->
+      <div id="practiceFilters" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;">
+        <button class="btn btn-primary" onclick="startQuiz('all')">All Questions</button>
+        <button class="btn" onclick="startQuiz('Algebra 1')">Algebra I</button>
+        <button class="btn" onclick="startQuiz('Alebgra 2')">Algebra II</button>
+        <button class="btn" onclick="startQuiz('Geometry')">Geometry</button>
+        <button class="btn" onclick="startQuiz('Statistics')">Statistics</button>
+        <button class="btn" onclick="startQuiz('Pre-algebra')">Pre-Algebra</button>
+      </div>
+
+      <div id="quizArea" class="quiz-container"></div>
+    </section>
+
+    <!-- CALENDAR -->
+    <section class="page" id="page-calendar">
+      <div class="welcome-header">
+        <h1>📅 Class Calendar</h1>
+        <p>View your upcoming meetings and join directly.</p>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="calendar-container">
+            <div class="calendar-header">
+              <h3 id="calendarTitle">January 2025</h3>
+              <div class="calendar-nav">
+                <button onclick="changeMonth(-1)">‹</button>
+                <button onclick="changeMonth(1)">›</button>
+              </div>
+            </div>
+            <div class="calendar-grid">
+              <div class="calendar-weekdays">
+                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+              </div>
+              <div class="calendar-days" id="calendarDays"></div>
+            </div>
+          </div>
+          <div class="day-detail" id="dayDetail">
+            <h3 id="dayDetailTitle" style="margin-bottom:12px;">Classes on this day</h3>
+            <div id="dayDetailContent"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="meet-section" id="calendarMeetings">
+            <h3>🔗 Your Meetings</h3>
+            <div class="empty-state">
+              <div class="emoji">📭</div>
+              <h3>No meetings yet</h3>
+              <p>Once staff adds meetings for your username, they'll appear here.</p>
+            </div>
+          </div>
+          <div style="margin-top:24px;">
+            <div class="section-header"><h2>Upcoming</h2></div>
+            <div class="upcoming-list" id="calendarUpcomingList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =========================
+// CONFIG — update these sheet URLs
+// =========================
+const USERS_URL       = 'https://opensheet.elk.sh/1S9wcSH4fzhnZqJB2ZnC8HEBw49VynN9vHozA7SoTMHg/Sheet1';
+const APPROVALS_URL   = 'https://opensheet.elk.sh/1KJ2lWZ3kj5q36_768I6s_-fDxWiVrmciRScV9ZwvXhc/Sheet1';
+const MEETINGS_URL    = 'https://opensheet.elk.sh/1Bpho-NecP90LqdYoxfvUxblsCoSuwQT3KYFAvonOZ10/Sheet1';
+const QUESTIONS_URL   = 'https://opensheet.elk.sh/1f8VdEO7bv6hNrul0i8rHTvzpFPYo0jNmZeRri_OLMv4/Sheet1';
+
+// =========================
+// State
+// =========================
+let currentUser = null;
+let approvedSet = new Set();
+let meetingCache = [];
+let questionsCache = [];
+let calendarEventMap = {};
+let quizState = null;
+
+const nowInit = new Date();
+let calendarMonth = nowInit.getMonth();
+let calendarYear  = nowInit.getFullYear();
+
+const subjectCatalog = {
+  algebra1:   { label: 'Algebra I',    icon: '📐', desc: 'Linear equations, expressions, inequalities, and functions.', sheetKey: 'Algebra 1'    },
+  prealgebra: { label: 'Pre-Algebra',  icon: '🔢', desc: 'Whole numbers, fractions, decimals, and ratios.',            sheetKey: 'Pre-algebra'  },
+  geometry:   { label: 'Geometry',     icon: '📏', desc: 'Angles, triangles, shapes, area, and volume.',               sheetKey: 'Geometry'     },
+  algebra2:   { label: 'Algebra II',   icon: '🧮', desc: 'Quadratics, roots, and advanced algebra skills.',            sheetKey: 'Alebgra 2'   },
+  statistics: { label: 'Statistics',   icon: '📊', desc: 'Data, mean, probability, and interpretation.',              sheetKey: 'Statistics'   }
+};
+
+const daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+// =========================
+// Utilities
+// =========================
+function norm(v) { return String(v ?? '').trim().toLowerCase().replace(/\s+/g,' '); }
+
+function esc(str) {
+  return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function capitalizeName(n) {
+  const s = String(n||'Student').trim();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function formatShortDay(d) {
+  return new Intl.DateTimeFormat('en-US',{weekday:'long',month:'short',day:'numeric'}).format(d);
+}
+
+function extractTimeRange(text) {
+  const parts = String(text||'').split('·');
+  return (parts[1]||parts[0]||'').trim();
+}
+
+function parseTimeToHM(text) {
+  const m = String(text||'').match(/(\d{1,2}):(\d{2})\s*([AP]M)/i);
+  if (!m) return {h:12,min:0};
+  let h = parseInt(m[1],10), min = parseInt(m[2],10), ap = m[3].toUpperCase();
+  if (ap==='PM'&&h!==12) h+=12;
+  if (ap==='AM'&&h===12) h=0;
+  return {h,min};
+}
+
+function extractWeekdays(text) {
+  const out = [];
+  for (const day of daysOfWeek) {
+    if (new RegExp(`\\b${day}\\b`,'i').test(String(text||''))) out.push(day);
+  }
+  return [...new Set(out)];
+}
+
+function parseSpecificDate(text) {
+  const m = String(text||'').match(
+    /(?:Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday),?\s*([A-Za-z]{3,9})\s+(\d{1,2})(?:,\s*(\d{4}))?/i
+  );
+  if (!m) return null;
+  const mm={'jan':0,'feb':1,'mar':2,'apr':3,'may':4,'jun':5,'jul':6,'aug':7,'sep':8,'oct':9,'nov':10,'dec':11};
+  const mi = mm[m[1].toLowerCase().slice(0,3)];
+  if (mi===undefined) return null;
+  const t = parseTimeToHM(text);
+  const d = new Date(m[3]?parseInt(m[3]):new Date().getFullYear(), mi, parseInt(m[2],10), t.h, t.min, 0, 0);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+// =========================
+// Google Sheets Data Loaders
+// =========================
+async function fetchSheet(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Sheet fetch failed: ${res.status}`);
+  return await res.json();
+}
+
+async function loadUsers() {
+  try { return await fetchSheet(USERS_URL); }
+  catch (e) { return []; }
+}
+
+async function loadApprovals(username) {
+  try {
+    const rows = await fetchSheet(APPROVALS_URL);
+    return (rows||[]).filter(r => norm(r.Username) === norm(username));
+  } catch (e) { return []; }
+}
+
+async function loadMeetings() {
+  try {
+    const rows = await fetchSheet(MEETINGS_URL);
+    meetingCache = (rows||[]).map(normalizeMeeting).filter(Boolean);
+  } catch (e) { meetingCache = []; }
+}
+
+async function loadQuestions() {
+  if (questionsCache.length) return;
+  try {
+    const rows = await fetchSheet(QUESTIONS_URL);
+    questionsCache = rows || [];
+  } catch (e) { questionsCache = []; }
+}
+
+function normalizeMeeting(row) {
+  const username    = String(row.Username||'').trim();
+  const link        = String(row['Link to meeting']||'').trim();
+  const topic       = String(row['Meeting Topic']||'').trim();
+  const dateAndTime = String(row['Date and Time']||'').trim();
+  const userClass   = String(row["User's classes"]||'').trim();
+  if (!username||!link||!topic) return null;
+  return { username, link, topic, dateAndTime, userClass,
+    specificDate: parseSpecificDate(dateAndTime),
+    weekdays: extractWeekdays(userClass||dateAndTime) };
+}
+
+function getUserMeetings() {
+  return meetingCache.filter(m => norm(m.username) === norm(currentUser?.username||''));
+}
+
+function nextOccurrence(meeting, from=new Date()) {
+  const candidates = [];
+  if (meeting.specificDate && meeting.specificDate > from) candidates.push(meeting.specificDate);
+  const t = parseTimeToHM(meeting.dateAndTime);
+  (meeting.weekdays||[]).forEach(dayName => {
+    const targetDow = daysOfWeek.indexOf(dayName);
+    if (targetDow<0) return;
+    const c = new Date(from);
+    let diff = (targetDow - c.getDay() + 7) % 7;
+    c.setDate(c.getDate()+diff);
+    c.setHours(t.h,t.min,0,0);
+    if (c<=from) c.setDate(c.getDate()+7);
+    candidates.push(c);
+  });
+  if (candidates.length) { candidates.sort((a,b)=>a-b); return candidates[0]; }
+  if (meeting.specificDate) return meeting.specificDate;
+  return null;
+}
+
+function meetingCardHTML(meeting, nextDate) {
+  const day   = nextDate.getDate();
+  const month = new Intl.DateTimeFormat('en-US',{month:'short'}).format(nextDate);
+  const timeRange = extractTimeRange(meeting.dateAndTime);
+  return `
+    <div class="upcoming-card">
+      <div class="upcoming-date"><div class="day">${day}</div><div class="month">${month}</div></div>
+      <div class="upcoming-info">
+        <div class="title">${esc(meeting.topic)}</div>
+        <div class="time">${esc(formatShortDay(nextDate))} · ${esc(timeRange)}</div>
+        ${meeting.userClass?`<div class="time">${esc(meeting.userClass)}</div>`:''}
+      </div>
+      <a href="${esc(meeting.link)}" target="_blank" class="meet-link">📹 Join</a>
+    </div>
+  `;
+}
+
+// =========================
+// Auth
+// =========================
+const authMsg    = document.getElementById('authMessage');
+const authSubmit = document.getElementById('authSubmit');
+
+function showAuthMsg(text, type) {
+  authMsg.textContent = text;
+  authMsg.className = 'message ' + type;
+}
+
+async function handleAuth() {
+  const username = document.getElementById('authUsername').value.trim();
+  const password = document.getElementById('authPassword').value;
+
+  if (!username || !password) { showAuthMsg('Please enter your username and password.','error'); return; }
+
+  authSubmit.disabled = true;
+  authSubmit.textContent = 'Logging in…';
+
+  try {
+    const users = await loadUsers();
+
+    // Find user row (case-insensitive username match)
+    const userRow = users.find(r =>
+      norm(r.Username) === norm(username) || norm(r.username) === norm(username)
+    );
+
+    if (!userRow) { showAuthMsg('Username not found. Ask your instructor to add you.','error'); return; }
+
+    const storedPass = String(userRow.Password || userRow.password || '').trim();
+    if (storedPass !== password) { showAuthMsg('Incorrect password.','error'); return; }
+
+    // Logged in!
+    currentUser = {
+      username: String(userRow.Username || userRow.username || username).trim(),
+      displayName: String(userRow.DisplayName || userRow['Display Name'] || username).trim()
+    };
+
+    // Load approvals
+    approvedSet = new Set();
+    const approvals = await loadApprovals(currentUser.username);
+    approvals.forEach(r => {
+      const subKey  = String(r.Subject || r.subject || '').trim().toLowerCase().replace(/\s+/g,'');
+      const level   = String(r.Level   || r.level   || '').trim();
+      if (subKey && level) approvedSet.add(`${subKey}:${level}`);
+    });
+
+    // Load meetings + questions in parallel
+    await Promise.all([loadMeetings(), loadQuestions()]);
+
+    enterPortal();
+  } catch (err) {
+    showAuthMsg(err.message || 'Something went wrong.','error');
+  } finally {
+    authSubmit.disabled = false;
+    authSubmit.textContent = 'Log In';
+  }
+}
+
+function logout() {
+  currentUser = null;
+  approvedSet = new Set();
+  meetingCache = [];
+  document.getElementById('portalScreen').classList.remove('active');
+  document.getElementById('authScreen').classList.remove('hidden');
+  document.getElementById('authUsername').value = '';
+  document.getElementById('authPassword').value = '';
+  authMsg.className = 'message';
+  authMsg.textContent = '';
+  window.scrollTo(0,0);
+}
+
+function enterPortal() {
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('portalScreen').classList.add('active');
+
+  const displayName = capitalizeName(currentUser.displayName || currentUser.username);
+  document.getElementById('welcomeName').textContent = `Welcome back, ${displayName} 👋`;
+  document.getElementById('userAvatar').textContent  = displayName.charAt(0).toUpperCase();
+
+  renderDashboard();
+  showPage('dashboard');
+}
+
+// =========================
+// Navigation
+// =========================
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('active');
+}
+
+document.addEventListener('click', (e) => {
+  const menu = document.getElementById('mobileMenu');
+  const ham  = document.querySelector('.hamburger');
+  if (menu && ham && !menu.contains(e.target) && !ham.contains(e.target)) {
+    menu.classList.remove('active');
+  }
+});
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById(`page-${page}`);
+  if (target) target.classList.add('active');
+
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector(`.nav-btn[data-page="${page}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  if (page === 'subject') {
+    const dashBtn = document.querySelector('.nav-btn[data-page="dashboard"]');
+    if (dashBtn) dashBtn.classList.add('active');
+  }
+
+  if (page === 'calendar')  renderCalendar();
+  if (page === 'practice')  renderPracticeHome();
+  if (page === 'dashboard' || page === 'calendar') renderMeetingsUI();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// =========================
+// Dashboard + Subjects
+// =========================
+function approvedCountForSubject(subjectKey) {
+  let count = 0;
+  for (let i=1;i<=10;i++) {
+    if (approvedSet.has(`${subjectKey}:${i}`)) count++;
+  }
+  return count;
+}
+
+function renderDashboard() {
+  const container = document.getElementById('subjectCards');
+  if (!container) return;
+  container.innerHTML = '';
+
+  Object.entries(subjectCatalog).forEach(([key, subject]) => {
+    const approved = approvedCountForSubject(key);
+    const pct = Math.round((approved/10)*100);
+
+    const card = document.createElement('div');
+    card.className = 'subject-card';
+    card.onclick = () => openSubject(key);
+    card.innerHTML = `
+      <div class="subject-top">
+        <div class="subject-icon">${subject.icon}</div>
+        <div>
+          <div class="subject-name">${subject.label}</div>
+          <div class="subject-sub">${approved} approved level${approved===1?'':'s'}</div>
+        </div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div class="subject-footer">
+        <div class="subject-sub">${subject.desc}</div>
+        <span class="pill ${approved?'approved':'locked'}">${approved?'Approved':'Locked'}</span>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  renderMeetingsUI();
+}
+
+function openSubject(subjectKey) {
+  const subject = subjectCatalog[subjectKey];
+  if (!subject) return;
+
+  document.getElementById('subjectTitle').textContent = `${subject.icon} ${subject.label}`;
+  document.getElementById('subjectDesc').textContent  = subject.desc + ' Approved levels can be opened; locked levels are waiting for staff approval.';
+
+  const list = document.getElementById('unitList');
+  list.innerHTML = '';
+
+  for (let level=1; level<=10; level++) {
+    // Match by level number against the sheet "Level" column
+    const approved = approvedSet.has(`${subjectKey.replace(/\s+/g,'').toLowerCase()}:${level}`)
+                  || [...approvedSet].some(k => {
+                      const [sk, lv] = k.split(':');
+                      return (sk === subjectKey.replace(/\s+/g,'').toLowerCase() || sk === norm(subject.sheetKey)) && lv === String(level);
+                    });
+
+    const row = document.createElement('div');
+    row.className = 'unit-card' + (approved?' clickable':'');
+    row.innerHTML = `
+      <div class="unit-left">
+        <div class="unit-status ${approved?'current':''}">${approved?'✓':'🔒'}</div>
+        <div>
+          <div class="unit-name">Level ${level}</div>
+          <div class="unit-meta">${approved?'Approved by staff':'Awaiting approval'}</div>
+        </div>
+      </div>
+      <div class="unit-badge ${approved?'approved':'locked'}">${approved?'Open':'Locked'}</div>
+    `;
+
+    if (approved) {
+      row.onclick = () => showToast(`Level ${level} is approved! 🎉`);
+    }
+
+    list.appendChild(row);
+  }
+
+  showPage('subject');
+}
+
+// =========================
+// Meetings UI
+// =========================
+function renderMeetingsUI() {
+  const meetings = getUserMeetings();
+  const upcoming = meetings
+    .map(m => ({...m, next: nextOccurrence(m)}))
+    .filter(m => m.next)
+    .sort((a,b) => a.next - b.next);
+
+  const nextCard = document.getElementById('nextClassCard');
+  if (nextCard) {
+    if (upcoming.length) {
+      const next = upcoming[0];
+      nextCard.innerHTML = `
+        <div class="next-class-info">
+          <div class="next-class-label">📅 Next Meeting</div>
+          <div class="next-class-title">${esc(next.topic)}</div>
+          <div class="next-class-time"><strong>${esc(formatShortDay(next.next))}</strong> · ${esc(extractTimeRange(next.dateAndTime))}</div>
+        </div>
+        <a href="${esc(next.link)}" target="_blank" class="btn btn-meet">📹 Join Meeting</a>
+      `;
+    } else {
+      nextCard.innerHTML = `
+        <div class="next-class-info">
+          <div class="next-class-label">📅 Next Meeting</div>
+          <div class="next-class-title">No meetings yet</div>
+          <div class="next-class-time">Once staff adds a meeting for your username, it will appear here.</div>
+        </div>
+      `;
+    }
+  }
+
+  const dashList = document.getElementById('dashboardUpcomingList');
+  if (dashList) {
+    dashList.innerHTML = upcoming.length
+      ? upcoming.slice(0,5).map(m => meetingCardHTML(m, m.next)).join('')
+      : `<div class="empty-state"><div class="emoji">📭</div><h3>No upcoming meetings</h3><p>Once staff adds meetings for your username, they'll show up here.</p></div>`;
+  }
+
+  const calMeetings = document.getElementById('calendarMeetings');
+  if (calMeetings) {
+    calMeetings.innerHTML = meetings.length
+      ? `<h3>🔗 Your Meetings</h3>${meetings.map(m=>`
+          <div class="meet-item">
+            <div class="meet-info"><div class="title">${esc(m.topic)}</div><div class="time">${esc(m.dateAndTime)}${m.userClass?` · ${esc(m.userClass)}`:''}</div></div>
+            <a href="${esc(m.link)}" target="_blank" class="meet-link">📹 Join</a>
+          </div>`).join('')}`
+      : `<h3>🔗 Your Meetings</h3><div class="empty-state"><div class="emoji">📭</div><h3>No meetings yet</h3><p>Staff hasn't added any meetings for your username.</p></div>`;
+  }
+
+  const calList = document.getElementById('calendarUpcomingList');
+  if (calList) {
+    calList.innerHTML = upcoming.length
+      ? upcoming.slice(0,5).map(m => meetingCardHTML(m,m.next)).join('')
+      : `<div class="empty-state"><div class="emoji">📭</div><h3>No upcoming classes</h3><p>Once staff adds meetings, they will appear here.</p></div>`;
+  }
+}
+
+// =========================
+// QUIZ / PRACTICE
+// =========================
+function renderPracticeHome() {
+  const area = document.getElementById('quizArea');
+  if (questionsCache.length === 0) {
+    area.innerHTML = `<div class="empty-state"><div class="emoji">📭</div><h3>No questions loaded</h3><p>Questions couldn't be fetched. Please refresh.</p></div>`;
+    return;
+  }
+  area.innerHTML = `
+    <div class="empty-state" style="text-align:left;padding:28px;">
+      <div class="emoji">👆</div>
+      <h3>Pick a topic above to start!</h3>
+      <p>${questionsCache.length} question${questionsCache.length===1?'':'s'} available across all subjects.</p>
+    </div>
+  `;
+}
+
+function startQuiz(filter) {
+  let pool = questionsCache;
+
+  if (filter !== 'all') {
+    pool = pool.filter(q => norm(q['Question type']) === norm(filter));
+  }
+
+  // Filter by approved levels
+  if (filter !== 'all') {
+    const subjectKey = Object.keys(subjectCatalog).find(
+      key => norm(subjectCatalog[key].sheetKey) === norm(filter)
+    );
+    if (subjectKey) {
+      const maxApprovedLevel = approvedCountForSubject(subjectKey);
+      pool = pool.filter(q => {
+        const questionLevel = parseInt(q.Level || '0', 10);
+        return questionLevel <= maxApprovedLevel;
+      });
+    }
+  }
+
+  if (!pool.length) {
+    showToast('No questions found for that topic and level.');
+    return;
+  }
+
+  // Shuffle
+  pool = [...pool].sort(() => Math.random() - .5);
+
+  quizState = {
+    questions: pool,
+    current: 0,
+    correct: 0,
+    wrong: 0,
+    answered: false
+  };
+
+  renderQuestion();
+}
+
+function parseChoices(choiceStr) {
+  if (!choiceStr) return [];
+  // Matches "A: text B: text" or "A: text\nB: text"
+  const regex = /([A-E]):\s*(.+?)(?=\s+[A-E]:|$)/g;
+  const choices = [];
+  let m;
+  while ((m = regex.exec(String(choiceStr))) !== null) {
+    choices.push({ letter: m[1], text: m[2].trim() });
+  }
+  return choices;
+}
+
+function renderQuestion() {
+  const area  = document.getElementById('quizArea');
+  const state = quizState;
+
+  if (!state || state.current >= state.questions.length) {
+    renderResults();
+    return;
+  }
+
+  const q = state.questions[state.current];
+  const choices = parseChoices(q['Answer Choices']);
+  const total = state.questions.length;
+  const idx   = state.current;
+  const pct   = Math.round((idx / total) * 100);
+
+  const skillBadge = q.Skill ? `<span class="quiz-badge">${esc(q.Skill)}</span>` : '';
+  const typeBadge  = q['Question type'] ? `<span class="quiz-badge" style="color:var(--text)">${esc(q['Question type'])}</span>` : '';
+  const imageHTML  = q['Image (optional)']
+    ? `<img src="${esc(q['Image (optional)'])}" class="quiz-image" alt="Question image" loading="lazy" />`
+    : '';
+
+  const choicesHTML = choices.map(c => `
+    <button class="choice-btn" onclick="selectChoice(this, '${esc(c.letter)}')">
+      <span class="choice-letter">${esc(c.letter)}</span>
+      <span>${esc(c.text)}</span>
+    </button>
+  `).join('');
+
+  area.innerHTML = `
+    <div class="quiz-progress">
+      <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
+      <span class="quiz-progress-text">${idx+1} / ${total}</span>
     </div>
 
-    <main class="main">
-
-        <!-- ==================== DASHBOARD PAGE ==================== -->
-        <div class="page active" id="page-dashboard">
-            <div class="welcome-header">
-                <h1>Welcome back, Benjamin 👋</h1>
-                <p>Keep up the great work! Here's what's coming up.</p>
-            </div>
-
-            <div class="next-class-card">
-                <div class="next-class-info">
-                    <div class="next-class-label">📅 Next Class</div>
-                    <div class="next-class-title">Algebra I — Solving Equations</div>
-                    <div class="next-class-time">
-                        <strong id="nextClassDate">Tuesday, Jan 14</strong> · 4:00 PM – 5:00 PM
-                    </div>
-                </div>
-                <a href="https://meet.google.com/abc-defg-hij" target="_blank" class="btn btn-meet">
-                    📹 Join Google Meet
-                </a>
-            </div>
-
-            <div class="section-header">
-                <h2>Your Subjects</h2>
-            </div>
-            <div class="subject-list">
-                <div class="subject-card" onclick="openSubject('algebra1')">
-                    <div class="subject-icon">📐</div>
-                    <div class="subject-details">
-                        <div class="subject-name">Algebra I</div>
-                        <div class="subject-units">8 units · 3 completed</div>
-                    </div>
-                    <div class="subject-progress">
-                        <div class="progress-bar"><div class="progress-fill" style="width: 37%"></div></div>
-                        <div class="progress-text">37%</div>
-                    </div>
-                    <div class="arrow-icon">›</div>
-                </div>
-
-                <div class="subject-card" onclick="openSubject('prealgebra')">
-                    <div class="subject-icon">🔢</div>
-                    <div class="subject-details">
-                        <div class="subject-name">Pre-Algebra</div>
-                        <div class="subject-units">6 units · 6 completed</div>
-                    </div>
-                    <div class="subject-progress">
-                        <div class="progress-bar"><div class="progress-fill" style="width: 100%"></div></div>
-                        <div class="progress-text">100%</div>
-                    </div>
-                    <div class="arrow-icon">›</div>
-                </div>
-
-                <div class="subject-card" onclick="openSubject('geometry')">
-                    <div class="subject-icon">📏</div>
-                    <div class="subject-details">
-                        <div class="subject-name">Geometry</div>
-                        <div class="subject-units">7 units · 0 completed</div>
-                    </div>
-                    <div class="subject-progress">
-                        <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
-                        <div class="progress-text">0%</div>
-                    </div>
-                    <div class="arrow-icon">›</div>
-                </div>
-            </div>
-
-            <div class="section-header">
-                <h2>Upcoming Classes</h2>
-            </div>
-            <div class="upcoming-list">
-                <div class="upcoming-card">
-                    <div class="upcoming-date">
-                        <div class="day">14</div>
-                        <div class="month">Jan</div>
-                    </div>
-                    <div class="upcoming-info">
-                        <div class="title">Algebra I — Solving Equations</div>
-                        <div class="time">Tuesday · 4:00 PM – 5:00 PM</div>
-                    </div>
-                    <a href="https://meet.google.com/abc-defg-hij" target="_blank" class="meet-link">📹 Join</a>
-                </div>
-                <div class="upcoming-card">
-                    <div class="upcoming-date">
-                        <div class="day">16</div>
-                        <div class="month">Jan</div>
-                    </div>
-                    <div class="upcoming-info">
-                        <div class="title">Algebra I — Inequalities</div>
-                        <div class="time">Thursday · 4:00 PM – 5:00 PM</div>
-                    </div>
-                    <a href="https://meet.google.com/abc-defg-hij" target="_blank" class="meet-link">📹 Join</a>
-                </div>
-                <div class="upcoming-card">
-                    <div class="upcoming-date">
-                        <div class="day">21</div>
-                        <div class="month">Jan</div>
-                    </div>
-                    <div class="upcoming-info">
-                        <div class="title">Geometry — Intro to Angles</div>
-                        <div class="time">Tuesday · 5:30 PM – 6:30 PM</div>
-                    </div>
-                    <a href="https://meet.google.com/xyz-abcd-efg" target="_blank" class="meet-link">📹 Join</a>
-                </div>
-            </div>
+    <div class="quiz-card">
+      <div class="quiz-card-header">
+        <div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">${typeBadge}${skillBadge}</div>
+          <div class="quiz-question">${esc(q.Question)}</div>
         </div>
+      </div>
+      ${imageHTML}
+      <div class="quiz-choices" id="quizChoices">${choicesHTML}</div>
+      <div class="quiz-feedback" id="quizFeedback"></div>
+      <button class="quiz-next-btn" id="quizNextBtn" onclick="nextQuestion()">
+        ${state.current + 1 < total ? 'Next Question →' : 'See Results 🎉'}
+      </button>
+    </div>
+  `;
 
-        <!-- ==================== SUBJECT PAGE ==================== -->
-        <div class="page" id="page-subject">
-            <button class="back-btn" onclick="showPage('dashboard')">← Back to Dashboard</button>
-            <div class="welcome-header">
-                <h1 id="subjectTitle">Algebra I</h1>
-                <p id="subjectDesc">Work through each unit in order. Complete the practice problems to progress.</p>
-            </div>
-            <div class="unit-list" id="unitList"></div>
-        </div>
+  state.answered = false;
+}
 
-        <!-- ==================== QUIZ PAGE ==================== -->
-        <div class="page" id="page-quiz">
-            <button class="back-btn" onclick="goBackFromQuiz()">← Back to Units</button>
-            <div class="quiz-container">
-                <div class="quiz-progress">
-                    <div class="quiz-progress-bar">
-                        <div class="quiz-progress-fill" id="quizProgressFill"></div>
-                    </div>
-                    <div class="quiz-progress-text" id="quizProgressText">1 / 5</div>
-                </div>
+function selectChoice(btn, letter) {
+  if (quizState.answered) return;
+  quizState.answered = true;
 
-                <div id="quizContent"></div>
-            </div>
-        </div>
+  const correctFull = String(quizState.questions[quizState.current]['Correct Answer'] || '').trim();
+  const correctLetter = correctFull.split(':')[0].trim().toUpperCase();
+  const isCorrect = letter.toUpperCase() === correctLetter;
 
-        <!-- ==================== CALENDAR PAGE ==================== -->
-        <div class="page" id="page-calendar">
-            <div class="welcome-header">
-                <h1>📅 Class Calendar</h1>
-                <p>View your upcoming classes and join sessions directly.</p>
-            </div>
+  // Mark all buttons
+  const buttons = document.querySelectorAll('#quizChoices .choice-btn');
+  buttons.forEach(b => {
+    b.disabled = true;
+    const l = b.querySelector('.choice-letter').textContent.trim().toUpperCase();
+    if (l === correctLetter) b.classList.add('correct');
+  });
 
-            <div class="grid-2">
-                <div>
-                    <div class="calendar-container">
-                        <div class="calendar-header">
-                            <h3 id="calendarTitle">January 2025</h3>
-                            <div class="calendar-nav">
-                                <button onclick="changeMonth(-1)">‹</button>
-                                <button onclick="changeMonth(1)">›</button>
-                            </div>
-                        </div>
-                        <div class="calendar-grid">
-                            <div class="calendar-weekdays">
-                                <span>Sun</span>
-                                <span>Mon</span>
-                                <span>Tue</span>
-                                <span>Wed</span>
-                                <span>Thu</span>
-                                <span>Fri</span>
-                                <span>Sat</span>
-                            </div>
-                            <div class="calendar-days" id="calendarDays"></div>
-                        </div>
-                    </div>
+  if (!isCorrect) {
+    btn.classList.add('wrong');
+    quizState.wrong++;
+  } else {
+    quizState.correct++;
+  }
 
-                    <div class="day-detail" id="dayDetail">
-                        <h4 id="dayDetailTitle">Classes on this day</h4>
-                        <div id="dayDetailContent"></div>
-                    </div>
-                </div>
+  const feedback = document.getElementById('quizFeedback');
+  if (isCorrect) {
+    feedback.textContent = '✅ Correct! Great job.';
+    feedback.className = 'quiz-feedback correct';
+  } else {
+    feedback.textContent = `❌ Not quite. The correct answer is ${correctFull}.`;
+    feedback.className = 'quiz-feedback wrong';
+  }
 
-                <div>
-                    <div class="meet-section">
-                        <h3>🔗 Your Google Meet Links</h3>
-                        <div class="meet-item">
-                            <div class="meet-info">
-                                <div class="title">Algebra I Sessions</div>
-                                <div class="time">Tuesdays & Thursdays · 4:00 PM</div>
-                            </div>
-                            <a href="https://meet.google.com/abc-defg-hij" target="_blank" class="meet-link">📹 Join</a>
-                        </div>
-                        <div class="meet-item">
-                            <div class="meet-info">
-                                <div class="title">Geometry Sessions</div>
-                                <div class="time">Tuesdays · 5:30 PM</div>
-                            </div>
-                            <a href="https://meet.google.com/xyz-abcd-efg" target="_blank" class="meet-link">📹 Join</a>
-                        </div>
-                    </div>
+  const nextBtn = document.getElementById('quizNextBtn');
+  if (nextBtn) nextBtn.classList.add('visible');
+}
 
-                    <div style="margin-top: 24px;">
-                        <div class="section-header"><h2>Upcoming</h2></div>
-                        <div class="upcoming-list">
-                            <div class="upcoming-card">
-                                <div class="upcoming-date">
-                                    <div class="day">14</div>
-                                    <div class="month">Jan</div>
-                                </div>
-                                <div class="upcoming-info">
-                                    <div class="title">Algebra I — Solving Equations</div>
-                                    <div class="time">Tue · 4:00 – 5:00 PM</div>
-                                </div>
-                            </div>
-                            <div class="upcoming-card">
-                                <div class="upcoming-date">
-                                    <div class="day">16</div>
-                                    <div class="month">Jan</div>
-                                </div>
-                                <div class="upcoming-info">
-                                    <div class="title">Algebra I — Inequalities</div>
-                                    <div class="time">Thu · 4:00 – 5:00 PM</div>
-                                </div>
-                            </div>
-                            <div class="upcoming-card">
-                                <div class="upcoming-date">
-                                    <div class="day">21</div>
-                                    <div class="month">Jan</div>
-                                </div>
-                                <div class="upcoming-info">
-                                    <div class="title">Geometry — Intro to Angles</div>
-                                    <div class="time">Tue · 5:30 – 6:30 PM</div>
-                                </div>
-                            </div>
-                            <div class="upcoming-card">
-                                <div class="upcoming-date">
-                                    <div class="day">23</div>
-                                    <div class="month">Jan</div>
-                                </div>
-                                <div class="upcoming-info">
-                                    <div class="title">Algebra I — Graphing Lines</div>
-                                    <div class="time">Thu · 4:00 – 5:00 PM</div>
-                                </div>
-                            </div>
-                            <div class="upcoming-card">
-                                <div class="upcoming-date">
-                                    <div class="day">28</div>
-                                    <div class="month">Jan</div>
-                                </div>
-                                <div class="upcoming-info">
-                                    <div class="title">Geometry — Triangle Properties</div>
-                                    <div class="time">Tue · 5:30 – 6:30 PM</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+function nextQuestion() {
+  quizState.current++;
+  renderQuestion();
+}
 
-    </main>
+function renderResults() {
+  const { correct, wrong, questions } = quizState;
+  const total  = questions.length;
+  const pct    = Math.round((correct / total) * 100);
 
-    <div class="toast" id="toast"></div>
+  let emoji = '😅';
+  let msg   = 'Keep practicing — you\'ve got this!';
+  if (pct >= 90) { emoji = '🏆'; msg = 'Outstanding! Perfect score territory!'; }
+  else if (pct >= 70) { emoji = '🎉'; msg = 'Great work! Keep it up!'; }
+  else if (pct >= 50) { emoji = '💪'; msg = 'Good effort! Review and try again.'; }
 
-    <script>
-        let currentSubject = null;
-        let currentUnit = null;
+  document.getElementById('quizArea').innerHTML = `
+    <div class="quiz-results">
+      <div class="score-circle">
+        <div class="score-number">${pct}%</div>
+        <div class="score-label">Score</div>
+      </div>
+      <div style="font-size:40px;margin-bottom:8px;">${emoji}</div>
+      <h2>Quiz Complete!</h2>
+      <p>${msg}</p>
+      <div class="quiz-results-row">
+        <div class="quiz-stat green"><div class="stat-val">${correct}</div><div class="stat-key">Correct</div></div>
+        <div class="quiz-stat red"><div class="stat-val">${wrong}</div><div class="stat-key">Wrong</div></div>
+        <div class="quiz-stat"><div class="stat-val">${total}</div><div class="stat-key">Total</div></div>
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="startQuiz('all')">Try Again (All)</button>
+        <button class="btn" onclick="renderPracticeHome()">Back to Topics</button>
+      </div>
+    </div>
+  `;
+}
 
-        function showPage(page) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-' + page).classList.add('active');
+// =========================
+// Calendar
+// =========================
+function buildCalendarEventMap(year, month) {
+  const map = {};
+  const seen = new Set();
+  const meetings = getUserMeetings();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
 
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            const activeBtn = document.querySelector(`.nav-btn[data-page="${page}"]`);
-            if (activeBtn) activeBtn.classList.add('active');
+  function push(dateObj, meeting) {
+    const key = dateKey(dateObj);
+    const u = `${key}|${norm(meeting.username)}|${norm(meeting.topic)}|${norm(meeting.link)}`;
+    if (seen.has(u)) return;
+    seen.add(u);
+    if (!map[key]) map[key] = [];
+    map[key].push(meeting);
+  }
 
-            if (page === 'subject' || page === 'quiz') {
-                const dashBtn = document.querySelector('.nav-btn[data-page="dashboard"]');
-                if (dashBtn) dashBtn.classList.add('active');
-            }
-
-            if (page === 'calendar') {
-                renderCalendar();
-            }
-
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+  meetings.forEach(m => {
+    if (m.specificDate && m.specificDate.getFullYear()===year && m.specificDate.getMonth()===month) {
+      push(m.specificDate, m);
+    }
+    (m.weekdays||[]).forEach(dayName => {
+      const targetDow = daysOfWeek.indexOf(dayName);
+      if (targetDow<0) return;
+      for (let day=1; day<=daysInMonth; day++) {
+        const d = new Date(year, month, day);
+        if (d.getDay()===targetDow) {
+          const t = parseTimeToHM(m.dateAndTime);
+          d.setHours(t.h,t.min,0,0);
+          push(d, m);
         }
+      }
+    });
+  });
 
-        function toggleMobile() {
-            document.getElementById('mobileMenu').classList.toggle('active');
-        }
+  return map;
+}
 
-        document.addEventListener('click', function(e) {
-            const menu = document.getElementById('mobileMenu');
-            const hamburger = document.querySelector('.hamburger');
-            if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
-                menu.classList.remove('active');
-            }
-        });
+function renderCalendar() {
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calendarTitle').textContent = `${months[calendarMonth]} ${calendarYear}`;
+  calendarEventMap = buildCalendarEventMap(calendarYear, calendarMonth);
 
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
-        }
+  const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+  const daysInMonth = new Date(calendarYear, calendarMonth+1, 0).getDate();
+  const daysInPrev  = new Date(calendarYear, calendarMonth, 0).getDate();
+  const today = new Date();
+  const container = document.getElementById('calendarDays');
+  container.innerHTML = '';
 
-        const subjects = {
-            algebra1: {
-                name: 'Algebra I',
-                icon: '📐',
-                desc: 'Master the fundamentals of algebra — from expressions to equations to functions.',
-                units: [
-                    { id: 'a1u1', name: 'Expressions & Variables', status: 'done' },
-                    { id: 'a1u2', name: 'Order of Operations', status: 'done' },
-                    { id: 'a1u3', name: 'Solving One-Step Equations', status: 'done' },
-                    { id: 'a1u4', name: 'Solving Two-Step Equations', status: 'current' },
-                    { id: 'a1u5', name: 'Inequalities', status: 'locked' },
-                    { id: 'a1u6', name: 'Graphing Linear Equations', status: 'locked' },
-                    { id: 'a1u7', name: 'Slope & Rate of Change', status: 'locked' },
-                    { id: 'a1u8', name: 'Systems of Equations', status: 'locked' },
-                ]
-            },
-            prealgebra: {
-                name: 'Pre-Algebra',
-                icon: '🔢',
-                desc: 'Build a strong foundation with numbers, fractions, decimals, and basic operations.',
-                units: [
-                    { id: 'pau1', name: 'Whole Numbers & Place Value', status: 'done' },
-                    { id: 'pau2', name: 'Fractions', status: 'done' },
-                    { id: 'pau3', name: 'Decimals', status: 'done' },
-                    { id: 'pau4', name: 'Ratios & Proportions', status: 'done' },
-                    { id: 'pau5', name: 'Percentages', status: 'done' },
-                    { id: 'pau6', name: 'Integers & Absolute Value', status: 'done' },
-                ]
-            },
-            geometry: {
-                name: 'Geometry',
-                icon: '📏',
-                desc: 'Explore shapes, angles, area, volume, and geometric reasoning.',
-                units: [
-                    { id: 'gu1', name: 'Points, Lines & Planes', status: 'current' },
-                    { id: 'gu2', name: 'Angles & Angle Pairs', status: 'locked' },
-                    { id: 'gu3', name: 'Triangles', status: 'locked' },
-                    { id: 'gu4', name: 'Quadrilaterals & Polygons', status: 'locked' },
-                    { id: 'gu5', name: 'Area & Perimeter', status: 'locked' },
-                    { id: 'gu6', name: 'Volume & Surface Area', status: 'locked' },
-                    { id: 'gu7', name: 'Pythagorean Theorem', status: 'locked' },
-                ]
-            }
-        };
+  for (let i=firstDay-1; i>=0; i--) {
+    const d=document.createElement('div');
+    d.className='calendar-day other-month';
+    d.textContent=daysInPrev-i;
+    container.appendChild(d);
+  }
 
-        const questions = {
-            pau1: [
-                { q: 'What is 347 + 568?', options: ['815', '905', '915', '895'], answer: 2 },
-                { q: 'What is the place value of 7 in 4,732?', options: ['Ones', 'Tens', 'Hundreds', 'Thousands'], answer: 2 },
-                { q: 'Round 4,567 to the nearest hundred.', options: ['4,500', '4,600', '4,570', '5,000'], answer: 1 },
-                { q: 'What is 1,200 ÷ 4?', options: ['200', '300', '400', '350'], answer: 1 },
-                { q: 'What is 25 × 16?', options: ['375', '400', '350', '425'], answer: 1 },
-            ],
-            pau2: [
-                { q: 'What is 1/2 + 1/4?', options: ['2/6', '3/4', '1/3', '2/4'], answer: 1 },
-                { q: 'Simplify: 6/8', options: ['2/3', '3/4', '3/8', '1/2'], answer: 1 },
-                { q: 'What is 3/5 × 10?', options: ['3', '5', '6', '8'], answer: 2 },
-                { q: 'Which is larger: 2/3 or 3/5?', options: ['2/3', '3/5', 'They are equal', 'Cannot tell'], answer: 0 },
-                { q: 'What is 7/8 − 1/4?', options: ['5/8', '6/8', '3/4', '1/2'], answer: 0 },
-            ],
-            pau3: [
-                { q: 'What is 0.5 + 0.75?', options: ['1.00', '1.25', '1.15', '0.125'], answer: 1 },
-                { q: 'Convert 3/4 to a decimal.', options: ['0.34', '0.5', '0.75', '0.25'], answer: 2 },
-                { q: 'What is 2.4 × 3?', options: ['6.2', '7.2', '6.12', '8.4'], answer: 1 },
-                { q: 'Which is larger: 0.45 or 0.405?', options: ['0.45', '0.405', 'They are equal', 'Cannot tell'], answer: 0 },
-                { q: 'What is 10 − 3.67?', options: ['6.33', '6.43', '7.33', '7.67'], answer: 0 },
-            ],
-            pau4: [
-                { q: 'If 3 apples cost $6, how much do 5 apples cost?', options: ['$8', '$9', '$10', '$12'], answer: 2 },
-                { q: 'Simplify the ratio 12:8', options: ['6:4', '3:2', '4:3', '2:1'], answer: 1 },
-                { q: 'Solve: 4/x = 8/6', options: ['2', '3', '4', '12'], answer: 1 },
-                { q: 'A map scale is 1 cm = 5 km. What is 3.5 cm?', options: ['15 km', '17.5 km', '20 km', '35 km'], answer: 1 },
-                { q: 'What is the unit rate of 240 miles in 4 hours?', options: ['40 mph', '50 mph', '60 mph', '80 mph'], answer: 2 },
-            ],
-            pau5: [
-                { q: 'What is 25% of 80?', options: ['15', '20', '25', '40'], answer: 1 },
-                { q: 'Convert 0.6 to a percent.', options: ['6%', '0.6%', '60%', '600%'], answer: 2 },
-                { q: 'A shirt costs $40 and is 15% off. What\'s the sale price?', options: ['$34', '$36', '$25', '$38'], answer: 0 },
-                { q: 'What percent of 50 is 10?', options: ['10%', '15%', '20%', '25%'], answer: 2 },
-                { q: '30 is 75% of what number?', options: ['22.5', '35', '40', '45'], answer: 2 },
-            ],
-            pau6: [
-                { q: 'What is −5 + 8?', options: ['−3', '3', '13', '−13'], answer: 1 },
-                { q: 'What is |−12|?', options: ['−12', '0', '12', '−1'], answer: 2 },
-                { q: 'What is −3 × −4?', options: ['−12', '12', '−7', '7'], answer: 1 },
-                { q: 'Order from least to greatest: −2, 5, −8, 1', options: ['−8, −2, 1, 5', '−2, −8, 1, 5', '1, −2, 5, −8', '5, 1, −2, −8'], answer: 0 },
-                { q: 'What is −15 ÷ 3?', options: ['5', '−5', '−3', '3'], answer: 1 },
-            ],
-            a1u1: [
-                { q: 'Evaluate: 3x + 2 when x = 4', options: ['10', '12', '14', '16'], answer: 2 },
-                { q: 'Simplify: 5a + 3a', options: ['8a', '15a', '53a', '8a²'], answer: 0 },
-                { q: 'Which is a variable expression?', options: ['42', '7 + 3', '2x − 5', '100'], answer: 2 },
-                { q: 'Evaluate: 2(x + 3) when x = 5', options: ['13', '16', '11', '10'], answer: 1 },
-                { q: 'Simplify: 4y − y + 6', options: ['3y + 6', '4y + 6', '5y + 6', '10y'], answer: 0 },
-            ],
-            a1u2: [
-                { q: 'Solve: 3 + 4 × 2', options: ['14', '11', '10', '9'], answer: 1 },
-                { q: 'Solve: (8 − 2) × 3', options: ['18', '22', '6', '15'], answer: 0 },
-                { q: 'Solve: 2 + 3² × 4', options: ['38', '100', '44', '20'], answer: 0 },
-                { q: 'Solve: 24 ÷ (4 + 2)', options: ['8', '4', '6', '3'], answer: 1 },
-                { q: 'Solve: 5 × (2 + 1)²', options: ['45', '25', '27', '135'], answer: 0 },
-            ],
-            a1u3: [
-                { q: 'Solve: x + 7 = 12', options: ['x = 4', 'x = 5', 'x = 19', 'x = 7'], answer: 1 },
-                { q: 'Solve: x − 3 = 10', options: ['x = 7', 'x = 13', 'x = 30', 'x = 3'], answer: 1 },
-                { q: 'Solve: 4x = 20', options: ['x = 4', 'x = 16', 'x = 24', 'x = 5'], answer: 3 },
-                { q: 'Solve: x/3 = 9', options: ['x = 3', 'x = 6', 'x = 27', 'x = 12'], answer: 2 },
-                { q: 'Solve: x + 15 = 15', options: ['x = 0', 'x = 15', 'x = 30', 'x = −15'], answer: 0 },
-            ],
-            a1u4: [
-                { q: 'Solve: 2x + 3 = 11', options: ['x = 4', 'x = 5', 'x = 7', 'x = 3'], answer: 0 },
-                { q: 'Solve: 3x − 5 = 16', options: ['x = 5', 'x = 7', 'x = 3', 'x = 11'], answer: 1 },
-                { q: 'Solve: 5x + 2 = 27', options: ['x = 5', 'x = 29', 'x = 4', 'x = 6'], answer: 0 },
-                { q: 'Solve: (x/2) + 4 = 10', options: ['x = 3', 'x = 8', 'x = 12', 'x = 14'], answer: 2 },
-                { q: 'Solve: 4x − 1 = 15', options: ['x = 3', 'x = 4', 'x = 16', 'x = 5'], answer: 1 },
-            ],
-            a1u5: [
-                { q: 'Solve: x + 3 > 7', options: ['x > 4', 'x > 10', 'x < 4', 'x > 3'], answer: 0 },
-                { q: 'Solve: 2x < 10', options: ['x < 8', 'x < 5', 'x > 5', 'x < 12'], answer: 1 },
-                { q: 'Solve: x − 5 ≥ 2', options: ['x ≥ 7', 'x ≥ 3', 'x ≤ 7', 'x ≥ −3'], answer: 0 },
-                { q: 'Which value satisfies x > −3?', options: ['−5', '−4', '−3', '0'], answer: 3 },
-                { q: 'Solve: 3x + 1 ≤ 10', options: ['x ≤ 3', 'x ≤ 4', 'x ≥ 3', 'x ≤ 11'], answer: 0 },
-            ],
-            a1u6: [
-                { q: 'What is the y-intercept of y = 3x + 5?', options: ['3', '5', '(0,5)', '(5,0)'], answer: 2 },
-                { q: 'In y = mx + b, what does m represent?', options: ['y-intercept', 'slope', 'x-value', 'origin'], answer: 1 },
-                { q: 'Which point is on the line y = 2x + 1?', options: ['(1, 2)', '(0, 1)', '(2, 6)', '(1, 4)'], answer: 1 },
-                { q: 'What is the slope of y = −4x + 7?', options: ['7', '4', '−4', '−7'], answer: 2 },
-                { q: 'A horizontal line has a slope of:', options: ['1', 'undefined', '0', '−1'], answer: 2 },
-            ],
-            a1u7: [
-                { q: 'Find the slope between (1,2) and (3,8).', options: ['2', '3', '4', '6'], answer: 1 },
-                { q: 'A line goes up 6 and right 2. What is the slope?', options: ['1/3', '2', '3', '6'], answer: 2 },
-                { q: 'What is the slope of y = −(1/2)x + 4?', options: ['4', '1/2', '−1/2', '−4'], answer: 2 },
-                { q: 'Two parallel lines have:', options: ['Same slope', 'Different slopes', 'Opposite slopes', 'No slope'], answer: 0 },
-                { q: 'A car travels 180 miles in 3 hours. What is the rate of change?', options: ['540 mph', '60 mph', '3 mph', '180 mph'], answer: 1 },
-            ],
-            a1u8: [
-                { q: 'Solve: x + y = 5 and x − y = 1. What is x?', options: ['2', '3', '4', '1'], answer: 1 },
-                { q: 'In the system above, what is y?', options: ['1', '2', '3', '4'], answer: 1 },
-                { q: 'Two lines intersect at one point. The system has:', options: ['No solution', 'Infinite solutions', 'One solution', 'Two solutions'], answer: 2 },
-                { q: 'If y = 2x and y = 8, what is x?', options: ['2', '4', '6', '16'], answer: 1 },
-                { q: 'Solve: 2x + y = 7, x = 2. What is y?', options: ['1', '2', '3', '5'], answer: 2 },
-            ],
-            gu1: [
-                { q: 'How many endpoints does a ray have?', options: ['0', '1', '2', '3'], answer: 1 },
-                { q: 'Two points determine a:', options: ['Plane', 'Line', 'Ray', 'Angle'], answer: 1 },
-                { q: 'A flat surface that extends infinitely is a:', options: ['Line', 'Point', 'Plane', 'Segment'], answer: 2 },
-                { q: 'Points on the same line are called:', options: ['Coplanar', 'Collinear', 'Concurrent', 'Congruent'], answer: 1 },
-                { q: 'A line segment has:', options: ['No endpoints', '1 endpoint', '2 endpoints', 'Infinite endpoints'], answer: 2 },
-            ],
-            gu2: [
-                { q: 'A right angle measures:', options: ['45°', '90°', '180°', '360°'], answer: 1 },
-                { q: 'Two angles that sum to 90° are:', options: ['Supplementary', 'Complementary', 'Vertical', 'Adjacent'], answer: 1 },
-                { q: 'An angle greater than 90° is:', options: ['Acute', 'Right', 'Obtuse', 'Straight'], answer: 2 },
-                { q: 'Vertical angles are always:', options: ['Supplementary', 'Complementary', 'Equal', 'Adjacent'], answer: 2 },
-                { q: 'Two angles that sum to 180° are:', options: ['Complementary', 'Supplementary', 'Congruent', 'Vertical'], answer: 1 },
-            ],
-            gu3: [
-                { q: 'The angles in a triangle sum to:', options: ['90°', '180°', '270°', '360°'], answer: 1 },
-                { q: 'A triangle with all sides equal is:', options: ['Isosceles', 'Scalene', 'Equilateral', 'Right'], answer: 2 },
-                { q: 'A triangle with a 90° angle is:', options: ['Acute', 'Obtuse', 'Right', 'Equilateral'], answer: 2 },
-                { q: 'If two angles of a triangle are 50° and 60°, the third is:', options: ['70°', '80°', '90°', '110°'], answer: 0 },
-                { q: 'An isosceles triangle has:', options: ['No equal sides', '2 equal sides', '3 equal sides', 'No angles equal'], answer: 1 },
-            ],
-            gu4: [
-                { q: 'How many sides does a pentagon have?', options: ['4', '5', '6', '7'], answer: 1 },
-                { q: 'The sum of angles in a quadrilateral is:', options: ['180°', '270°', '360°', '540°'], answer: 2 },
-                { q: 'A rectangle has how many right angles?', options: ['2', '3', '4', '1'], answer: 2 },
-                { q: 'A parallelogram has:', options: ['All right angles', 'Opposite sides parallel', 'All sides equal', 'No parallel sides'], answer: 1 },
-                { q: 'A square is also a:', options: ['Triangle', 'Pentagon', 'Rectangle', 'Circle'], answer: 2 },
-            ],
-            gu5: [
-                { q: 'Area of a rectangle: length 8, width 5?', options: ['13', '26', '40', '80'], answer: 2 },
-                { q: 'Perimeter of a square with side 6?', options: ['12', '24', '36', '6'], answer: 1 },
-                { q: 'Area of a triangle: base 10, height 4?', options: ['14', '20', '40', '80'], answer: 1 },
-                { q: 'Area of a circle with radius 3? (Use π ≈ 3.14)', options: ['9.42', '18.84', '28.26', '6.28'], answer: 2 },
-                { q: 'Perimeter of a rectangle: length 12, width 7?', options: ['19', '38', '84', '34'], answer: 1 },
-            ],
-            gu6: [
-                { q: 'Volume of a cube with side 3?', options: ['9', '18', '27', '6'], answer: 2 },
-                { q: 'Volume of a rectangular prism: 4 × 5 × 3?', options: ['12', '47', '60', '35'], answer: 2 },
-                { q: 'How many faces does a cube have?', options: ['4', '6', '8', '12'], answer: 1 },
-                { q: 'Surface area of a cube with side 2?', options: ['8', '12', '24', '16'], answer: 2 },
-                { q: 'Volume of a cylinder: radius 2, height 5? (Use π ≈ 3.14)', options: ['31.4', '62.8', '20', '125.6'], answer: 1 },
-            ],
-            gu7: [
-                { q: 'In a right triangle, a = 3, b = 4. Find c.', options: ['5', '6', '7', '12'], answer: 0 },
-                { q: 'The Pythagorean theorem is:', options: ['a + b = c', 'a² + b² = c²', 'a² − b² = c²', 'a × b = c²'], answer: 1 },
-                { q: 'If c = 13 and a = 5, find b.', options: ['8', '10', '12', '18'], answer: 2 },
-                { q: 'Is a triangle with sides 6, 8, 10 a right triangle?', options: ['Yes', 'No', 'Cannot tell', 'Sometimes'], answer: 0 },
-                { q: 'The hypotenuse is the _____ side.', options: ['shortest', 'middle', 'longest', 'vertical'], answer: 2 },
-            ],
-        };
+  for (let day=1; day<=daysInMonth; day++) {
+    const d=document.createElement('div');
+    d.className='calendar-day';
+    const dateObj=new Date(calendarYear,calendarMonth,day);
+    const dateStr=dateKey(dateObj);
+    const isToday=today.getFullYear()===calendarYear&&today.getMonth()===calendarMonth&&today.getDate()===day;
+    const hasCls=!!(calendarEventMap[dateStr]?.length);
+    if (isToday) d.classList.add('today');
+    if (hasCls) { d.classList.add('has-class'); d.onclick=()=>showDayDetail(dateStr,day); }
+    d.innerHTML=`${day}${hasCls?'<div class="class-dot"></div>':''}`;
+    container.appendChild(d);
+  }
 
-        function openSubject(subjectId) {
-            currentSubject = subjectId;
-            const subject = subjects[subjectId];
+  const totalCells=firstDay+daysInMonth;
+  const remaining=totalCells%7===0?0:7-(totalCells%7);
+  for (let i=1;i<=remaining;i++){
+    const d=document.createElement('div');
+    d.className='calendar-day other-month';
+    d.textContent=i;
+    container.appendChild(d);
+  }
+  document.getElementById('dayDetail').classList.remove('active');
+}
 
-            document.getElementById('subjectTitle').textContent = subject.icon + ' ' + subject.name;
-            document.getElementById('subjectDesc').textContent = subject.desc;
+function changeMonth(dir) {
+  calendarMonth+=dir;
+  if (calendarMonth>11){calendarMonth=0;calendarYear++;}
+  if (calendarMonth<0){calendarMonth=11;calendarYear--;}
+  renderCalendar();
+  renderMeetingsUI();
+}
 
-            const unitList = document.getElementById('unitList');
-            unitList.innerHTML = '';
+function showDayDetail(dateStr, day) {
+  const classes = calendarEventMap[dateStr]||[];
+  if (!classes.length) return;
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('dayDetailTitle').textContent=`📅 ${months[calendarMonth]} ${day}, ${calendarYear}`;
+  document.getElementById('dayDetailContent').innerHTML=classes.map(c=>`
+    <div class="meet-item" style="margin-bottom:8px;">
+      <div class="meet-info"><div class="title">${esc(c.topic)}</div><div class="time">${esc(c.dateAndTime)}${c.userClass?` · ${esc(c.userClass)}`:''}</div></div>
+      <a href="${esc(c.link)}" target="_blank" class="meet-link">📹 Join</a>
+    </div>`).join('');
+  document.getElementById('dayDetail').classList.add('active');
+}
 
-            subject.units.forEach((unit, i) => {
-                const card = document.createElement('div');
-                card.className = 'unit-card' + (unit.status === 'done' ? ' completed' : '');
+// =========================
+// Event Listeners
+// =========================
+document.getElementById('authSubmit').addEventListener('click', handleAuth);
+document.getElementById('authPassword').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
+document.getElementById('authUsername').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
 
-                let statusHTML = '';
-                let badgeHTML = '';
-
-                if (unit.status === 'done') {
-                    statusHTML = '<div class="unit-status done">✓</div>';
-                    badgeHTML = '<span class="unit-badge badge-done">Completed</span>';
-                } else if (unit.status === 'current') {
-                    statusHTML = '<div class="unit-status current">→</div>';
-                    badgeHTML = '<span class="unit-badge badge-start">Start →</span>';
-                } else {
-                    statusHTML = '<div class="unit-status">🔒</div>';
-                    badgeHTML = '<span class="unit-badge badge-locked">Locked</span>';
-                }
-
-                card.innerHTML = `
-                    <div class="unit-left">
-                        ${statusHTML}
-                        <span class="unit-name">${unit.name}</span>
-                    </div>
-                    ${badgeHTML}
-                `;
-
-                if (unit.status === 'current' || unit.status === 'done') {
-                    card.style.cursor = 'pointer';
-                    card.onclick = () => startQuiz(unit.id, unit.name);
-                }
-
-                unitList.appendChild(card);
-            });
-
-            showPage('subject');
-        }
-
-        let quizState = {
-            questions: [],
-            current: 0,
-            score: 0,
-            answered: false,
-            unitName: '',
-            unitId: ''
-        };
-
-        function startQuiz(unitId, unitName) {
-            currentUnit = unitId;
-            const qs = questions[unitId];
-            if (!qs) {
-                showToast('No questions available for this unit yet.');
-                return;
-            }
-
-            quizState = {
-                questions: [...qs],
-                current: 0,
-                score: 0,
-                answered: false,
-                unitName: unitName,
-                unitId: unitId
-            };
-
-            showPage('quiz');
-            renderQuestion();
-        }
-
-        function renderQuestion() {
-            const { questions: qs, current } = quizState;
-            const q = qs[current];
-
-            const progressPct = ((current) / qs.length) * 100;
-            document.getElementById('quizProgressFill').style.width = progressPct + '%';
-            document.getElementById('quizProgressText').textContent = `${current + 1} / ${qs.length}`;
-
-            const content = document.getElementById('quizContent');
-            content.innerHTML = `
-                <div class="quiz-mascot-wrap">
-                    <div class="quiz-mascot" id="quizMascot">
-                        <svg class="mascot-svg" viewBox="0 0 200 200"><use href="#mascot"/></svg>
-                    </div>
-                </div>
-                <div class="quiz-card">
-                    <div class="quiz-question-label">${quizState.unitName}</div>
-                    <div class="quiz-question">${q.q}</div>
-                    <div class="quiz-options">
-                        ${q.options.map((opt, i) => `
-                            <button class="quiz-option" onclick="selectAnswer(${i})" data-index="${i}">${opt}</button>
-                        `).join('')}
-                    </div>
-                    <div class="quiz-feedback" id="quizFeedback"></div>
-                    <div class="quiz-actions">
-                        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" style="display:none">
-                            ${current < qs.length - 1 ? 'Next Question →' : 'See Results →'}
-                        </button>
-                    </div>
-                </div>
-            `;
-
-            quizState.answered = false;
-        }
-
-        function selectAnswer(index) {
-            if (quizState.answered) return;
-            quizState.answered = true;
-
-            const q = quizState.questions[quizState.current];
-            const buttons = document.querySelectorAll('.quiz-option');
-            const feedback = document.getElementById('quizFeedback');
-            const mascot = document.getElementById('quizMascot');
-
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                const i = parseInt(btn.dataset.index);
-                if (i === q.answer) {
-                    btn.classList.add('correct');
-                }
-            });
-
-            if (index === q.answer) {
-                quizState.score++;
-                buttons[index].classList.add('correct');
-                feedback.className = 'quiz-feedback correct';
-                feedback.textContent = '✓ Correct! Great job!';
-                // Switch mascot to happy + animate
-                mascot.innerHTML = '<svg class="mascot-svg" viewBox="0 0 200 200"><use href="#mascot-happy"/></svg>';
-                mascot.classList.add('celebrate');
-            } else {
-                buttons[index].classList.add('incorrect');
-                feedback.className = 'quiz-feedback incorrect';
-                feedback.textContent = `✗ Not quite. The answer is: ${q.options[q.answer]}`;
-                mascot.innerHTML = '<svg class="mascot-svg" viewBox="0 0 200 200"><use href="#mascot-sad"/></svg>';
-                mascot.classList.add('sad');
-            }
-
-            document.getElementById('nextBtn').style.display = 'inline-flex';
-        }
-
-        function nextQuestion() {
-            quizState.current++;
-            if (quizState.current >= quizState.questions.length) {
-                showQuizComplete();
-            } else {
-                renderQuestion();
-            }
-        }
-
-        function showQuizComplete() {
-            const { score, questions: qs } = quizState;
-            const pct = Math.round((score / qs.length) * 100);
-
-            document.getElementById('quizProgressFill').style.width = '100%';
-            document.getElementById('quizProgressText').textContent = `Done!`;
-
-            let message = 'Amazing work!';
-            let mascotId = 'mascot-happy';
-            if (pct < 60) { message = 'Keep practicing! You\'ll get there.'; mascotId = 'mascot-sad'; }
-            else if (pct < 80) { message = 'Good job! Almost perfect!'; mascotId = 'mascot'; }
-            else if (pct < 100) { message = 'Excellent work!'; mascotId = 'mascot-happy'; }
-
-            const content = document.getElementById('quizContent');
-            content.innerHTML = `
-                <div class="quiz-card quiz-complete">
-                    <div class="complete-mascot">
-                        <svg class="mascot-svg" viewBox="0 0 200 200"><use href="#${mascotId}"/></svg>
-                    </div>
-                    <h2>${message}</h2>
-                    <p>${quizState.unitName}</p>
-                    <div class="quiz-score">${score} / ${qs.length}</div>
-                    <p style="margin-bottom: 24px;">${pct}% correct</p>
-                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn btn-secondary" onclick="startQuiz('${quizState.unitId}', '${quizState.unitName}')">Try Again</button>
-                        <button class="btn btn-primary" onclick="openSubject('${currentSubject}')">Back to Units</button>
-                    </div>
-                </div>
-            `;
-        }
-
-        function goBackFromQuiz() {
-            if (currentSubject) {
-                openSubject(currentSubject);
-            } else {
-                showPage('dashboard');
-            }
-        }
-
-        let calendarMonth = 0;
-        let calendarYear = 2025;
-
-        const classSchedule = {
-            '2025-01-07': [{ title: 'Algebra I — Expressions Review', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
-            '2025-01-09': [{ title: 'Algebra I — Order of Operations', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
-            '2025-01-14': [{ title: 'Algebra I — Solving Equations', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
-            '2025-01-16': [{ title: 'Algebra I — Inequalities', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
-            '2025-01-21': [
-                { title: 'Algebra I — Graphing Lines', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' },
-                { title: 'Geometry — Intro to Angles', time: '5:30 – 6:30 PM', meet: 'https://meet.google.com/xyz-abcd-efg' }
-            ],
-            '2025-01-23': [{ title: 'Algebra I — Graphing Lines', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
-            '2025-01-28': [
-                { title: 'Algebra I — Slope', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' },
-                { title: 'Geometry — Triangle Properties', time: '5:30 – 6:30 PM', meet: 'https://meet.google.com/xyz-abcd-efg' }
-            ],
-            '2025-01-30': [{ title: 'Algebra I — Slope Practice', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
-            '2025-02-04': [{ title: 'Algebra I — Systems Intro', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
-            '2025-02-06': [{ title: 'Algebra I — Systems Practice', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
-            '2025-02-11': [
-                { title: 'Algebra I — Review', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' },
-                { title: 'Geometry — Quadrilaterals', time: '5:30 – 6:30 PM', meet: 'https://meet.google.com/xyz-abcd-efg' }
-            ],
-            '2025-02-13': [{ title: 'Algebra I — Test Prep', time: '4:00 – 5:00 PM', meet: 'https://meet.google.com/abc-defg-hij' }],
-            '2025-02-18': [{ title: 'Geometry — Area & Perimeter', time: '5:30 – 6:30 PM', meet: 'https://meet.google.com/xyz-abcd-efg' }],
-            '2025-02-25': [{ title: 'Geometry — Volume', time: '5:30 – 6:30 PM', meet: 'https://meet.google.com/xyz-abcd-efg' }],
-        };
-
-        function renderCalendar() {
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            document.getElementById('calendarTitle').textContent = `${months[calendarMonth]} ${calendarYear}`;
-
-            const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
-            const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
-            const daysInPrevMonth = new Date(calendarYear, calendarMonth, 0).getDate();
-
-            const today = new Date();
-            const container = document.getElementById('calendarDays');
-            container.innerHTML = '';
-
-            for (let i = firstDay - 1; i >= 0; i--) {
-                const d = document.createElement('div');
-                d.className = 'calendar-day other-month';
-                d.textContent = daysInPrevMonth - i;
-                container.appendChild(d);
-            }
-
-            for (let day = 1; day <= daysInMonth; day++) {
-                const d = document.createElement('div');
-                d.className = 'calendar-day';
-
-                const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const isToday = today.getFullYear() === calendarYear && today.getMonth() === calendarMonth && today.getDate() === day;
-                const hasClass = classSchedule[dateStr];
-
-                if (isToday) d.classList.add('today');
-                if (hasClass) {
-                    d.classList.add('has-class');
-                    d.onclick = () => showDayDetail(dateStr, day);
-                }
-
-                d.innerHTML = `${day}${hasClass ? '<div class="class-dot"></div>' : ''}`;
-                container.appendChild(d);
-            }
-
-            const totalCells = firstDay + daysInMonth;
-            const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
-            for (let i = 1; i <= remaining; i++) {
-                const d = document.createElement('div');
-                d.className = 'calendar-day other-month';
-                d.textContent = i;
-                container.appendChild(d);
-            }
-
-            document.getElementById('dayDetail').classList.remove('active');
-        }
-
-        function changeMonth(dir) {
-            calendarMonth += dir;
-            if (calendarMonth > 11) { calendarMonth = 0; calendarYear++; }
-            if (calendarMonth < 0) { calendarMonth = 11; calendarYear--; }
-            renderCalendar();
-        }
-
-        function showDayDetail(dateStr, day) {
-            const classes = classSchedule[dateStr];
-            if (!classes) return;
-
-            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-            const detail = document.getElementById('dayDetail');
-            document.getElementById('dayDetailTitle').textContent = `📅 ${months[calendarMonth]} ${day}, ${calendarYear}`;
-
-            let html = '';
-            classes.forEach(c => {
-                html += `
-                    <div class="meet-item" style="margin-bottom: 8px;">
-                        <div class="meet-info">
-                            <div class="title">${c.title}</div>
-                            <div class="time">${c.time}</div>
-                        </div>
-                        <a href="${c.meet}" target="_blank" class="meet-link">📹 Join</a>
-                    </div>
-                `;
-            });
-
-            document.getElementById('dayDetailContent').innerHTML = html;
-            detail.classList.add('active');
-        }
-
-        (function() {
-            const now = new Date();
-            const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-            let next = new Date(now);
-            while (next.getDay() !== 2 && next.getDay() !== 4) {
-                next.setDate(next.getDate() + 1);
-            }
-
-            const dateEl = document.getElementById('nextClassDate');
-            if (dateEl) {
-                dateEl.textContent = `${days[next.getDay()]}, ${months[next.getMonth()]} ${next.getDate()}`;
-            }
-        })();
-    </script>
-
+// Pre-load questions in background on page load
+loadQuestions();
+</script>
 </body>
 </html>
