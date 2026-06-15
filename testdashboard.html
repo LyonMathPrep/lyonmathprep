@@ -4,8 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Student Portal | Lyon Math Prep</title>
-  <!-- Add bcrypt.js for password hashing -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bcrypt.js/2.4.0/bcrypt.min.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -933,38 +931,23 @@ async function handleAuth() {
   const username = document.getElementById('authUsername').value.trim();
   const password = document.getElementById('authPassword').value;
 
-  if (!username || !password) {
-    showAuthMsg('Please enter your username and password.', 'error');
-    return;
-  }
+  if (!username || !password) { showAuthMsg('Please enter your username and password.','error'); return; }
 
   authSubmit.disabled = true;
   authSubmit.textContent = 'Logging in…';
 
   try {
     const users = await loadUsers();
+
+    // Find user row (case-insensitive username match)
     const userRow = users.find(r =>
       norm(r.Username) === norm(username) || norm(r.username) === norm(username)
     );
 
-    if (!userRow) {
-      showAuthMsg('Username not found. Ask your instructor to add you.', 'error');
-      return;
-    }
+    if (!userRow) { showAuthMsg('Username not found. Ask your instructor to add you.','error'); return; }
 
-    const storedHash = String(userRow.Password || userRow.password || '').trim();
-
-    // Compare the input password with the stored bcrypt hash
-    const isMatch = await new Promise((resolve) => {
-      bcrypt.compare(password, storedHash, (err, result) => {
-        resolve(result);
-      });
-    });
-
-    if (!isMatch) {
-      showAuthMsg('Incorrect password.', 'error');
-      return;
-    }
+    const storedPass = String(userRow.Password || userRow.password || '').trim();
+    if (storedPass !== password) { showAuthMsg('Incorrect password.','error'); return; }
 
     // Logged in!
     currentUser = {
@@ -976,8 +959,8 @@ async function handleAuth() {
     approvedSet = new Set();
     const approvals = await loadApprovals(currentUser.username);
     approvals.forEach(r => {
-      const subKey = String(r.Subject || r.subject || '').trim().toLowerCase().replace(/\s+/g, '');
-      const level = String(r.Level || r.level || '').trim();
+      const subKey  = String(r.Subject || r.subject || '').trim().toLowerCase().replace(/\s+/g,'');
+      const level   = String(r.Level   || r.level   || '').trim();
       if (subKey && level) approvedSet.add(`${subKey}:${level}`);
     });
 
@@ -986,7 +969,7 @@ async function handleAuth() {
 
     enterPortal();
   } catch (err) {
-    showAuthMsg(err.message || 'Something went wrong.', 'error');
+    showAuthMsg(err.message || 'Something went wrong.','error');
   } finally {
     authSubmit.disabled = false;
     authSubmit.textContent = 'Log In';
@@ -1108,6 +1091,7 @@ function openSubject(subjectKey) {
   list.innerHTML = '';
 
   for (let level=1; level<=10; level++) {
+    // Match by level number against the sheet "Level" column
     const approved = approvedSet.has(`${subjectKey.replace(/\s+/g,'').toLowerCase()}:${level}`)
                   || [...approvedSet].some(k => {
                       const [sk, lv] = k.split(':');
