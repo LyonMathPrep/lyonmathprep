@@ -26,11 +26,146 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg);
+            background: transparent;
             color: var(--text);
             line-height: 1.6;
             -webkit-tap-highlight-color: transparent;
+            position: relative;
+            overflow-x: hidden;
         }
+
+        /* ============================================
+           PARALLAX MATH BACKGROUND
+           ============================================ */
+        .parallax-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: #ffffff;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .parallax-layer {
+            position: absolute;
+            top: -200%;
+            left: 0;
+            width: 100%;
+            height: 500%;
+            will-change: transform;
+        }
+
+        /* Fine graph paper grid - barely visible */
+        .layer-grid-fine {
+            background-image:
+                linear-gradient(to right, rgba(17, 17, 17, 0.035) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(17, 17, 17, 0.035) 1px, transparent 1px);
+            background-size: 28px 28px;
+        }
+
+        /* Bold red-tinted grid - larger spacing */
+        .layer-grid-bold {
+            background-image:
+                linear-gradient(to right, rgba(230, 57, 70, 0.08) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(230, 57, 70, 0.08) 1px, transparent 1px);
+            background-size: 168px 168px;
+        }
+
+        /* SVG function graphs */
+        .layer-graphs svg {
+            position: absolute;
+            fill: none;
+            stroke: rgba(230, 57, 70, 0.16);
+            stroke-width: 1.6;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        /* Math equations layer */
+        .math-eq {
+            position: absolute;
+            font-family: 'Cambria Math', 'STIX Two Math', 'Latin Modern Math', Georgia, serif;
+            color: rgba(230, 57, 70, 0.14);
+            font-weight: 500;
+            white-space: nowrap;
+            user-select: none;
+            will-change: transform;
+            animation: floatEq 14s ease-in-out infinite;
+            letter-spacing: 0.3px;
+        }
+
+        .math-eq.dark { color: rgba(17, 17, 17, 0.10); }
+        .math-eq.bold { font-weight: 700; color: rgba(230, 57, 70, 0.22); }
+        .math-eq.lg { font-size: 32px; }
+        .math-eq.md { font-size: 24px; }
+        .math-eq.sm { font-size: 18px; }
+
+        @keyframes floatEq {
+            0%, 100% { transform: translate(0, 0) rotate(var(--rot, 0deg)); }
+            50% { transform: translate(2px, -8px) rotate(calc(var(--rot, 0deg) + 0.6deg)); }
+        }
+
+        /* Math symbols layer */
+        .math-symbol {
+            position: absolute;
+            font-family: 'Cambria Math', Georgia, serif;
+            color: rgba(17, 17, 17, 0.12);
+            font-weight: 400;
+            user-select: none;
+            will-change: transform;
+            animation: floatSym 18s ease-in-out infinite;
+            line-height: 1;
+        }
+
+        .math-symbol.accent { color: rgba(230, 57, 70, 0.24); }
+        .math-symbol.greek { font-style: italic; }
+        .math-symbol.lg { font-size: 56px; }
+        .math-symbol.md { font-size: 38px; }
+        .math-symbol.sm { font-size: 28px; }
+
+        @keyframes floatSym {
+            0%, 100% { transform: translate(0, 0) rotate(var(--rot, 0deg)) scale(1); }
+            50% { transform: translate(-3px, 6px) rotate(calc(var(--rot, 0deg) - 1deg)) scale(1.06); }
+        }
+
+        /* Pulsing particle dots */
+        .math-particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(230, 57, 70, 0.45);
+            will-change: transform;
+            animation: pulseDot 7s ease-in-out infinite;
+        }
+
+        .math-particle.dark { background: rgba(17, 17, 17, 0.28); }
+        .math-particle.large { width: 8px; height: 8px; }
+        .math-particle.small { width: 3px; height: 3px; }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); opacity: 0.45; }
+            50% { transform: scale(1.9); opacity: 1; }
+        }
+
+        @media (max-width: 768px) {
+            .math-eq.lg { font-size: 24px; }
+            .math-eq.md { font-size: 18px; }
+            .math-eq.sm { font-size: 14px; }
+            .math-symbol.lg { font-size: 38px; }
+            .math-symbol.md { font-size: 28px; }
+            .math-symbol.sm { font-size: 20px; }
+            .layer-particles { opacity: 0.5; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .parallax-layer { transform: none !important; }
+            .math-eq, .math-symbol, .math-particle { animation: none !important; }
+        }
+
+        /* ============================================
+           ORIGINAL STYLES
+           ============================================ */
 
         /* Top Bar */
         .topbar {
@@ -201,6 +336,8 @@
             margin-left: auto;
             margin-right: auto;
             animation: fadeUp 0.6s ease;
+            position: relative;
+            z-index: 1;
         }
 
         @keyframes fadeUp {
@@ -214,6 +351,8 @@
             margin: 0 auto 24px;
             display: block;
             animation: bounce 2.5s ease-in-out infinite;
+            position: relative;
+            z-index: 2;
         }
 
         .hero-mascot img {
@@ -221,6 +360,7 @@
             height: 100%;
             object-fit: contain;
             display: block;
+            filter: drop-shadow(0 8px 24px rgba(230, 57, 70, 0.18));
         }
 
         @keyframes bounce {
@@ -239,6 +379,7 @@
             font-weight: 700;
             margin-bottom: 24px;
             letter-spacing: 0.3px;
+            box-shadow: 3px 3px 0 var(--border);
         }
 
         /* Mission Section */
@@ -247,6 +388,8 @@
             color: var(--white);
             border-top: 2px solid var(--border);
             border-bottom: 2px solid var(--border);
+            position: relative;
+            z-index: 1;
         }
 
         .mission-content {
@@ -419,6 +562,8 @@
             border-top: 2px solid var(--border);
             border-bottom: 2px solid var(--border);
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
 
         .impact-stats {
@@ -465,6 +610,7 @@
             letter-spacing: -1.5px;
             margin-bottom: 20px;
             color: var(--text);
+            text-shadow: 0 2px 30px rgba(255, 255, 255, 0.8);
         }
 
         .hero h1 .accent {
@@ -477,6 +623,7 @@
             max-width: 520px;
             margin: 0 auto 36px;
             line-height: 1.7;
+            text-shadow: 0 1px 20px rgba(255, 255, 255, 0.9);
         }
 
         .hero-buttons {
@@ -495,6 +642,8 @@
             max-width: 600px;
             margin: 0 auto;
             animation: fadeUp 0.6s ease 0.15s both;
+            position: relative;
+            z-index: 1;
         }
 
         .stat {
@@ -520,6 +669,8 @@
             padding: 60px 24px;
             max-width: 960px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         .section-title {
@@ -528,6 +679,7 @@
             text-align: center;
             margin-bottom: 8px;
             letter-spacing: -0.5px;
+            text-shadow: 0 2px 24px rgba(255, 255, 255, 0.85);
         }
 
         .section-sub {
@@ -535,6 +687,7 @@
             color: var(--text-light);
             margin-bottom: 48px;
             font-size: 16px;
+            text-shadow: 0 1px 16px rgba(255, 255, 255, 0.85);
         }
 
         /* Feature Cards */
@@ -551,6 +704,8 @@
             padding: 32px 28px;
             transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
             will-change: transform;
+            position: relative;
+            z-index: 1;
         }
 
         .feature-card:hover {
@@ -606,6 +761,8 @@
             will-change: transform;
             width: 200px;
             flex-shrink: 0;
+            position: relative;
+            z-index: 1;
         }
 
         .subject-card:hover {
@@ -663,6 +820,7 @@
             font-weight: 800;
             font-size: 18px;
             margin: 0 auto 16px;
+            box-shadow: 3px 3px 0 var(--border);
         }
 
         .step h3 {
@@ -682,6 +840,8 @@
             background: var(--primary-light);
             border-top: 2px solid var(--border);
             border-bottom: 2px solid var(--border);
+            position: relative;
+            z-index: 1;
         }
 
         .testimonials-grid {
@@ -729,6 +889,8 @@
             padding: 80px 24px;
             max-width: 560px;
             margin: 0 auto;
+            position: relative;
+            z-index: 1;
         }
 
         .cta-section h2 {
@@ -736,12 +898,14 @@
             font-weight: 800;
             margin-bottom: 12px;
             letter-spacing: -0.5px;
+            text-shadow: 0 2px 24px rgba(255, 255, 255, 0.85);
         }
 
         .cta-section p {
             color: var(--text-light);
             margin-bottom: 32px;
             font-size: 16px;
+            text-shadow: 0 1px 16px rgba(255, 255, 255, 0.85);
         }
 
         /* Footer */
@@ -750,6 +914,8 @@
             padding: 40px 24px;
             text-align: center;
             background: var(--white);
+            position: relative;
+            z-index: 1;
         }
 
         .footer-content {
@@ -799,6 +965,11 @@
             color: var(--text);
             text-decoration: none;
             transition: color 0.2s;
+            background: var(--white);
+            padding: 12px 20px;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            box-shadow: 3px 3px 0 var(--border);
         }
 
         .contact-list-item svg {
@@ -807,6 +978,8 @@
 
         .contact-list-item:hover {
             color: var(--primary);
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--border);
         }
 
         .footer-copy .heart {
@@ -863,7 +1036,7 @@
             }
         }
 
-        /* Scroll animations - properly combined with hover effects */
+        /* Scroll animations */
         .animate-on-scroll {
             opacity: 0;
         }
@@ -872,7 +1045,6 @@
             opacity: 1;
         }
         
-        /* Ensure cards have proper transitions for both scroll and hover */
         .feature-card.animate-on-scroll {
             transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, opacity 0.5s ease;
         }
@@ -885,7 +1057,6 @@
             transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
         }
         
-        /* Other elements with scroll animation only */
         .section-title.animate-on-scroll,
         .section-sub.animate-on-scroll,
         .step.animate-on-scroll,
@@ -909,6 +1080,91 @@
     </style>
 </head>
 <body>
+
+    <!-- Parallax Math Background -->
+    <div class="parallax-bg" aria-hidden="true">
+        <div class="parallax-layer layer-grid-fine" data-speed="0.04"></div>
+        <div class="parallax-layer layer-grid-bold" data-speed="0.07"></div>
+        <div class="parallax-layer layer-graphs" data-speed="0.11">
+            <svg viewBox="0 0 200 60" style="top: 12%; left: 4%; width: 280px;">
+                <path d="M 0 30 Q 25 5 50 30 T 100 30 T 150 30 T 200 30" />
+            </svg>
+            <svg viewBox="0 0 200 120" style="top: 22%; right: 8%; width: 240px;">
+                <path d="M 20 110 Q 100 -10 180 110" />
+                <line x1="20" y1="110" x2="180" y2="110" stroke-dasharray="3,4" stroke-width="1" opacity="0.6" />
+            </svg>
+            <svg viewBox="0 0 120 120" style="top: 45%; left: 62%; width: 160px;">
+                <circle cx="60" cy="60" r="55" />
+                <line x1="60" y1="5" x2="60" y2="115" stroke-dasharray="3,3" stroke-width="1" opacity="0.5" />
+                <line x1="5" y1="60" x2="115" y2="60" stroke-dasharray="3,3" stroke-width="1" opacity="0.5" />
+            </svg>
+            <svg viewBox="0 0 200 100" style="top: 68%; right: 6%; width: 220px;">
+                <path d="M 30 5 Q 5 50 30 95" />
+                <path d="M 170 5 Q 195 50 170 95" />
+                <line x1="100" y1="10" x2="100" y2="90" stroke-dasharray="3,3" stroke-width="1" opacity="0.5" />
+            </svg>
+            <svg viewBox="0 0 160 100" style="top: 85%; left: 30%; width: 260px;">
+                <path d="M 10 80 Q 60 0 150 50" />
+                <line x1="30" y1="50" x2="130" y2="20" />
+                <circle cx="60" cy="20" r="3" fill="rgba(230,57,70,0.4)" stroke="none" />
+            </svg>
+        </div>
+        <div class="parallax-layer layer-equations" data-speed="0.15">
+            <span class="math-eq lg" style="top: 3%; left: 5%; --rot: -2deg;">E = mc²</span>
+            <span class="math-eq dark sm" style="top: 7%; right: 8%; --rot: 1deg;">∫₀^∞ e^(-x²) dx = √π/2</span>
+            <span class="math-eq sm" style="top: 11%; left: 32%; --rot: -1deg;">sin²θ + cos²θ = 1</span>
+            <span class="math-eq bold lg" style="top: 15%; right: 18%; --rot: 2deg;">a² + b² = c²</span>
+            <span class="math-eq dark md" style="top: 19%; left: 68%;">F = ma</span>
+            <span class="math-eq md" style="top: 23%; left: 10%; --rot: -1.5deg;">π ≈ 3.14159</span>
+            <span class="math-eq sm" style="top: 27%; right: 6%;">e^(iπ) + 1 = 0</span>
+            <span class="math-eq bold md" style="top: 31%; left: 45%; --rot: 1.5deg;">f′(x)</span>
+            <span class="math-eq dark sm" style="top: 35%; left: 8%;">∑ 1/n² = π²/6</span>
+            <span class="math-eq md" style="top: 39%; right: 12%; --rot: -1deg;">∇·E = ρ/ε₀</span>
+            <span class="math-eq sm" style="top: 43%; left: 60%;">y = mx + b</span>
+            <span class="math-eq bold lg" style="top: 47%; left: 22%; --rot: 0.8deg;">ax² + bx + c = 0</span>
+            <span class="math-eq dark md" style="top: 51%; right: 6%;">log(ab) = log a + log b</span>
+            <span class="math-eq md" style="top: 55%; left: 50%; --rot: -1deg;">∂f/∂x</span>
+            <span class="math-eq bold md" style="top: 59%; left: 12%;">x = (−b ± √(b²−4ac))/2a</span>
+            <span class="math-eq dark sm" style="top: 63%; right: 22%; --rot: 1deg;">lim sin(x)/x = 1</span>
+            <span class="math-eq md" style="top: 67%; left: 5%;">∀x ∈ ℝ, x² ≥ 0</span>
+            <span class="math-eq md" style="top: 71%; right: 10%; --rot: -2deg;">∮ F·dr</span>
+            <span class="math-eq bold md" style="top: 75%; left: 35%;">Δ = b² − 4ac</span>
+            <span class="math-eq dark md" style="top: 79%; left: 65%;">A = πr²</span>
+            <span class="math-eq md" style="top: 83%; right: 25%; --rot: 1.5deg;">F = G(m₁m₂)/r²</span>
+            <span class="math-eq md" style="top: 87%; left: 15%;">σ = √(Σ(x−μ)²/N)</span>
+            <span class="math-eq bold lg" style="top: 91%; right: 5%; --rot: -1deg;">d/dx [xⁿ] = nxⁿ⁻¹</span>
+            <span class="math-eq dark sm" style="top: 95%; left: 45%;">P(A|B) = P(A∩B)/P(B)</span>
+            <span class="math-eq md" style="top: 98%; left: 8%;">∮ E·dA = Q/ε₀</span>
+        </div>
+        <div class="parallax-layer layer-symbols" data-speed="0.22">
+            <span class="math-symbol accent lg" style="top: 2%; left: 18%;">π</span>
+            <span class="math-symbol md" style="top: 6%; left: 55%;">∞</span>
+            <span class="math-symbol greek md" style="top: 10%; right: 30%;">θ</span>
+            <span class="math-symbol accent md" style="top: 14%; left: 40%;">∫</span>
+            <span class="math-symbol sm" style="top: 18%; right: 8%;">√</span>
+            <span class="math-symbol greek md" style="top: 22%; left: 75%;">λ</span>
+            <span class="math-symbol accent md" style="top: 26%; left: 5%;">∑</span>
+            <span class="math-symbol greek md" style="top: 30%; right: 45%;">α</span>
+            <span class="math-symbol md" style="top: 34%; left: 28%;">∂</span>
+            <span class="math-symbol accent md" style="top: 38%; right: 18%;">∇</span>
+            <span class="math-symbol greek sm" style="top: 42%; left: 55%;">β</span>
+            <span class="math-symbol md" style="top: 46%; left: 18%;">Δ</span>
+            <span class="math-symbol greek md" style="top: 50%; right: 5%;">μ</span>
+            <span class="math-symbol accent lg" style="top: 54%; left: 70%;">Ω</span>
+            <span class="math-symbol md" style="top: 58%; left: 30%;">∈</span>
+            <span class="math-symbol greek md" style="top: 62%; right: 35%;">σ</span>
+            <span class="math-symbol accent md" style="top: 66%; left: 8%;">∀</span>
+            <span class="math-symbol md" style="top: 70%; right: 12%;">∃</span>
+            <span class="math-symbol greek md" style="top: 74%; left: 50%;">φ</span>
+            <span class="math-symbol accent md" style="top: 78%; left: 22%;">∮</span>
+            <span class="math-symbol sm" style="top: 82%; right: 25%;">≤</span>
+            <span class="math-symbol greek md" style="top: 86%; left: 60%;">ε</span>
+            <span class="math-symbol accent md" style="top: 90%; left: 12%;">±</span>
+            <span class="math-symbol md" style="top: 94%; right: 8%;">≈</span>
+            <span class="math-symbol greek sm" style="top: 97%; left: 40%;">ψ</span>
+        </div>
+        <div class="parallax-layer layer-particles" data-speed="0.30"></div>
+    </div>
 
     <!-- Top Bar -->
     <header class="topbar">
@@ -1084,11 +1340,8 @@
             <div class="subject-card animate-on-scroll">
                 <div class="emoji">
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <!-- Front face -->
                         <polygon points="4 8 4 20 16 20 16 8"></polygon>
-                        <!-- Top face -->
                         <polygon points="4 8 10 4 22 4 16 8"></polygon>
-                        <!-- Right face -->
                         <polygon points="16 8 22 4 22 16 16 20"></polygon>
                     </svg>
                 </div>
@@ -1097,12 +1350,9 @@
             </div>
             <div class="subject-card animate-on-scroll">
                 <div class="emoji">
-                    <!-- Parabola / quadratic function for Algebra II -->
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <!-- Axes -->
                         <line x1="3" y1="21" x2="3" y2="3"></line>
                         <line x1="3" y1="21" x2="21" y2="21"></line>
-                        <!-- Parabola curve (opening upward) -->
                         <path d="M4 18 Q7 2 12 10 Q17 18 20 4" fill="none"></path>
                     </svg>
                 </div>
@@ -1122,13 +1372,9 @@
             </div>
             <div class="subject-card animate-on-scroll">
                 <div class="emoji">
-                    <!-- Integral symbol for Pre-Calculus -->
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <!-- Integral sign (∫) drawn as an elongated S-curve -->
                         <path d="M15 3c-1.5 0-2.5 1-2.8 2.5L9.8 18.5C9.5 20 8.5 21 7 21" fill="none"></path>
-                        <!-- Top serif -->
                         <path d="M13 3h4" fill="none"></path>
-                        <!-- Bottom serif -->
                         <path d="M5 21h4" fill="none"></path>
                     </svg>
                 </div>
@@ -1179,7 +1425,6 @@
                     <div class="impact-number">500+</div>
                     <div class="impact-label">Hours Tutored</div>
                 </div>
-
             </div>
         </div>
     </section>
@@ -1324,6 +1569,64 @@
                 }
             });
         });
+
+        // ============================================
+        // PARALLAX MATH BACKGROUND
+        // ============================================
+        (function() {
+            const parallaxLayers = document.querySelectorAll('.parallax-layer[data-speed]');
+            let mouseX = 0, mouseY = 0;
+            let pending = false;
+
+            // Generate floating particle dots
+            const particleLayer = document.querySelector('.layer-particles');
+            if (particleLayer) {
+                const particleCount = 42;
+                for (let i = 0; i < particleCount; i++) {
+                    const p = document.createElement('span');
+                    let cls = 'math-particle';
+                    const r = Math.random();
+                    if (r > 0.72) cls += ' dark';
+                    if (r > 0.86) cls += ' large';
+                    else if (r < 0.32) cls += ' small';
+                    p.className = cls;
+                    p.style.top = (Math.random() * 100) + '%';
+                    p.style.left = (Math.random() * 100) + '%';
+                    p.style.animationDelay = (-Math.random() * 7) + 's';
+                    p.style.animationDuration = (5 + Math.random() * 5) + 's';
+                    particleLayer.appendChild(p);
+                }
+            }
+
+            function update() {
+                const scrollY = window.pageYOffset;
+                parallaxLayers.forEach(layer => {
+                    const speed = parseFloat(layer.dataset.speed);
+                    const yPos = -(scrollY * speed);
+                    // Mouse-based parallax: faster layers shift more (closer to viewer)
+                    const xOffset = -mouseX * speed * 35;
+                    const yOffset = -mouseY * speed * 35;
+                    layer.style.transform = `translate3d(${xOffset}px, ${yPos + yOffset}px, 0)`;
+                });
+                pending = false;
+            }
+
+            function scheduleUpdate() {
+                if (!pending) {
+                    pending = true;
+                    requestAnimationFrame(update);
+                }
+            }
+
+            window.addEventListener('scroll', scheduleUpdate, { passive: true });
+            window.addEventListener('mousemove', (e) => {
+                mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+                mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+                scheduleUpdate();
+            }, { passive: true });
+
+            update();
+        })();
     </script>
 
 </body>
