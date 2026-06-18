@@ -904,7 +904,7 @@ body {
 .lockdown-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(193, 18, 31, 0.95);
+  background: rgba(51, 65, 85, 0.98); /* Soft slate blue */
   z-index: 5500;
   display: none;
   align-items: center;
@@ -915,6 +915,7 @@ body {
 .lockdown-overlay.active { display: flex; }
 .lockdown-box {
   color: #fff;
+  max-width: 500px;
 }
 .lockdown-box h2 { font-size: 32px; font-weight: 900; margin-bottom: 16px; }
 .lockdown-box p { font-size: 18px; margin-bottom: 24px; }
@@ -1203,7 +1204,7 @@ body {
 <div class="modal-overlay" id="testStartModal">
   <div class="modal-box">
     <h2>Unit Test Ready</h2>
-    <p>You are about to start the Unit Test. This test contains up to 30 questions. The page will enter lockdown mode, and you <strong>cannot leave this tab</strong> during the test.</p>
+    <p>You are about to start the Unit Test. This test contains up to 30 questions. The page will enter lockdown mode, and you <strong>cannot leave this tab or exit fullscreen</strong> during the test.</p>
     <div class="modal-btns">
       <button class="btn" id="testCancelBtn">Cancel</button>
       <button class="btn btn-primary" id="testStartBtn">Start Test</button>
@@ -1214,9 +1215,9 @@ body {
 <!-- Lockdown Warning Overlay -->
 <div class="lockdown-overlay" id="testLockdownOverlay">
   <div class="lockdown-box">
-    <h2>⚠️ Tab Switch Detected</h2>
-    <p>Please return to the test tab immediately. Leaving the tab during a unit test is not allowed and may invalidate your test.</p>
-    <button class="btn btn-primary" onclick="closeLockdown()">I understand, Resume Test</button>
+    <h2>🔒 Test Paused</h2>
+    <p>You have exited fullscreen mode or switched tabs. Please click the button below to securely resume your test.</p>
+    <button class="btn btn-primary" onclick="resumeFullscreen()">Resume Test in Fullscreen</button>
   </div>
 </div>
 
@@ -1946,23 +1947,38 @@ function enableTestLockdown() {
 
 function disableTestLockdown() {
   testLockdownActive = false;
+  document.getElementById('testLockdownOverlay').classList.remove('active');
   if (document.fullscreenElement || document.webkitFullscreenElement) {
     if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
     else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
   }
 }
 
-function handleTestVisibility() {
+function handleLockdown() {
   if (!testLockdownActive) return;
-  if (document.hidden) {
+  
+  // If the tab is hidden OR the user exited fullscreen
+  if (document.hidden || !document.fullscreenElement) {
     document.getElementById('testLockdownOverlay').classList.add('active');
+  } else {
+    document.getElementById('testLockdownOverlay').classList.remove('active');
   }
 }
 
-document.addEventListener('visibilitychange', handleTestVisibility);
+document.addEventListener('visibilitychange', handleLockdown);
+document.addEventListener('fullscreenchange', handleLockdown);
+document.addEventListener('webkitfullscreenchange', handleLockdown);
 
-function closeLockdown() {
-  document.getElementById('testLockdownOverlay').classList.remove('active');
+function resumeFullscreen() {
+  const elem = document.documentElement;
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen().then(() => {
+      document.getElementById('testLockdownOverlay').classList.remove('active');
+    }).catch(()=>{});
+  } else if (elem.webkitRequestFullscreen) {
+    elem.webkitRequestFullscreen();
+    document.getElementById('testLockdownOverlay').classList.remove('active');
+  }
 }
 
 function initQuizUI() {
