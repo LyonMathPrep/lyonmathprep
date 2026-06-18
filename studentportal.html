@@ -874,6 +874,51 @@ body {
 .graph-controls button:hover { background: var(--primary-light); }
 .graph-hint { font-size: 11px; color: var(--text-light); text-align: center; font-weight: 600; }
 
+/* ==================== MODAL & LOCKDOWN ==================== */
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 5000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  max-width: 480px;
+  width: 100%;
+  padding: 30px;
+  text-align: center;
+  box-shadow: 6px 6px 0 var(--border);
+}
+.modal-box h2 { font-size: 24px; font-weight: 900; margin-bottom: 14px; }
+.modal-box p { color: var(--text-light); margin-bottom: 24px; font-size: 15px; }
+.modal-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.modal-btns .btn { min-width: 140px; }
+
+.lockdown-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(193, 18, 31, 0.95);
+  z-index: 5500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  text-align: center;
+}
+.lockdown-overlay.active { display: flex; }
+.lockdown-box {
+  color: #fff;
+}
+.lockdown-box h2 { font-size: 32px; font-weight: 900; margin-bottom: 16px; }
+.lockdown-box p { font-size: 18px; margin-bottom: 24px; }
+
 @media (max-width: 768px) {
   .nav-links { display:none; }
   .hamburger { display:flex; }
@@ -1154,6 +1199,27 @@ body {
 
 <div class="toast" id="toast"></div>
 
+<!-- Test Start Confirmation Modal -->
+<div class="modal-overlay" id="testStartModal">
+  <div class="modal-box">
+    <h2>Unit Test Ready</h2>
+    <p>You are about to start the Unit Test. This test contains up to 30 questions. The page will enter lockdown mode, and you <strong>cannot leave this tab</strong> during the test.</p>
+    <div class="modal-btns">
+      <button class="btn" id="testCancelBtn">Cancel</button>
+      <button class="btn btn-primary" id="testStartBtn">Start Test</button>
+    </div>
+  </div>
+</div>
+
+<!-- Lockdown Warning Overlay -->
+<div class="lockdown-overlay" id="testLockdownOverlay">
+  <div class="lockdown-box">
+    <h2>⚠️ Tab Switch Detected</h2>
+    <p>Please return to the test tab immediately. Leaving the tab during a unit test is not allowed and may invalidate your test.</p>
+    <button class="btn btn-primary" onclick="closeLockdown()">I understand, Resume Test</button>
+  </div>
+</div>
+
 <!-- ==================== CALCULATOR ==================== -->
 <button class="calc-toggle" id="calcToggle" onclick="toggleCalculator()" title="Open calculator">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -1272,6 +1338,7 @@ let meetingCache   = [];
 let questionsCache = [];
 let calendarEventMap = {};
 let quizState      = null;
+let testLockdownActive = false;
 
 let activeLevels   = new Set();
 let finishedLevels = new Set();
@@ -1281,10 +1348,10 @@ let calendarMonth = nowInit.getMonth();
 let calendarYear  = nowInit.getFullYear();
 
 const subjectCatalog = {
-  algebra1:   { label: 'Algebra I',   iconId: 'icon-algebra1',    desc: 'Linear equations, expressions, inequalities, and functions.', sheetKey: 'Algebra1'   },
+  algebra1:   { label: 'Algebra I',   iconId: 'icon-algebra1',    desc: 'Linear equations, expressions, inequalities, and functions.', sheetKey: 'Algebra 1'   },
   prealgebra: { label: 'Pre-Algebra', iconId: 'icon-prealgebra',  desc: 'Whole numbers, fractions, decimals, and ratios.',            sheetKey: 'Pre-algebra' },
   geometry:   { label: 'Geometry',    iconId: 'icon-geometry',    desc: 'Angles, triangles, shapes, area, and volume.',               sheetKey: 'Geometry'    },
-  algebra2:   { label: 'Algebra II',  iconId: 'icon-algebra2',    desc: 'Quadratics, roots, and advanced algebra skills.',            sheetKey: 'Algebra2'  },
+  algebra2:   { label: 'Algebra II',  iconId: 'icon-algebra2',    desc: 'Quadratics, roots, and advanced algebra skills.',            sheetKey: 'Algebra 2'  },
   statistics: { label: 'Statistics',  iconId: 'icon-statistics',  desc: 'Data, mean, probability, and interpretation.',              sheetKey: 'Statistics'  }
 };
 
@@ -1762,11 +1829,46 @@ function openSubject(subjectKey) {
     `;
 
     if (isClickable) {
-      row.onclick = () => startLevelQuiz(subjectKey, level);
+      row.onclick = () => startLevelQuiz(subjectKey, level, false);
     }
 
     list.appendChild(row);
   }
+
+  // Append Unit Test Card at the bottom
+  let allLevelsFinished = true;
+  for(let i=1; i<=10; i++) {
+    if (getLevelStatus(subjectKey, i) !== 'finished') {
+      allLevelsFinished = false;
+      break;
+    }
+  }
+
+  const testStatus = allLevelsFinished ? 'active' : 'locked';
+  const testStatusIcon = allLevelsFinished ? svgUse('icon-play', 14) : svgUse('icon-lock', 14);
+  const testStatusClass = allLevelsFinished ? 'current' : 'locked';
+  const testBadgeText = allLevelsFinished ? 'Take Test' : 'Locked';
+  const testBadgeClass = allLevelsFinished ? 'active-level' : 'locked';
+  const testMetaText = allLevelsFinished ? 'Available — click to start' : 'Complete all 10 levels to unlock';
+
+  const testRow = document.createElement('div');
+  testRow.className = 'unit-card' + (allLevelsFinished ? ' clickable' : '');
+  testRow.innerHTML = `
+    <div class="unit-left">
+      <div class="unit-status ${testStatusClass}">${testStatusIcon}</div>
+      <div>
+        <div class="unit-name">Unit Test</div>
+        <div class="unit-meta">${testMetaText}</div>
+      </div>
+    </div>
+    <div class="unit-badge ${testBadgeClass}">${testBadgeText}</div>
+  `;
+
+  if (allLevelsFinished) {
+    testRow.onclick = () => startLevelQuiz(subjectKey, 0, true); // 0 means Unit Test
+  }
+
+  list.appendChild(testRow);
 
   showPage('subject');
 }
@@ -1774,22 +1876,31 @@ function openSubject(subjectKey) {
 // =========================
 // Quiz Logic
 // =========================
-function startLevelQuiz(subjectKey, level) {
+function startLevelQuiz(subjectKey, level, isTest = false) {
   const subject = subjectCatalog[subjectKey];
   if (!subject) return;
 
-  const pool = questionsCache.filter(q => {
-    const matchSubject = norm(q['Question type']) === norm(subject.sheetKey);
+  const sheetKeyToMatch = isTest ? subject.sheetKey + '-test' : subject.sheetKey;
+  
+  let pool = questionsCache.filter(q => {
+    const matchSubject = norm(q['Question type']) === norm(sheetKeyToMatch);
+    if (!matchSubject) return false;
+    if (isTest) return true; // Grab all test questions regardless of level
     const qLevel = parseInt(String(q.Level || '0').trim(), 10);
-    return matchSubject && qLevel === level;
+    return qLevel === level;
   });
 
   if (!pool.length) {
-    showToast(`No questions yet for ${subject.label} Level ${level}.`);
+    showToast(`No ${isTest ? 'test ' : ''}questions yet for ${subject.label}.`);
     return;
   }
 
-  const shuffled = [...pool].sort(() => Math.random() - 0.5);
+  let shuffled = [...pool].sort(() => Math.random() - 0.5);
+  
+  // If test and we have more than 30, slice. If test and less than 30, we use what we have.
+  if (isTest && shuffled.length > 30) {
+    shuffled = shuffled.slice(0, 30);
+  }
 
   quizState = {
     subjectKey,
@@ -1799,12 +1910,82 @@ function startLevelQuiz(subjectKey, level) {
     current: 0,
     correct: 0,
     wrong: 0,
-    answered: false
+    answered: false,
+    isTest
   };
 
-  document.getElementById('quizBackBtn').onclick = () => openSubject(subjectKey);
-  document.getElementById('quizPageTitle').innerHTML = `${svgUse(subject.iconId,26)} ${subject.label} — Level ${level}`;
-  document.getElementById('quizPageSubtitle').textContent = `${shuffled.length} question${shuffled.length===1?'':'s'} · Answer them all to see your results.`;
+  if (isTest) {
+    showTestStartModal();
+  } else {
+    initQuizUI();
+  }
+}
+
+function showTestStartModal() {
+  document.getElementById('testStartModal').classList.add('active');
+  document.getElementById('testStartBtn').onclick = () => {
+    document.getElementById('testStartModal').classList.remove('active');
+    initQuizUI();
+    enableTestLockdown();
+  };
+  document.getElementById('testCancelBtn').onclick = () => {
+    document.getElementById('testStartModal').classList.remove('active');
+    openSubject(quizState.subjectKey);
+  };
+}
+
+function enableTestLockdown() {
+  testLockdownActive = true;
+  const elem = document.documentElement;
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen().catch(()=>{});
+  } else if (elem.webkitRequestFullscreen) {
+    elem.webkitRequestFullscreen();
+  }
+}
+
+function disableTestLockdown() {
+  testLockdownActive = false;
+  if (document.fullscreenElement || document.webkitFullscreenElement) {
+    if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+    else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+  }
+}
+
+function handleTestVisibility() {
+  if (!testLockdownActive) return;
+  if (document.hidden) {
+    document.getElementById('testLockdownOverlay').classList.add('active');
+  }
+}
+
+document.addEventListener('visibilitychange', handleTestVisibility);
+
+function closeLockdown() {
+  document.getElementById('testLockdownOverlay').classList.remove('active');
+}
+
+function initQuizUI() {
+  document.getElementById('quizBackBtn').onclick = () => {
+    if (quizState.isTest) {
+      if (confirm("You are currently taking a locked unit test. Are you sure you want to leave? Your progress will be lost.")) {
+        disableTestLockdown();
+        openSubject(quizState.subjectKey);
+      }
+    } else {
+      openSubject(quizState.subjectKey);
+    }
+  };
+  
+  let titleText = `${svgUse(subjectCatalog[quizState.subjectKey].iconId,26)} ${quizState.subjectLabel} — `;
+  if (quizState.isTest) {
+    titleText += 'Unit Test';
+  } else {
+    titleText += `Level ${quizState.level}`;
+  }
+  
+  document.getElementById('quizPageTitle').innerHTML = titleText;
+  document.getElementById('quizPageSubtitle').textContent = `${quizState.questions.length} question${quizState.questions.length===1?'':'s'} · Answer them all to see your results.` + (quizState.isTest ? ' · TEST MODE: Tab locked.' : '');
 
   showPage('quiz');
   renderQuizQuestion();
@@ -1848,9 +2029,11 @@ function renderQuizQuestion() {
     </button>
   `).join('');
 
+  const levelLabel = state.isTest ? 'Unit Test' : `Level ${state.level}`;
+
   area.innerHTML = `
     <div class="quiz-header-bar">
-      <span class="quiz-level-label">Level ${state.level}</span>
+      <span class="quiz-level-label">${levelLabel}</span>
       <div class="quiz-progress-bar"><div class="quiz-progress-fill" style="width:${pct}%"></div></div>
       <span class="quiz-progress-text">${idx+1} / ${total}</span>
     </div>
@@ -1912,7 +2095,11 @@ function nextQuizQuestion() {
 }
 
 function renderQuizResults() {
-  const { correct, wrong, questions, subjectKey, subjectLabel, level } = quizState;
+  if (quizState.isTest) {
+    disableTestLockdown();
+  }
+  
+  const { correct, wrong, questions, subjectKey, subjectLabel, level, isTest } = quizState;
   const total = questions.length;
   const pct   = Math.round((correct / total) * 100);
 
@@ -1928,7 +2115,7 @@ function renderQuizResults() {
         <div class="score-label">Score</div>
       </div>
       <div style="font-size:40px;margin-bottom:8px;">${emoji}</div>
-      <h2>Level ${level} Complete!</h2>
+      <h2>${isTest ? 'Unit Test' : 'Level ' + level} Complete!</h2>
       <p>${msg}</p>
       <div class="quiz-results-row">
         <div class="quiz-stat green"><div class="stat-val">${correct}</div><div class="stat-key">Correct</div></div>
@@ -1936,7 +2123,7 @@ function renderQuizResults() {
         <div class="quiz-stat"><div class="stat-val">${total}</div><div class="stat-key">Total</div></div>
       </div>
       <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="startLevelQuiz('${esc(subjectKey)}', ${level})">Try Again</button>
+        <button class="btn btn-primary" onclick="startLevelQuiz('${esc(subjectKey)}', ${level}, ${isTest})">Try Again</button>
         <button class="btn" onclick="openSubject('${esc(subjectKey)}')">Back to Levels</button>
       </div>
     </div>
