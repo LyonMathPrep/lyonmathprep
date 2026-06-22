@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -708,7 +709,13 @@ body {
   padding: 10px 12px;
   border-bottom: 2px solid var(--border);
   background: var(--primary-light);
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  touch-action: none;   /* lets us intercept touch drags */
 }
+.calc-header.dragging { cursor: grabbing; }
 .calc-tabs { display: flex; gap: 6px; }
 .calc-tab {
   border: 2px solid var(--border);
@@ -2565,6 +2572,8 @@ function calcEquals() {
 
 // Keyboard support for calc input
 document.addEventListener('DOMContentLoaded', function() {
+  initCalcDrag();   // <-- add this line
+
   const calcExpr = document.getElementById('calcExpr');
   if (calcExpr) {
     calcExpr.addEventListener('keydown', function(e) {
@@ -2584,6 +2593,111 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// =========================
+// CALCULATOR DRAG
+// =========================
+let calcDragState = null;
+
+function initCalcDrag() {
+  const panel  = document.getElementById('calcPanel');
+  const header = panel ? panel.querySelector('.calc-header') : null;
+  if (!panel || !header) return;
+
+  // Start drag on mouse or touch
+  header.addEventListener('mousedown', calcDragStart);
+  header.addEventListener('touchstart', calcDragStart, { passive: false });
+
+  document.addEventListener('mousemove', calcDragMove);
+  document.addEventListener('mouseup',   calcDragEnd);
+  document.addEventListener('touchmove', calcDragMove, { passive: false });
+  document.addEventListener('touchend',  calcDragEnd);
+  document.addEventListener('touchcancel', calcDragEnd);
+
+  // Keep panel on-screen when viewport resizes
+  window.addEventListener('resize', calcClampToViewport);
+}
+
+function calcDragStart(e) {
+  const panel  = document.getElementById('calcPanel');
+  const header = panel.querySelector('.calc-header');
+
+  // Ignore drags that begin on the tab buttons or close button
+  if (e.target.closest('.calc-tab') || e.target.closest('.calc-close')) return;
+  if (!panel.classList.contains('open')) return;
+
+  e.preventDefault();
+
+  const rect  = panel.getBoundingClientRect();
+  const point = e.touches ? e.touches[0] : e;
+
+  // Freeze current size and switch from CSS right/bottom to explicit left/top
+  panel.style.width  = rect.width + 'px';
+  panel.style.left   = rect.left + 'px';
+  panel.style.top    = rect.top + 'px';
+  panel.style.right  = 'auto';
+  panel.style.bottom = 'auto';
+
+  calcDragState = {
+    offsetX: point.clientX - rect.left,
+    offsetY: point.clientY - rect.top
+  };
+
+  header.classList.add('dragging');
+  document.body.style.userSelect = 'none';
+}
+
+function calcDragMove(e) {
+  if (!calcDragState) return;
+  e.preventDefault();
+
+  const panel = document.getElementById('calcPanel');
+  const point = e.touches ? e.touches[0] : e;
+
+  let x = point.clientX - calcDragState.offsetX;
+  let y = point.clientY - calcDragState.offsetY;
+
+  const rect = panel.getBoundingClientRect();
+  const maxX = window.innerWidth  - rect.width;
+  const maxY = window.innerHeight - rect.height;
+
+  // Clamp so the panel can't be dragged off-screen
+  x = Math.max(0, Math.min(x, Math.max(0, maxX)));
+  y = Math.max(0, Math.min(y, Math.max(0, maxY)));
+
+  panel.style.left = x + 'px';
+  panel.style.top  = y + 'px';
+}
+
+function calcDragEnd() {
+  if (!calcDragState) return;
+  calcDragState = null;
+
+  const panel  = document.getElementById('calcPanel');
+  const header = panel.querySelector('.calc-header');
+  if (header) header.classList.remove('dragging');
+  document.body.style.userSelect = '';
+}
+
+function calcClampToViewport() {
+  const panel = document.getElementById('calcPanel');
+  if (!panel || !panel.classList.contains('open')) return;
+  // Only clamp if we've already started dragging (inline left/top set)
+  if (!panel.style.left || !panel.style.top) return;
+
+  const rect = panel.getBoundingClientRect();
+  let x = parseFloat(panel.style.left);
+  let y = parseFloat(panel.style.top);
+
+  const maxX = window.innerWidth  - rect.width;
+  const maxY = window.innerHeight - rect.height;
+
+  x = Math.max(0, Math.min(x, Math.max(0, maxX)));
+  y = Math.max(0, Math.min(y, Math.max(0, maxY)));
+
+  panel.style.left = x + 'px';
+  panel.style.top  = y + 'px';
+}
 
 // =========================
 // GRAPHING
