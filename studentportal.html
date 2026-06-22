@@ -1316,7 +1316,7 @@ body {
 // =========================
 // CONFIG
 // =========================
-const USERS_URL     = 'https://opensheet.elk.sh/1S9wcSH4fzhnZqJB2ZnC8HEBw49VynN9vHozA7SoTMHg/Sheet1';
+const USERS_URL     = 'https://users-api.lyonmathprep.workers.dev/';
 const APPROVALS_URL = 'https://opensheet.elk.sh/1KJ2lWZ3kj5q36_768I6s_-fDxWiVrmciRScV9ZwvXhc/Sheet1';
 const MEETINGS_URL  = 'https://opensheet.elk.sh/1Bpho-NecP90LqdYoxfvUxblsCoSuwQT3KYFAvonOZ10/Sheet1';
 const QUESTIONS_URL = 'https://opensheet.elk.sh/1f8VdEO7bv6hNrul0i8rHTvzpFPYo0jNmZeRri_OLMv4/Sheet1';
@@ -1578,19 +1578,24 @@ async function handleAuth(savedPassword) {
   authSubmit.textContent = 'Logging in…';
 
   try {
-    const users = await loadUsers();
-    const userRow = users.find(r =>
-      norm(r.Username) === norm(username) || norm(r.username) === norm(username)
-    );
+    // Send credentials securely to the Cloudflare Worker
+    const response = await fetch(USERS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
 
-    if (!userRow) { showAuthMsg('Username not found. Ask your instructor to add you.','error'); return; }
+    const data = await response.json();
 
-    const storedPass = String(userRow.Password || userRow.password || '').trim();
-    if (storedPass !== password) { showAuthMsg('Incorrect password.','error'); return; }
+    if (!response.ok || !data.success) {
+      showAuthMsg(data.error || 'Invalid username or password.', 'error');
+      return;
+    }
 
+    // Login successful - apply the user data returned by the worker
     currentUser = {
-      username: String(userRow.Username || userRow.username || username).trim(),
-      displayName: String(userRow.DisplayName || userRow['Display Name'] || username).trim()
+      username: data.user.username,
+      displayName: data.user.displayName
     };
 
     // Save credentials to localStorage for auto-login on refresh
