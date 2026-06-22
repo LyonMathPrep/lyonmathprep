@@ -1318,7 +1318,7 @@ body {
 // =========================
 const USERS_URL     = 'https://users-api.lyonmathprep.workers.dev/';
 const APPROVALS_URL = 'https://opensheet.elk.sh/1KJ2lWZ3kj5q36_768I6s_-fDxWiVrmciRScV9ZwvXhc/Sheet1';
-const MEETINGS_URL  = 'https://opensheet.elk.sh/1Bpho-NecP90LqdYoxfvUxblsCoSuwQT3KYFAvonOZ10/Sheet1';
+const MEETINGS_URL  = 'https://meetings-api.lyonmathprep.workers.dev/';
 const QUESTIONS_URL = 'https://opensheet.elk.sh/1f8VdEO7bv6hNrul0i8rHTvzpFPYo0jNmZeRri_OLMv4/Sheet1';
 
 // LocalStorage key for saved session
@@ -1490,10 +1490,25 @@ async function loadApprovals(username) {
 }
 
 async function loadMeetings() {
+  if (!currentUser || !currentUser.username) {
+    meetingCache = [];
+    return;
+  }
   try {
-    const rows = await fetchSheet(MEETINGS_URL);
-    meetingCache = (rows||[]).map(normalizeMeeting).filter(Boolean);
-  } catch (e) { meetingCache = []; }
+    // Send a POST request with the logged-in user's username
+    const response = await fetch(MEETINGS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: currentUser.username })
+    });
+
+    if (!response.ok) throw new Error('Failed to load meetings');
+    
+    const rows = await response.json();
+    meetingCache = (rows || []).map(normalizeMeeting).filter(Boolean);
+  } catch (e) {
+    meetingCache = [];
+  }
 }
 
 async function loadQuestions() {
