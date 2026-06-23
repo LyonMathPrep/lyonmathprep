@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -946,6 +947,90 @@ body {
   .calc-toggle { bottom: 16px; right: 16px; padding: 10px 14px; }
   .calc-toggle span { display: none; }
   .calc-panel { bottom: 72px; right: 8px; left: 8px; width: auto; max-width: none; }
+  
+  .signup-modal-box {
+    max-width: 100%;
+    padding: 16px;
+  }
+  .signup-iframe {
+    height: 70vh;
+  }
+}
+/* ==================== SIGNUP MODAL ==================== */
+.auth-signup-btn {
+  width: 100%;
+  max-width: 420px;
+  margin-top: 10px;
+  padding: 14px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--white);
+  color: var(--text);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  min-height: 50px;
+  font-size: 16px;
+  transition: background .15s, color .15s, border-color .15s;
+}
+.auth-signup-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+.signup-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.75);
+  z-index: 5000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.signup-modal-overlay.active { display: flex; }
+
+.signup-modal-box {
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  max-width: 640px;
+  width: 100%;
+  padding: 20px;
+  box-shadow: 6px 6px 0 var(--border);
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+
+.signup-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.signup-modal-header h2 {
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.signup-close {
+  width: 32px; height: 32px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  font: inherit;
+  font-size: 18px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+.signup-close:hover { background: var(--primary); color: var(--white); }
+
+.signup-iframe {
+  width: 100%;
+  height: 60vh;
+  border: 2px solid var(--border);
+  border-radius: 8px;
 }
   </style>
 </head>
@@ -1061,7 +1146,8 @@ body {
     </div>
   </div>
 
-  <p class="auth-note">Ask your instructor to set up your account.</p>
+    <p class="auth-note">Don't have an account? Click the button below to register. <br> You will receive and email with your login credentials.</p>
+  <button class="auth-signup-btn" onclick="openSignupModal()">Sign Up</button>
 </div>
 
 <div id="portalScreen">
@@ -1225,6 +1311,18 @@ body {
     <h2>🔒 Test Paused</h2>
     <p>You have exited fullscreen mode or switched tabs. Please click the button below to securely resume your test.</p>
     <button class="btn btn-primary" onclick="resumeFullscreen()">Resume Test in Fullscreen</button>
+  </div>
+</div>
+
+<!-- Signup Modal -->
+<div class="signup-modal-overlay" id="signupModal">
+  <div class="signup-modal-box">
+    <div class="signup-modal-header">
+      <h2>Create an Account</h2>
+      <button class="signup-close" onclick="closeSignupModal()">×</button>
+    </div>
+    <!-- IMPORTANT: Replace YOUR_FORM_ID with your actual Google Form ID -->
+    <iframe class="signup-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSf59KopwNB0lxih_7yGvTSh8OsJNntFXvUa3-7tFvUW2Yh2zg/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
   </div>
 </div>
 
@@ -1432,6 +1530,25 @@ function parseSpecificDate(text) {
   const d = new Date(m[3]?parseInt(m[3]):new Date().getFullYear(), mi, parseInt(m[2],10), t.h, t.min, 0, 0);
   return isNaN(d.getTime()) ? null : d;
 }
+
+
+// =========================
+// Signup Modal Logic
+// =========================
+function openSignupModal() {
+  document.getElementById('signupModal').classList.add('active');
+}
+
+function closeSignupModal() {
+  document.getElementById('signupModal').classList.remove('active');
+}
+
+// Close modal if user clicks the dark overlay area outside the form box
+document.getElementById('signupModal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeSignupModal();
+  }
+});
 
 // =========================
 // Session persistence (localStorage)
