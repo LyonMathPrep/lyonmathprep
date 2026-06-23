@@ -670,7 +670,8 @@ body {
 // =========================
 // CONFIG
 // =========================
-const TUTORS_URL = 'https://opensheet.elk.sh/1oZ26kj60hz4fMt_U69W9YwYNt_gZPCoF5Q8_idu2Jcg/Sheet1';
+// Change this to your actual Cloudflare Worker URL
+const WORKER_URL = 'https://tutors-api.lyonmathprep.workers.dev/';
 
 // =========================
 // SVG icon helpers
@@ -772,7 +773,8 @@ function normalizeClass(row) {
   const topic = String(row['Topic']||'').trim();
   const meetingLink = String(row['Meeting Link']||'').trim();
   
-  if (!tutorName || !password || !meetingLink || !topic) return null;
+  // Updated to not require password since Worker securely omits it
+  if (!tutorName || !meetingLink || !topic) return null;
   
   return {
     tutorName,
@@ -846,26 +848,41 @@ async function handleAuth() {
   const username = document.getElementById('authUsername').value.trim();
   const password = document.getElementById('authPassword').value;
 
-  if (!username || !password) { showAuthMsg('Please enter your username and password.','error'); return; }
+  if (!username || !password) { 
+    showAuthMsg('Please enter your username and password.','error'); 
+    return; 
+  }
 
   authSubmit.disabled = true;
   authSubmit.textContent = 'Logging in…';
 
   try {
-    const tutors = await fetchSheet(TUTORS_URL);
-    const tutorRow = tutors.find(r => norm(r['Tutor Name']) === norm(username));
+    // 1. Send credentials securely to the Cloudflare Worker
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
 
-    if (!tutorRow) { showAuthMsg('Username not found. Ask your administrator to add you.','error'); return; }
+    const data = await res.json();
 
-    const storedPass = String(tutorRow.Password || '').trim();
-    if (storedPass !== password) { showAuthMsg('Incorrect password.','error'); return; }
+    if (!data.success) {
+      showAuthMsg(data.error || 'Login failed.', 'error');
+      return;
+    }
 
+    // 2. Set the current tutor based on Worker response
     currentTutor = {
-      username: String(tutorRow['Tutor Name'] || username).trim(),
-      displayName: String(tutorRow['Tutor Name'] || username).trim()
+      username: data.user.username,
+      displayName: data.user.displayName
     };
 
-    classesCache = (tutors || []).map(normalizeClass).filter(Boolean);
+    // 3. Load classes securely from Worker response (no passwords included!)
+    // We wrap it so normalizeClass() still works correctly on the frontend
+    classesCache = (data.classes || []).map(c => ({
+      'Tutor Name': currentTutor.username, // Inject name back in so frontend filters work
+      ...c
+    })).map(normalizeClass).filter(Boolean);
 
     enterPortal();
   } catch (err) {
@@ -1140,15 +1157,6 @@ function renderCalendarMeetings() {
       ? upcoming.slice(0,5).map(c => classCardHTML(c,c.next)).join('')
       : `<div class="empty-state"><div class="es-icon"><svg width="44" height="44"><use href="#icon-inbox"/></svg></div><h3>No upcoming classes</h3><p>Once classes are scheduled, they will appear here.</p></div>`;
   }
-}
-
-// =========================
-// Fetch
-// =========================
-async function fetchSheet(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`Sheet fetch failed: ${res.status}`);
-  return await res.json();
 }
 
 // =========================
