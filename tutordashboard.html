@@ -702,10 +702,10 @@ body {
           <svg width="22" height="22" style="vertical-align:middle;margin-right:6px;color:var(--primary)"><use href="#icon-zap"/></svg>
           Auto-Assign Next Levels
         </h2>
-        <p>Clicking this button will check every user's finished levels. If they have finished a level (1-9) and are missing the next one, it will be assigned to them automatically. Users who finish Level 10 will be left alone to take the Unit Test.</p>
+        <p>Clicking this button will check your students' finished levels. If they have finished a level (1-9) and are missing the next one, it will be assigned to them automatically. Users who finish Level 10 will be left alone to take the Unit Test.</p>
         
         <button class="btn btn-primary" id="adminRunBtn" onclick="runAutoAssign()" style="font-size: 16px;">
-          Run Auto-Assign
+          Run Auto-Assign for My Students
         </button>
         
         <div class="message" id="adminStatus"></div>
@@ -724,7 +724,7 @@ body {
 const WORKER_URL = 'https://tutors-api.lyonmathprep.workers.dev/';
 
 // Admin Google Apps Script URL
-const ADMIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxu3P-XTzGjBhopCXQJiDD6MPlRMLJ34uJCzMgWyof5KdDpp9mGzh2Eb5_KeFTTPC7P/exec';
+const ADMIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyusR-_sAjF2UJpCubZKDq6L17IxZBGpJGfbElHvq27dK_7OkzO9wUn1ghdDaWaNQFo/exec';
 
 // =========================
 // Local Storage Auth Persistence
@@ -1300,7 +1300,24 @@ async function runAutoAssign() {
   const status = document.getElementById('adminStatus');
   
   if (!btn || !status) return;
-  
+
+  // Get unique list of students for the currently logged-in tutor
+  const tutorStudents = new Set();
+  getTutorClasses().forEach(c => {
+    c.students.forEach(s => {
+      if (s.trim()) tutorStudents.add(s.trim());
+    });
+  });
+
+  const studentList = Array.from(tutorStudents);
+
+  if (studentList.length === 0) {
+    status.textContent = '❌ You have no students assigned to your classes.';
+    status.className = 'message error';
+    showToast('No students found to assign.');
+    return;
+  }
+
   btn.disabled = true;
   btn.textContent = 'Processing...';
   status.className = 'message';
@@ -1310,7 +1327,11 @@ async function runAutoAssign() {
     const response = await fetch(ADMIN_SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ action: 'autoAssignNextLevels' })
+      body: JSON.stringify({ 
+        action: 'autoAssignNextLevels',
+        tutorName: currentTutor.displayName || currentTutor.username,
+        students: studentList 
+      })
     });
 
     const data = await response.json();
@@ -1318,7 +1339,7 @@ async function runAutoAssign() {
     if (data.success) {
       status.textContent = '✅ ' + data.message;
       status.className = 'message success';
-      showToast('Auto-assign completed successfully!');
+      showToast('Auto-assign completed for your students!');
     } else {
       status.textContent = '❌ Error: ' + (data.error || 'Something went wrong.');
       status.className = 'message error';
@@ -1330,7 +1351,7 @@ async function runAutoAssign() {
     showToast('Network error during auto-assign.');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Run Auto-Assign';
+    btn.textContent = 'Run Auto-Assign for My Students';
   }
 }
 
