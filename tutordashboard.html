@@ -674,6 +674,39 @@ body {
 const WORKER_URL = 'https://tutors-api.lyonmathprep.workers.dev/';
 
 // =========================
+// Local Storage Auth Persistence
+// =========================
+const AUTH_STORAGE_KEY = 'lyonmath_tutor_auth';
+
+function saveAuth(username, password) {
+  try {
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username, password }));
+  } catch (e) {
+    console.warn('Could not save credentials:', e);
+  }
+}
+
+function loadAuth() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !parsed.username || !parsed.password) return null;
+    return parsed;
+  } catch (e) {
+    return null;
+  }
+}
+
+function clearAuth() {
+  try {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch (e) {
+    console.warn('Could not clear credentials:', e);
+  }
+}
+
+// =========================
 // SVG icon helpers
 // =========================
 function svgUse(id, size=22) {
@@ -844,20 +877,43 @@ function showAuthMsg(text, type) {
   authMsg.className = 'message ' + type;
 }
 
+function processAuthResponse(data, persistCredentials = null) {
+  if (!data.success) return false;
+
+  currentTutor = {
+    username: data.user.username,
+    displayName: data.user.displayName
+  };
+
+  classesCache = (data.classes || [])
+    .map(c => ({
+      'Tutor Name': currentTutor.username,
+      ...c
+    }))
+    .map(normalizeClass)
+    .filter(Boolean);
+
+  if (persistCredentials) {
+    saveAuth(persistCredentials.username, persistCredentials.password);
+  }
+
+  enterPortal();
+  return true;
+}
+
 async function handleAuth() {
   const username = document.getElementById('authUsername').value.trim();
   const password = document.getElementById('authPassword').value;
 
-  if (!username || !password) { 
-    showAuthMsg('Please enter your username and password.','error'); 
-    return; 
+  if (!username || !password) {
+    showAuthMsg('Please enter your username and password.', 'error');
+    return;
   }
 
   authSubmit.disabled = true;
   authSubmit.textContent = 'Logging in…';
 
   try {
-    // 1. Send credentials securely to the Cloudflare Worker
     const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -868,32 +924,56 @@ async function handleAuth() {
 
     if (!data.success) {
       showAuthMsg(data.error || 'Login failed.', 'error');
+      clearAuth();
       return;
     }
 
-    // 2. Set the current tutor based on Worker response
-    currentTutor = {
-      username: data.user.username,
-      displayName: data.user.displayName
-    };
-
-    // 3. Load classes securely from Worker response (no passwords included!)
-    // We wrap it so normalizeClass() still works correctly on the frontend
-    classesCache = (data.classes || []).map(c => ({
-      'Tutor Name': currentTutor.username, // Inject name back in so frontend filters work
-      ...c
-    })).map(normalizeClass).filter(Boolean);
-
-    enterPortal();
+    processAuthResponse(data, { username, password });
   } catch (err) {
-    showAuthMsg(err.message || 'Something went wrong.','error');
+    showAuthMsg(err.message || 'Something went wrong.', 'error');
   } finally {
     authSubmit.disabled = false;
     authSubmit.textContent = 'Log In';
   }
 }
 
+// Auto-login on page load using stored credentials
+async function tryAutoLogin() {
+  const stored = loadAuth();
+  if (!stored) return;
+
+  // Show a subtle "restoring session…" hint
+  showAuthMsg('Restoring your session…', 'success');
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: stored.username, password: stored.password })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      // Credentials no longer valid — wipe them
+      clearAuth();
+      authMsg.className = 'message';
+      authMsg.textContent = '';
+      return;
+    }
+
+    authMsg.className = 'message';
+    authMsg.textContent = '';
+    processAuthResponse(data); // already persisted, no need to re-save
+  } catch (err) {
+    // Network error — keep stored credentials so the user can retry later
+    authMsg.className = 'message';
+    authMsg.textContent = '';
+  }
+}
+
 function logout() {
+  clearAuth();
   currentTutor = null;
   classesCache = [];
   document.getElementById('portalScreen').classList.remove('active');
@@ -903,7 +983,7 @@ function logout() {
   authMsg.className = 'message';
   authMsg.textContent = '';
   closeAvatarDropdown();
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 
 function enterPortal() {
@@ -1165,6 +1245,9 @@ function renderCalendarMeetings() {
 document.getElementById('authSubmit').addEventListener('click', handleAuth);
 document.getElementById('authPassword').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
 document.getElementById('authUsername').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
+
+// Attempt silent auto-login from localStorage on page load
+tryAutoLogin();
 </script>
 </body>
 </html>
