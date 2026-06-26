@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2038,9 +2039,19 @@ function startLevelQuiz(subjectKey, level, isTest = false) {
     return;
   }
 
-  let shuffled = [...pool].sort(() => Math.random() - 0.5);
+  // Fisher-Yates shuffle for true randomization
+  let shuffled = [...pool];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
   
-  // If test and we have more than 30, slice. If test and less than 30, we use what we have.
+  // Limit levels to 10 questions
+  if (!isTest && shuffled.length > 10) {
+    shuffled = shuffled.slice(0, 10);
+  }
+  
+  // Limit tests to 30 questions
   if (isTest && shuffled.length > 30) {
     shuffled = shuffled.slice(0, 30);
   }
