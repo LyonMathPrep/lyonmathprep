@@ -328,6 +328,7 @@ body {
 }
 .btn-primary { background: var(--primary); color: var(--white); }
 .btn-primary:hover { background: var(--primary-dark); }
+.btn-primary:disabled { opacity:.6; cursor:not-allowed; background: var(--primary); }
 .btn-meet { background: var(--primary); color: var(--white); }
 .btn-meet:hover { background: var(--primary-dark); }
 
@@ -446,12 +447,25 @@ body {
   color: var(--text-light);
 }
 
+/* ==================== ADMIN ACTIONS ==================== */
+.admin-action-card {
+  padding: 40px;
+  text-align: center;
+  max-width: 540px;
+  margin: 0 auto;
+  box-shadow: 6px 6px 0 var(--border);
+}
+.admin-action-card h2 { font-size: 24px; margin-bottom: 12px; font-weight: 900; }
+.admin-action-card p { color: var(--text-light); margin-bottom: 24px; font-size: 15px; line-height: 1.5; }
+.admin-action-card .message { margin-top: 20px; margin-bottom: 0; text-align: left; }
+
 @media (max-width: 768px) {
   .nav-links { display:none; }
   .hamburger { display:flex; }
   .main { padding: 24px 16px; }
   .grid-2 { grid-template-columns: 1fr; }
   .welcome-header h1 { font-size: 24px; }
+  .admin-action-card { padding: 28px 20px; }
 }
 
 @media (max-width: 480px) {
@@ -512,6 +526,15 @@ body {
       <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
       <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
     </symbol>
+    <!-- Settings/Admin -->
+    <symbol id="icon-settings" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/>
+      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+    </symbol>
+    <!-- Zap (Auto) -->
+    <symbol id="icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </symbol>
   </defs>
 </svg>
 
@@ -559,6 +582,7 @@ body {
       <ul class="nav-links">
         <li><button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')">Dashboard</button></li>
         <li><button class="nav-btn" data-page="calendar" onclick="showPage('calendar')">Calendar</button></li>
+        <li><button class="nav-btn" data-page="admin" onclick="showPage('admin')">Admin</button></li>
       </ul>
     </nav>
 
@@ -585,6 +609,7 @@ body {
   <div class="mobile-menu" id="mobileMenu">
     <button onclick="showPage('dashboard'); toggleMobile();">Dashboard</button>
     <button onclick="showPage('calendar'); toggleMobile();">Calendar</button>
+    <button onclick="showPage('admin'); toggleMobile();">Admin</button>
     <button onclick="logout()">Log Out</button>
   </div>
 
@@ -661,6 +686,31 @@ body {
         </div>
       </div>
     </section>
+
+    <!-- ADMIN PAGE -->
+    <section class="page" id="page-admin">
+      <div class="welcome-header">
+        <h1>
+          <svg width="28" height="28" style="vertical-align:middle;margin-right:6px;color:var(--primary)"><use href="#icon-settings"/></svg>
+          Admin Actions
+        </h1>
+        <p>Manage user progress and automated level assignments.</p>
+      </div>
+
+      <div class="card admin-action-card">
+        <h2>
+          <svg width="22" height="22" style="vertical-align:middle;margin-right:6px;color:var(--primary)"><use href="#icon-zap"/></svg>
+          Auto-Assign Next Levels
+        </h2>
+        <p>Clicking this button will check every user's finished levels. If they have finished a level (1-9) and are missing the next one, it will be assigned to them automatically. Users who finish Level 10 will be left alone to take the Unit Test.</p>
+        
+        <button class="btn btn-primary" id="adminRunBtn" onclick="runAutoAssign()" style="font-size: 16px;">
+          Run Auto-Assign
+        </button>
+        
+        <div class="message" id="adminStatus"></div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -672,6 +722,9 @@ body {
 // =========================
 // Change this to your actual Cloudflare Worker URL
 const WORKER_URL = 'https://tutors-api.lyonmathprep.workers.dev/';
+
+// Admin Google Apps Script URL
+const ADMIN_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxu3P-XTzGjBhopCXQJiDD6MPlRMLJ34uJCzMgWyof5KdDpp9mGzh2Eb5_KeFTTPC7P/exec';
 
 // =========================
 // Local Storage Auth Persistence
@@ -1236,6 +1289,48 @@ function renderCalendarMeetings() {
     calList.innerHTML = upcoming.length
       ? upcoming.slice(0,5).map(c => classCardHTML(c,c.next)).join('')
       : `<div class="empty-state"><div class="es-icon"><svg width="44" height="44"><use href="#icon-inbox"/></svg></div><h3>No upcoming classes</h3><p>Once classes are scheduled, they will appear here.</p></div>`;
+  }
+}
+
+// =========================
+// Admin Auto-Assign
+// =========================
+async function runAutoAssign() {
+  const btn = document.getElementById('adminRunBtn');
+  const status = document.getElementById('adminStatus');
+  
+  if (!btn || !status) return;
+  
+  btn.disabled = true;
+  btn.textContent = 'Processing...';
+  status.className = 'message';
+  status.textContent = '';
+
+  try {
+    const response = await fetch(ADMIN_SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'autoAssignNextLevels' })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      status.textContent = '✅ ' + data.message;
+      status.className = 'message success';
+      showToast('Auto-assign completed successfully!');
+    } else {
+      status.textContent = '❌ Error: ' + (data.error || 'Something went wrong.');
+      status.className = 'message error';
+      showToast('Auto-assign failed. See details.');
+    }
+  } catch (e) {
+    status.textContent = '❌ Network Error: ' + e.message;
+    status.className = 'message error';
+    showToast('Network error during auto-assign.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Run Auto-Assign';
   }
 }
 
