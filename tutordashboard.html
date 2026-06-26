@@ -1,1752 +1,1253 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- PRIMARY SEO META TAGS -->
-    <title>Free Online Math Tutoring | Lyon Math Prep | South Lyon, MI</title>
-    <meta name="description" content="Lyon Math Prep is a 100% free, student-run nonprofit providing online math tutoring for middle & high schoolers. Serving South Lyon, Novi, Canton & online.">
-    <meta name="keywords" content="free math tutoring, online math tutor, math tutor South Lyon MI, math tutor Novi MI, math tutor Canton MI, nonprofit tutoring, student-run nonprofit, algebra tutoring, geometry tutoring, pre-calculus tutoring">
-    <meta name="author" content="Lyon Math Prep">
-    <meta name="robots" content="index, follow">
-    
-    <!-- CANONICAL TAG -->
-    <link rel="canonical" href="https://coachinbha.github.io/math/">
-    
-    <!-- GEO TARGETING META TAGS (Local SEO) -->
-    <meta name="geo.region" content="US-MI" />
-    <meta name="geo.placename" content="South Lyon, Michigan" />
-    <meta name="geo.position" content="42.4614; -83.6513" />
-    <meta name="ICBM" content="42.4614, -83.6513" />
-    
-    <!-- OPEN GRAPH / SOCIAL MEDIA META TAGS -->
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content="Free Online Math Tutoring | Lyon Math Prep | South Lyon, MI" />
-    <meta property="og:description" content="100% free, student-run nonprofit math tutoring for middle and high school students. Serving South Lyon, Novi, Canton, and online." />
-    <meta property="og:url" content="https://coachinbha.github.io/math/" />
-    <meta property="og:image" content="https://coachinbha.github.io/math/logo.png" />
-    <meta property="og:site_name" content="Lyon Math Prep" />
-    
-    <!-- TWITTER CARD META TAGS -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Free Online Math Tutoring | Lyon Math Prep | South Lyon, MI" />
-    <meta name="twitter:description" content="100% free, student-run nonprofit math tutoring for middle and high school students. Serving South Lyon, Novi, Canton, and online." />
-    <meta name="twitter:image" content="https://coachinbha.github.io/math/logo.png" />
-
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #e63946;
-            --primary-light: #fde8ea;
-            --primary-dark: #c1121f;
-            --text: #000000;
-            --text-light: #555555;
-            --bg: #ffffff;
-            --white: #ffffff;
-            --border: #000000;
-            --border-light: #e8e8e8;
-            --accent: #c1121f;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-            background: transparent;
-            color: var(--text);
-            line-height: 1.6;
-            -webkit-tap-highlight-color: transparent;
-            position: relative;
-            overflow-x: hidden;
-        }
-
-        /* ============================================
-           PARALLAX MATH BACKGROUND
-           ============================================ */
-        .parallax-bg {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background: #ffffff;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .parallax-layer {
-            position: absolute;
-            top: -200%;
-            left: 0;
-            width: 100%;
-            height: 500%;
-            will-change: transform;
-        }
-
-        /* Fine graph paper grid - barely visible */
-        .layer-grid-fine {
-            background-image:
-                linear-gradient(to right, rgba(17, 17, 17, 0.035) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(17, 17, 17, 0.035) 1px, transparent 1px);
-            background-size: 28px 28px;
-        }
-
-        /* Bold red-tinted grid - larger spacing */
-        .layer-grid-bold {
-            background-image:
-                linear-gradient(to right, rgba(230, 57, 70, 0.08) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(230, 57, 70, 0.08) 1px, transparent 1px);
-            background-size: 168px 168px;
-        }
-
-        /* SVG function graphs */
-        .layer-graphs svg {
-            position: absolute;
-            fill: none;
-            stroke: rgba(230, 57, 70, 0.16);
-            stroke-width: 1.6;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        /* Math equations layer */
-        .math-eq {
-            position: absolute;
-            font-family: 'Cambria Math', 'STIX Two Math', 'Latin Modern Math', Georgia, serif;
-            color: rgba(230, 57, 70, 0.14);
-            font-weight: 500;
-            white-space: nowrap;
-            user-select: none;
-            will-change: transform;
-            animation: floatEq 14s ease-in-out infinite;
-            letter-spacing: 0.3px;
-        }
-
-        .math-eq.dark { color: rgba(17, 17, 17, 0.10); }
-        .math-eq.bold { font-weight: 700; color: rgba(230, 57, 70, 0.22); }
-        .math-eq.lg { font-size: 32px; }
-        .math-eq.md { font-size: 24px; }
-        .math-eq.sm { font-size: 18px; }
-
-        @keyframes floatEq {
-            0%, 100% { transform: translate(0, 0) rotate(var(--rot, 0deg)); }
-            50% { transform: translate(2px, -8px) rotate(calc(var(--rot, 0deg) + 0.6deg)); }
-        }
-
-        /* Math symbols layer */
-        .math-symbol {
-            position: absolute;
-            font-family: 'Cambria Math', Georgia, serif;
-            color: rgba(17, 17, 17, 0.12);
-            font-weight: 400;
-            user-select: none;
-            will-change: transform;
-            animation: floatSym 18s ease-in-out infinite;
-            line-height: 1;
-        }
-
-        .math-symbol.accent { color: rgba(230, 57, 70, 0.24); }
-        .math-symbol.greek { font-style: italic; }
-        .math-symbol.lg { font-size: 56px; }
-        .math-symbol.md { font-size: 38px; }
-        .math-symbol.sm { font-size: 28px; }
-
-        @keyframes floatSym {
-            0%, 100% { transform: translate(0, 0) rotate(var(--rot, 0deg)) scale(1); }
-            50% { transform: translate(-3px, 6px) rotate(calc(var(--rot, 0deg) - 1deg)) scale(1.06); }
-        }
-
-        /* Pulsing particle dots */
-        .math-particle {
-            position: absolute;
-            width: 5px;
-            height: 5px;
-            border-radius: 50%;
-            background: rgba(230, 57, 70, 0.45);
-            will-change: transform;
-            animation: pulseDot 7s ease-in-out infinite;
-        }
-
-        .math-particle.dark { background: rgba(17, 17, 17, 0.28); }
-        .math-particle.large { width: 8px; height: 8px; }
-        .math-particle.small { width: 3px; height: 3px; }
-
-        @keyframes pulseDot {
-            0%, 100% { transform: scale(1); opacity: 0.45; }
-            50% { transform: scale(1.9); opacity: 1; }
-        }
-
-        @media (max-width: 768px) {
-            .math-eq.lg { font-size: 24px; }
-            .math-eq.md { font-size: 18px; }
-            .math-eq.sm { font-size: 14px; }
-            .math-symbol.lg { font-size: 38px; }
-            .math-symbol.md { font-size: 28px; }
-            .math-symbol.sm { font-size: 20px; }
-            .layer-particles { opacity: 0.5; }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .parallax-layer { transform: none !important; }
-            .math-eq, .math-symbol, .math-particle { animation: none !important; }
-        }
-
-        /* ============================================
-           ORIGINAL STYLES
-           ============================================ */
-
-        /* Top Bar */
-        .topbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border-bottom: 2px solid var(--border);
-            z-index: 1000;
-            padding: 0 24px;
-            height: 64px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            text-decoration: none;
-            height: 48px;
-        }
-
-        .logo img {
-            height: 100%;
-            width: auto;
-            display: block;
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 32px;
-            list-style: none;
-        }
-
-        .nav-links a {
-            text-decoration: none;
-            color: var(--text);
-            font-size: 15px;
-            font-weight: 500;
-            transition: color 0.2s;
-            padding: 8px 0;
-        }
-
-        .nav-links a.highlight {
-            color: var(--primary);
-            font-weight: 600;
-        }
-
-        .nav-links a:hover {
-            color: var(--primary);
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            cursor: pointer;
-            border: 2px solid var(--border);
-            min-height: 44px;
-            min-width: 44px;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: var(--white);
-            border-color: var(--border);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: var(--primary-light);
-            color: var(--primary);
-            border-color: var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: #fbd5d9;
-        }
-
-        .btn-outline {
-            background: transparent;
-            color: var(--text);
-            border: 2px solid var(--border);
-        }
-
-        .btn-outline:hover {
-            background: var(--text);
-            color: var(--white);
-        }
-
-        .hamburger {
-            display: none;
-            flex-direction: column;
-            gap: 5px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
-            min-height: 44px;
-            min-width: 44px;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .hamburger span {
-            width: 22px;
-            height: 2px;
-            background: var(--text);
-            transition: all 0.3s;
-            border-radius: 2px;
-        }
-
-        .mobile-menu {
-            display: none;
-            position: fixed;
-            top: 64px;
-            left: 0;
-            right: 0;
-            background: var(--white);
-            border-bottom: 2px solid var(--border);
-            padding: 16px 24px;
-            z-index: 999;
-            animation: slideDown 0.25s ease;
-        }
-
-        .mobile-menu.active {
-            display: block;
-        }
-
-        .mobile-menu a {
-            display: block;
-            padding: 14px 0;
-            text-decoration: none;
-            color: var(--text);
-            font-size: 16px;
-            font-weight: 500;
-            border-bottom: 1px solid var(--border-light);
-        }
-
-        .mobile-menu a:last-child {
-            border-bottom: none;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Hero */
-        .hero {
-            margin-top: 64px;
-            padding: 80px 24px 40px;
-            text-align: center;
-            max-width: 760px;
-            margin-left: auto;
-            margin-right: auto;
-            animation: fadeUp 0.6s ease;
-            position: relative;
-            z-index: 1;
-        }
-
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .hero-mascot {
-            width: 240px;
-            height: 240px;
-            margin: 0 auto 24px;
-            display: block;
-            animation: bounce 2.5s ease-in-out infinite;
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-mascot img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-            filter: drop-shadow(0 8px 24px rgba(230, 57, 70, 0.18));
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .hero-badge {
-            display: inline-block;
-            background: var(--white);
-            color: var(--primary);
-            padding: 6px 16px;
-            border: 2px solid var(--border);
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 24px;
-            letter-spacing: 0.3px;
-            box-shadow: 3px 3px 0 var(--border);
-        }
-
-        /* Mission Section */
-        .mission-section {
-            background: var(--primary);
-            color: var(--white);
-            border-top: 2px solid var(--border);
-            border-bottom: 2px solid var(--border);
-            position: relative;
-            z-index: 1;
-        }
-
-        .mission-content {
-            max-width: 720px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .mission-section h2 {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 16px;
-            letter-spacing: -0.5px;
-        }
-
-        .mission-section p {
-            font-size: 17px;
-            line-height: 1.8;
-            opacity: 0.95;
-        }
-
-        /* Tutors Section */
-        .tutors-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-        }
-
-        .tutor-card {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 28px 24px;
-            text-align: center;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            will-change: transform;
-        }
-
-        .tutor-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 5px 5px 0 var(--border);
-        }
-
-        .tutor-avatar {
-            width: 80px;
-            height: 80px;
-            background: var(--primary-light);
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            margin: 0 auto 16px;
-        }
-        
-        .tutor-avatar svg {
-            color: var(--primary);
-        }
-
-        .tutor-card h3 {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .tutor-grade {
-            font-size: 13px;
-            color: var(--primary);
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .tutor-subjects {
-            font-size: 13px;
-            color: var(--text-light);
-            line-height: 1.5;
-        }
-
-        /* Dual CTA Section */
-        .dual-cta-section {
-            background: var(--primary-light);
-            border-top: 2px solid var(--border);
-            border-bottom: 2px solid var(--border);
-        }
-
-        .dual-cta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 32px;
-        }
-
-        .cta-box {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            padding: 40px 32px;
-            text-align: center;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .cta-box:hover {
-            transform: translateY(-4px);
-            box-shadow: 8px 8px 0 var(--border);
-        }
-
-        .cta-icon {
-            width: 64px;
-            height: 64px;
-            background: var(--primary-light);
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin: 0 auto 20px;
-        }
-
-        .cta-box h3 {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 12px;
-            letter-spacing: -0.3px;
-        }
-
-        .cta-box p {
-            color: var(--text-light);
-            margin-bottom: 24px;
-            line-height: 1.6;
-        }
-
-        /* FAQ Section */
-        .faq-list {
-            max-width: 720px;
-            margin: 0 auto;
-        }
-
-        .faq-item {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            padding: 24px 28px;
-            margin-bottom: 16px;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .faq-item:hover {
-            transform: translateX(4px);
-            box-shadow: 4px 4px 0 var(--border);
-        }
-
-        .faq-item h3 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-
-        .faq-item p {
-            font-size: 14px;
-            color: var(--text-light);
-            line-height: 1.7;
-        }
-
-        /* Impact Stats */
-        .impact-section {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: var(--white);
-            border-top: 2px solid var(--border);
-            border-bottom: 2px solid var(--border);
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .impact-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            max-width: 960px;
-            margin: 40px auto 0;
-        }
-
-        .impact-stat {
-            text-align: center;
-        }
-
-        .impact-number {
-            font-size: 42px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -1.5px;
-        }
-
-        .impact-label {
-            font-size: 15px;
-            opacity: 0.9;
-            font-weight: 500;
-        }
-
-        .impact-section h2 {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-
-        .impact-section .section-sub {
-            color: var(--white);
-            opacity: 0.9;
-            margin-bottom: 0;
-        }
-
-        .hero h1 {
-            font-size: clamp(32px, 6vw, 52px);
-            font-weight: 800;
-            line-height: 1.15;
-            letter-spacing: -1.5px;
-            margin-bottom: 20px;
-            color: var(--text);
-            text-shadow: 0 2px 30px rgba(255, 255, 255, 0.8);
-        }
-
-        .hero h1 .accent {
-            color: var(--primary);
-        }
-
-        .hero p {
-            font-size: 18px;
-            color: var(--text-light);
-            max-width: 520px;
-            margin: 0 auto 36px;
-            line-height: 1.7;
-            text-shadow: 0 1px 20px rgba(255, 255, 255, 0.9);
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        /* Stats */
-        .stats {
-            display: flex;
-            justify-content: center;
-            gap: 48px;
-            padding: 40px 24px 60px;
-            max-width: 600px;
-            margin: 0 auto;
-            animation: fadeUp 0.6s ease 0.15s both;
-            position: relative;
-            z-index: 1;
-        }
-
-        .stat {
-            text-align: center;
-        }
-
-        .stat-number {
-            font-size: 32px;
-            font-weight: 800;
-            color: var(--primary);
-            letter-spacing: -1px;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            color: var(--text-light);
-            margin-top: 4px;
-            font-weight: 500;
-        }
-
-        /* Sections */
-        .section {
-            padding: 60px 24px;
-            max-width: 960px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .section-title {
-            font-size: 32px;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 24px rgba(255, 255, 255, 0.85);
-        }
-
-        .section-sub {
-            text-align: center;
-            color: var(--text-light);
-            margin-bottom: 48px;
-            font-size: 16px;
-            text-shadow: 0 1px 16px rgba(255, 255, 255, 0.85);
-        }
-
-        /* Feature Cards */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 28px;
-        }
-
-        .feature-card {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 32px 28px;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-            will-change: transform;
-            position: relative;
-            z-index: 1;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 6px 6px 0 var(--border);
-        }
-
-        .feature-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--primary-light);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            margin-bottom: 16px;
-        }
-        
-        .feature-icon svg {
-            color: var(--primary);
-        }
-
-        .feature-card h3 {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .feature-card p {
-            font-size: 14px;
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-
-        /* Subjects */
-        .subjects-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 24px;
-        }
-
-        .subject-card {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            padding: 24px;
-            text-align: center;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-            cursor: default;
-            will-change: transform;
-            width: 200px;
-            flex-shrink: 0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .subject-card:hover {
-            background: var(--primary-light);
-            transform: translateY(-3px);
-            box-shadow: 4px 4px 0 var(--border);
-        }
-
-        .subject-card .emoji {
-            font-size: 30px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .subject-card .emoji svg {
-            color: var(--primary);
-        }
-
-        .subject-card h3 {
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .subject-card p {
-            font-size: 13px;
-            color: var(--text-light);
-        }
-
-        /* How it Works */
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 32px;
-            counter-reset: step;
-        }
-
-        .step {
-            text-align: center;
-            position: relative;
-        }
-
-        .step-number {
-            width: 48px;
-            height: 48px;
-            background: var(--primary);
-            color: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 18px;
-            margin: 0 auto 16px;
-            box-shadow: 3px 3px 0 var(--border);
-        }
-
-        .step h3 {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .step p {
-            font-size: 14px;
-            color: var(--text-light);
-            line-height: 1.6;
-        }
-
-        /* Testimonial */
-        .testimonial-section {
-            background: var(--primary-light);
-            border-top: 2px solid var(--border);
-            border-bottom: 2px solid var(--border);
-            position: relative;
-            z-index: 1;
-        }
-
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 28px;
-        }
-
-        .testimonial-card {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 28px;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            will-change: transform;
-        }
-
-        .testimonial-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 6px 6px 0 var(--border);
-        }
-
-        .testimonial-card p {
-            font-size: 15px;
-            color: var(--text);
-            line-height: 1.7;
-            margin-bottom: 16px;
-            font-style: italic;
-        }
-
-        .testimonial-author {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .testimonial-role {
-            font-size: 13px;
-            color: var(--text-light);
-        }
-
-        /* CTA */
-        .cta-section {
-            text-align: center;
-            padding: 80px 24px;
-            max-width: 560px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-
-        .cta-section h2 {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 12px;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 24px rgba(255, 255, 255, 0.85);
-        }
-
-        .cta-section p {
-            color: var(--text-light);
-            margin-bottom: 32px;
-            font-size: 16px;
-            text-shadow: 0 1px 16px rgba(255, 255, 255, 0.85);
-        }
-
-        /* Footer */
-        .footer {
-            border-top: 2px solid var(--border);
-            padding: 40px 24px;
-            text-align: center;
-            background: var(--white);
-            position: relative;
-            z-index: 1;
-        }
-
-        .footer-content {
-            max-width: 960px;
-            margin: 0 auto;
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 24px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
-
-        .footer-links a {
-            color: var(--text);
-            text-decoration: none;
-            font-size: 14px;
-            padding: 4px;
-            font-weight: 500;
-        }
-
-        .footer-links a:hover {
-            color: var(--primary);
-        }
-
-        .footer-copy {
-            font-size: 13px;
-            color: var(--text-light);
-        }
-
-        /* Contact List */
-        .contact-list {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 16px;
-        }
-
-        .contact-list-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text);
-            text-decoration: none;
-            transition: color 0.2s;
-            background: var(--white);
-            padding: 12px 20px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            box-shadow: 3px 3px 0 var(--border);
-        }
-
-        .contact-list-item svg {
-            color: var(--primary);
-        }
-
-        .contact-list-item:hover {
-            color: var(--primary);
-            transform: translate(-1px, -1px);
-            box-shadow: 4px 4px 0 var(--border);
-        }
-
-        .footer-copy .heart {
-            color: var(--primary);
-        }
-
-        /* Mobile */
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-            }
-
-            .hamburger {
-                display: flex;
-            }
-
-            .logo {
-                height: 40px;
-            }
-
-            .hero {
-                padding: 60px 20px 20px;
-            }
-
-            .hero-mascot {
-                width: 120px;
-                height: 120px;
-            }
-
-            .stats {
-                gap: 24px;
-            }
-
-            .stat-number {
-                font-size: 26px;
-            }
-
-            .section {
-                padding: 48px 20px;
-            }
-
-            .section-title {
-                font-size: 26px;
-            }
-
-            .hero-buttons {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .hero-buttons .btn {
-                width: 100%;
-                max-width: 300px;
-            }
-        }
-
-        /* Scroll animations */
-        .animate-on-scroll {
-            opacity: 0;
-        }
-
-        .animate-on-scroll.visible {
-            opacity: 1;
-        }
-        
-        .feature-card.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, opacity 0.5s ease;
-        }
-        
-        .subject-card.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, opacity 0.5s ease;
-        }
-        
-        .testimonial-card.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
-        }
-        
-        .section-title.animate-on-scroll,
-        .section-sub.animate-on-scroll,
-        .step.animate-on-scroll,
-        .cta-section.animate-on-scroll,
-        .mission-content.animate-on-scroll,
-        .impact-stat.animate-on-scroll {
-            transition: opacity 0.5s ease;
-        }
-
-        .tutor-card.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
-        }
-
-        .cta-box.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
-        }
-
-        .faq-item.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tutor Portal | Lyon Math Prep</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --primary:#e63946;
+  --primary-light:#fde8ea;
+  --primary-dark:#c1121f;
+  --text:#000;
+  --text-light:#555;
+  --bg:#fff;
+  --white:#fff;
+  --border:#000;
+  --border-light:#e8e8e8;
+  --green:#2d7a3a;
+  --green-light:#e6f4ea;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.hidden { display:none !important; }
+
+/* ==================== AUTH ==================== */
+#authScreen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 40px 20px;
+}
+
+.auth-logo {
+  height: 56px;
+  margin-bottom: 22px;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  animation: fadeUp .35s ease;
+}
+
+@keyframes fadeUp {
+  from { opacity:0; transform: translateY(16px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+.auth-mascot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 26px auto 10px;
+  color: var(--primary);
+}
+
+.auth-body { padding: 28px 30px 30px; }
+
+.auth-body h1 {
+  font-size: 22px;
+  text-align:center;
+  font-weight:800;
+  letter-spacing:-.4px;
+}
+
+.auth-body p.subtitle {
+  text-align:center;
+  color:var(--text-light);
+  font-size:14px;
+  margin-top:4px;
+  margin-bottom:22px;
+}
+
+.form-group { margin-bottom: 14px; }
+
+.form-group label {
+  display:block;
+  font-size:13px;
+  font-weight:800;
+  margin-bottom:6px;
+}
+
+.form-group input {
+  width:100%;
+  padding:14px 16px;
+  border:2px solid var(--border);
+  border-radius:10px;
+  font-size:15px;
+  font-family:inherit;
+  outline:none;
+  -webkit-appearance:none;
+}
+
+.form-group input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.auth-submit {
+  width:100%;
+  margin-top:4px;
+  padding:14px 16px;
+  border:2px solid var(--border);
+  border-radius:10px;
+  background: var(--primary);
+  color: var(--white);
+  font: inherit;
+  font-weight:800;
+  cursor:pointer;
+  min-height:50px;
+  font-size: 16px;
+}
+
+.auth-submit:hover { background: var(--primary-dark); }
+.auth-submit:disabled { opacity:.6; cursor:not-allowed; }
+
+.message {
+  display:none;
+  margin-bottom:14px;
+  padding:12px;
+  border-radius:10px;
+  font-size:14px;
+  font-weight:700;
+  text-align:center;
+  border:2px solid var(--border);
+}
+
+.message.error { display:block; background: var(--primary-light); color: var(--primary-dark); }
+.message.success { display:block; background: var(--green-light); color: var(--green); }
+
+.auth-note {
+  margin-top: 16px;
+  color: var(--text-light);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* ==================== PORTAL ==================== */
+#portalScreen { display:none; }
+#portalScreen.active { display:block; }
+
+.topbar {
+  position: fixed;
+  top:0; left:0; right:0;
+  height:64px;
+  background: var(--white);
+  border-bottom:2px solid var(--border);
+  z-index:1000;
+  padding: 0 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.topbar-right { display:flex; align-items:center; gap:16px; }
+
+.nav-links { display:flex; list-style:none; align-items:center; gap:8px; }
+
+.nav-links a, .nav-links button {
+  border:none; background:none; text-decoration:none;
+  color:var(--text); font: inherit; font-size:14px; font-weight:600;
+  padding:8px 14px; border-radius:8px; cursor:pointer;
+  min-height:44px; display:flex; align-items:center;
+}
+
+.nav-links a:hover, .nav-links button:hover { color: var(--primary); background: var(--primary-light); }
+.nav-links .nav-btn.active { color:var(--primary); background:var(--primary-light); font-weight:800; }
+
+/* Avatar dropdown */
+.avatar-wrapper {
+  position: relative;
+}
+
+.user-avatar {
+  width:38px; height:38px; border-radius:50%;
+  background:var(--primary); border:2px solid var(--border);
+  color:var(--white); font-weight:900;
+  display:flex; align-items:center; justify-content:center;
+  font-size: 16px; cursor: pointer;
+  user-select: none;
+  transition: opacity .15s;
+}
+.user-avatar:hover { opacity: .85; }
+
+.avatar-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  min-width: 200px;
+  box-shadow: 4px 4px 0 var(--border);
+  overflow: hidden;
+  z-index: 2000;
+  animation: fadeUp .18s ease;
+}
+
+.avatar-dropdown.open { display: block; }
+
+.avatar-dropdown-header {
+  padding: 14px 16px 10px;
+  border-bottom: 2px solid var(--border-light);
+}
+
+.avatar-dropdown-name {
+  font-weight: 900;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.avatar-dropdown-user {
+  font-size: 12px;
+  color: var(--text-light);
+  font-weight: 600;
+}
+
+.avatar-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 13px 16px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  cursor: pointer;
+  text-align: left;
+}
+
+.avatar-dropdown-btn:hover { background: var(--primary-light); }
+
+.hamburger {
+  display:none; background:none; border:none; cursor:pointer;
+  flex-direction:column; justify-content:center; align-items:center;
+  gap:5px; padding:8px; min-height:44px; min-width:44px;
+}
+.hamburger span { width:22px; height:2px; background:var(--text); border-radius:2px; }
+
+.mobile-menu {
+  display:none; position:fixed; top:64px; left:0; right:0;
+  z-index:999; background:var(--white); border-bottom:2px solid var(--border);
+  padding:8px 16px;
+}
+.mobile-menu.active { display:block; }
+.mobile-menu a, .mobile-menu button {
+  display:block; width:100%; text-align:left;
+  padding:14px 8px; border:none; background:none;
+  color:var(--text); font: inherit; font-size:16px; font-weight:600;
+  cursor:pointer; border-bottom:1px solid var(--border-light);
+  text-decoration: none;
+}
+.mobile-menu a:last-child, .mobile-menu button:last-child { border-bottom:none; }
+
+.main {
+  margin-top:64px;
+  max-width:1080px;
+  margin-left:auto; margin-right:auto;
+  padding: 32px 24px;
+}
+
+.page { display:none; animation: fadeIn .25s ease; }
+.page.active { display:block; }
+
+@keyframes fadeIn {
+  from { opacity:0; transform: translateY(10px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+.welcome-header { margin-bottom: 28px; }
+.welcome-header h1 { font-size: 30px; font-weight: 900; letter-spacing:-.5px; }
+.welcome-header p { color: var(--text-light); margin-top:4px; }
+
+.card, .calendar-container, .meet-section, .day-detail, .empty-state {
+  background: var(--white); border:2px solid var(--border); border-radius:14px;
+}
+
+.next-class-card {
+  background: var(--white); border:2px solid var(--border); border-radius:14px;
+  padding: 24px;
+  display:flex; align-items:center; justify-content:space-between;
+  gap: 18px; flex-wrap:wrap; margin-bottom: 26px;
+}
+
+.next-class-info { flex:1; min-width:200px; }
+.next-class-label {
+  font-size:12px; font-weight:900; text-transform:uppercase; letter-spacing:.8px;
+  color:var(--primary); margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.next-class-title { font-size:20px; font-weight:900; margin-bottom: 4px; }
+.next-class-time { font-size:14px; color:var(--text-light); }
+.next-class-time strong { color: var(--text); }
+
+.btn {
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+  padding:12px 18px; border:2px solid var(--border); border-radius:8px;
+  background:var(--white); color:var(--text); text-decoration:none;
+  font: inherit; font-weight:700; min-height:48px; cursor:pointer;
+}
+.btn-primary { background: var(--primary); color: var(--white); }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-meet { background: var(--primary); color: var(--white); }
+.btn-meet:hover { background: var(--primary-dark); }
+
+.section-header { display:flex; align-items:center; justify-content:space-between; margin: 20px 0 14px; }
+.section-header h2 { font-size: 22px; font-weight: 900; }
+
+/* ==================== CALENDAR ==================== */
+.grid-2 { display:grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+.calendar-container { overflow:hidden; }
+.calendar-header { display:flex; align-items:center; justify-content:space-between; padding:18px 20px; border-bottom:2px solid var(--border); }
+.calendar-header h3 { font-size:17px; font-weight:900; }
+.calendar-nav { display:flex; gap:8px; }
+.calendar-nav button { width:40px; height:40px; border:2px solid var(--border); border-radius:8px; background:var(--white); cursor:pointer; font:inherit; font-weight:900; }
+.calendar-nav button:hover { background: var(--primary); color: var(--white); }
+.calendar-grid { padding: 14px; }
+.calendar-weekdays, .calendar-days { display:grid; grid-template-columns: repeat(7, 1fr); gap:4px; }
+.calendar-weekdays span { font-size:12px; font-weight:900; text-transform:uppercase; text-align:center; padding:8px 0; }
+
+.calendar-day {
+  min-height:44px; aspect-ratio:1;
+  display:flex; align-items:center; justify-content:center;
+  border:2px solid transparent; border-radius:10px;
+  position:relative; font-size:14px; font-weight:700;
+}
+.calendar-day.other-month { color:#c0c0c0; }
+.calendar-day.today { background: var(--text); color: var(--white); }
+.calendar-day.has-class { background: var(--primary-light); color: var(--primary); border-color: var(--border); cursor:pointer; }
+.calendar-day.has-class:hover { background: var(--primary); color:var(--white); }
+.class-dot { width:5px; height:5px; border-radius:50%; background:var(--primary); position:absolute; bottom:7px; }
+.calendar-day.has-class:hover .class-dot, .calendar-day.today .class-dot { background: var(--white); }
+
+.day-detail { display:none; padding:18px; margin-top:16px; }
+.day-detail.active { display:block; }
+
+.meet-section { padding:18px; }
+.meet-section h3 { margin-bottom: 12px; font-size:17px; font-weight:900; }
+.meet-item { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; border:2px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; }
+.meet-item:last-child { margin-bottom:0; }
+.meet-info { flex:1; min-width:180px; }
+.meet-info .title { font-weight:800; }
+.meet-info .time { font-size:13px; color:var(--text-light); }
+.meet-link { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border:2px solid var(--border); border-radius:8px; background: var(--primary); color: var(--white); text-decoration:none; font-size:13px; font-weight:900; white-space: nowrap; }
+.meet-link:hover { background: var(--primary-dark); }
+
+.upcoming-list { display:flex; flex-direction:column; gap:10px; }
+.upcoming-card { background: var(--white); border:2px solid var(--border); border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:16px; transition: all .2s; }
+.upcoming-card:hover { transform: translateY(-2px); box-shadow: 4px 4px 0 var(--border); }
+.upcoming-date { text-align:center; min-width:48px; padding:6px; background: var(--primary-light); border:2px solid var(--border); border-radius:8px; }
+.upcoming-date .day { font-size:20px; font-weight:800; color: var(--primary); line-height:1; }
+.upcoming-date .month { font-size:10px; color: var(--text); text-transform:uppercase; font-weight:700; letter-spacing:.5px; margin-top:2px; }
+.upcoming-info { flex:1; }
+.upcoming-info .title { font-size:15px; font-weight:700; margin-bottom:2px; }
+.upcoming-info .time { font-size:13px; color:var(--text-light); }
+
+.toast { position:fixed; left:50%; bottom:24px; transform: translateX(-50%) translateY(80px); background: var(--text); color: var(--white); border:2px solid var(--border); padding: 12px 18px; border-radius:10px; z-index:2000; font-size:14px; font-weight:800; transition: transform .22s ease; white-space:nowrap; }
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+.loading-spinner {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 48px; gap: 16px;
+}
+.spinner { width: 36px; height: 36px; border: 3px solid var(--border-light); border-top-color: var(--primary); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ==================== STUDENTS LIST ==================== */
+.students-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.student-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--white);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  transition: all .2s;
+}
+
+.student-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 4px 4px 0 var(--border);
+}
+
+.student-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary);
+  font-weight: 900;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.student-info {
+  flex: 1;
+}
+
+.student-name {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.student-meta {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+@media (max-width: 768px) {
+  .nav-links { display:none; }
+  .hamburger { display:flex; }
+  .main { padding: 24px 16px; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .welcome-header h1 { font-size: 24px; }
+}
+
+@media (max-width: 480px) {
+  .auth-body { padding: 24px 18px 22px; }
+}
+  </style>
 </head>
 <body>
 
-    <!-- Parallax Math Background -->
-    <div class="parallax-bg" aria-hidden="true">
-        <div class="parallax-layer layer-grid-fine" data-speed="0.04"></div>
-        <div class="parallax-layer layer-grid-bold" data-speed="0.07"></div>
-        <div class="parallax-layer layer-graphs" data-speed="0.11">
-            <svg viewBox="0 0 200 60" style="top: 12%; left: 4%; width: 280px;">
-                <path d="M 0 30 Q 25 5 50 30 T 100 30 T 150 30 T 200 30" />
-            </svg>
-            <svg viewBox="0 0 200 120" style="top: 22%; right: 8%; width: 240px;">
-                <path d="M 20 110 Q 100 -10 180 110" />
-                <line x1="20" y1="110" x2="180" y2="110" stroke-dasharray="3,4" stroke-width="1" opacity="0.6" />
-            </svg>
-            <svg viewBox="0 0 120 120" style="top: 45%; left: 62%; width: 160px;">
-                <circle cx="60" cy="60" r="55" />
-                <line x1="60" y1="5" x2="60" y2="115" stroke-dasharray="3,3" stroke-width="1" opacity="0.5" />
-                <line x1="5" y1="60" x2="115" y2="60" stroke-dasharray="3,3" stroke-width="1" opacity="0.5" />
-            </svg>
-            <svg viewBox="0 0 200 100" style="top: 68%; right: 6%; width: 220px;">
-                <path d="M 30 5 Q 5 50 30 95" />
-                <path d="M 170 5 Q 195 50 170 95" />
-                <line x1="100" y1="10" x2="100" y2="90" stroke-dasharray="3,3" stroke-width="1" opacity="0.5" />
-            </svg>
-            <svg viewBox="0 0 160 100" style="top: 85%; left: 30%; width: 260px;">
-                <path d="M 10 80 Q 60 0 150 50" />
-                <line x1="30" y1="50" x2="130" y2="20" />
-                <circle cx="60" cy="20" r="3" fill="rgba(230,57,70,0.4)" stroke="none" />
-            </svg>
-        </div>
-        <div class="parallax-layer layer-equations" data-speed="0.15">
-            <span class="math-eq lg" style="top: 3%; left: 5%; --rot: -2deg;">E = mc²</span>
-            <span class="math-eq dark sm" style="top: 7%; right: 8%; --rot: 1deg;">∫₀^∞ e^(-x²) dx = √π/2</span>
-            <span class="math-eq sm" style="top: 11%; left: 32%; --rot: -1deg;">sin²θ + cos²θ = 1</span>
-            <span class="math-eq bold lg" style="top: 15%; right: 18%; --rot: 2deg;">a² + b² = c²</span>
-            <span class="math-eq dark md" style="top: 19%; left: 68%;">F = ma</span>
-            <span class="math-eq md" style="top: 23%; left: 10%; --rot: -1.5deg;">π ≈ 3.14159</span>
-            <span class="math-eq sm" style="top: 27%; right: 6%;">e^(iπ) + 1 = 0</span>
-            <span class="math-eq bold md" style="top: 31%; left: 45%; --rot: 1.5deg;">f′(x)</span>
-            <span class="math-eq dark sm" style="top: 35%; left: 8%;">∑ 1/n² = π²/6</span>
-            <span class="math-eq md" style="top: 39%; right: 12%; --rot: -1deg;">∇·E = ρ/ε₀</span>
-            <span class="math-eq sm" style="top: 43%; left: 60%;">y = mx + b</span>
-            <span class="math-eq bold lg" style="top: 47%; left: 22%; --rot: 0.8deg;">ax² + bx + c = 0</span>
-            <span class="math-eq dark md" style="top: 51%; right: 6%;">log(ab) = log a + log b</span>
-            <span class="math-eq md" style="top: 55%; left: 50%; --rot: -1deg;">∂f/∂x</span>
-            <span class="math-eq bold md" style="top: 59%; left: 12%;">x = (−b ± √(b²−4ac))/2a</span>
-            <span class="math-eq dark sm" style="top: 63%; right: 22%; --rot: 1deg;">lim sin(x)/x = 1</span>
-            <span class="math-eq md" style="top: 67%; left: 5%;">∀x ∈ ℝ, x² ≥ 0</span>
-            <span class="math-eq md" style="top: 71%; right: 10%; --rot: -2deg;">∮ F·dr</span>
-            <span class="math-eq bold md" style="top: 75%; left: 35%;">Δ = b² − 4ac</span>
-            <span class="math-eq dark md" style="top: 79%; left: 65%;">A = πr²</span>
-            <span class="math-eq md" style="top: 83%; right: 25%; --rot: 1.5deg;">F = G(m₁m₂)/r²</span>
-            <span class="math-eq md" style="top: 87%; left: 15%;">σ = √(Σ(x−μ)²/N)</span>
-            <span class="math-eq bold lg" style="top: 91%; right: 5%; --rot: -1deg;">d/dx [xⁿ] = nxⁿ⁻¹</span>
-            <span class="math-eq dark sm" style="top: 95%; left: 45%;">P(A|B) = P(A∩B)/P(B)</span>
-            <span class="math-eq md" style="top: 98%; left: 8%;">∮ E·dA = Q/ε₀</span>
-        </div>
-        <div class="parallax-layer layer-symbols" data-speed="0.22">
-            <span class="math-symbol accent lg" style="top: 2%; left: 18%;">π</span>
-            <span class="math-symbol md" style="top: 6%; left: 55%;">∞</span>
-            <span class="math-symbol greek md" style="top: 10%; right: 30%;">θ</span>
-            <span class="math-symbol accent md" style="top: 14%; left: 40%;">∫</span>
-            <span class="math-symbol sm" style="top: 18%; right: 8%;">√</span>
-            <span class="math-symbol greek md" style="top: 22%; left: 75%;">λ</span>
-            <span class="math-symbol accent md" style="top: 26%; left: 5%;">∑</span>
-            <span class="math-symbol greek md" style="top: 30%; right: 45%;">α</span>
-            <span class="math-symbol md" style="top: 34%; left: 28%;">∂</span>
-            <span class="math-symbol accent md" style="top: 38%; right: 18%;">∇</span>
-            <span class="math-symbol greek sm" style="top: 42%; left: 55%;">β</span>
-            <span class="math-symbol md" style="top: 46%; left: 18%;">Δ</span>
-            <span class="math-symbol greek md" style="top: 50%; right: 5%;">μ</span>
-            <span class="math-symbol accent lg" style="top: 54%; left: 70%;">Ω</span>
-            <span class="math-symbol md" style="top: 58%; left: 30%;">∈</span>
-            <span class="math-symbol greek md" style="top: 62%; right: 35%;">σ</span>
-            <span class="math-symbol accent md" style="top: 66%; left: 8%;">∀</span>
-            <span class="math-symbol md" style="top: 70%; right: 12%;">∃</span>
-            <span class="math-symbol greek md" style="top: 74%; left: 50%;">φ</span>
-            <span class="math-symbol accent md" style="top: 78%; left: 22%;">∮</span>
-            <span class="math-symbol sm" style="top: 82%; right: 25%;">≤</span>
-            <span class="math-symbol greek md" style="top: 86%; left: 60%;">ε</span>
-            <span class="math-symbol accent md" style="top: 90%; left: 12%;">±</span>
-            <span class="math-symbol md" style="top: 94%; right: 8%;">≈</span>
-            <span class="math-symbol greek sm" style="top: 97%; left: 40%;">ψ</span>
-        </div>
-        <div class="parallax-layer layer-particles" data-speed="0.30"></div>
+<!-- SVG ICON DEFS -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Compass / logo -->
+    <symbol id="icon-compass" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/>
+      <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+    </symbol>
+    <!-- Ruler / protractor for auth mascot -->
+    <symbol id="icon-ruler" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 6l18 0a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/>
+      <line x1="6" y1="6" x2="6" y2="12"/>
+      <line x1="10" y1="6" x2="10" y2="10"/>
+      <line x1="14" y1="6" x2="14" y2="12"/>
+      <line x1="18" y1="6" x2="18" y2="10"/>
+    </symbol>
+    <!-- Calendar -->
+    <symbol id="icon-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+      <line x1="16" y1="2" x2="16" y2="6"/>
+      <line x1="8" y1="2" x2="8" y2="6"/>
+      <line x1="3" y1="10" x2="21" y2="10"/>
+    </symbol>
+    <!-- Video -->
+    <symbol id="icon-video" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="23 7 16 12 23 17 23 7"/>
+      <rect x="1" y="5" width="15" height="14" rx="2" ry="2"/>
+    </symbol>
+    <!-- Logout -->
+    <symbol id="icon-logout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+      <polyline points="16 17 21 12 16 7"/>
+      <line x1="21" y1="12" x2="9" y2="12"/>
+    </symbol>
+    <!-- User -->
+    <symbol id="icon-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </symbol>
+    <!-- Users -->
+    <symbol id="icon-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </symbol>
+    <!-- Inbox -->
+    <symbol id="icon-inbox" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/>
+      <path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- AUTH -->
+<div id="authScreen">
+  <a class="auth-logo" href="index.html">
+    <img src="logo.png" alt="Lyon Math Prep" style="height:48px;width:auto;display:block;" />
+  </a>
+
+  <div class="auth-card">
+    <div class="auth-mascot" style="margin:26px auto 10px;">
+      <svg width="64" height="64" style="color:var(--primary)"><use href="#icon-compass"/></svg>
     </div>
 
-    <!-- Top Bar -->
-    <header class="topbar">
-        <a href="#" class="logo">
-            <img src="logo.png" alt="Lyon Math Prep">
-        </a>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="https://coachinbha.github.io/math/about.html">About</a></li>
-                <li><a href="#faq">FAQ</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li><a href="studentportal.html" class="btn btn-primary">Student Portal</a></li>
-            </ul>
-        </nav>
-        <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-    </header>
+    <div class="auth-body">
+      <h1>Welcome back 👋</h1>
+      <p class="subtitle">Log in to your tutor portal</p>
 
-    <div class="mobile-menu" id="mobileMenu">
-        <a href="https://coachinbha.github.io/math/about.html" onclick="toggleMenu()">About</a>
-        <a href="#faq" onclick="toggleMenu()">FAQ</a>
-        <a href="#contact" onclick="toggleMenu()">Contact</a>
-        <a href="studentportal.html" onclick="toggleMenu()">Student Portal</a>
+      <div class="message" id="authMessage"></div>
+
+      <div class="form-group">
+        <label for="authUsername">Username</label>
+        <input id="authUsername" type="text" placeholder="Your username" autocomplete="username" />
+      </div>
+
+      <div class="form-group">
+        <label for="authPassword">Password</label>
+        <input id="authPassword" type="password" placeholder="••••••••" autocomplete="current-password" />
+      </div>
+
+      <button class="auth-submit" id="authSubmit" type="button">Log In</button>
     </div>
+  </div>
 
-    <!-- Hero -->
-    <section class="hero">
-        <div class="hero-mascot"><img src="compass.png" alt="Compass mascot"></div>
-        <div class="hero-badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
-                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
-                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
-            </svg>
-            Student-Run · 100% Free · Non-Profit
-        </div>
-        <h1>Free Online Math Tutoring for <span class="accent">every student.</span></h1>
-        <p><strong>Math clicked for us. Now we're making it click for you. </strong> We provide 100% free, personalized online math tutoring for middle and high school students in South Lyon, Novi, Canton, and beyond. Taught by students, for students—join our live online classes, tackle practice problems, and get improvement.</p>
-        <div class="hero-buttons">
-            <a href="studentportal.html" class="btn btn-primary">
-                Open Student Portal 
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-left: 4px;">
-                    <line x1="5" y1="12" x2="19" y2="12"></line>
-                    <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-            </a>
-            <a href="#mission" class="btn btn-outline">Learn More</a>
-        </div>
-    </section>
+  <p class="auth-note">Ask your administrator to set up your account.</p>
+</div>
 
-    <!-- Stats -->
-    <div class="stats">
-        <div class="stat">
-            <div class="stat-number">4+</div>
-            <div class="stat-label">Districts We Work With</div>
-        </div>
-        <div class="stat">
-            <div class="stat-number">20+</div>
-            <div class="stat-label">Volunteer Tutors</div>
-        </div>
-    </div>
-
-    <!-- Mission Section -->
-    <section class="mission-section" id="mission">
-        <div class="section">
-            <div class="mission-content animate-on-scroll">
-                <h2>Built by students, for students.</h2>
-                <p>Lyon Math Prep is a 100% student-run, non-profit organization based in South Lyon, Michigan, dedicated to making high-quality math education accessible to everyone. Together with out cutting-edge new software, our volunteer tutors are high school and college students passionate about helping peers succeed. We believe that when students teach students, everyone wins.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- About / Features -->
-    <section class="section" id="about">
-        <h2 class="section-title animate-on-scroll">Why students love Lyon Math Prep</h2>
-        <p class="section-sub animate-on-scroll">We believe every student deserves the chance to succeed in math.</p>
-        <div class="features-grid">
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M23 7l-7 5 7 5V7z"></path>
-                        <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-                    </svg>
-                </div>
-                <h3>Live Small Group Classes</h3>
-                <p>Join small group online sessions via Google Meet with 3-5 students for personalized help and collaborative learning.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                </div>
-                <h3>Practice Problems</h3>
-                <p>Work through curated problem sets in your student portal to reinforce what you've learned in class.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="18" y1="20" x2="18" y2="10"></line>
-                        <line x1="12" y1="20" x2="12" y2="4"></line>
-                        <line x1="6" y1="20" x2="6" y2="14"></line>
-                    </svg>
-                </div>
-                <h3>Track Your Progress</h3>
-                <p>See your completed units, upcoming classes, and how far you've come — all in one place.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </div>
-                <h3>Always Free</h3>
-                <p>We're a non-profit. No hidden fees, no premium tiers. Every student gets the same great experience.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                </div>
-                <h3>Flexible Scheduling</h3>
-                <p>Classes fit around your schedule. See your upcoming sessions right in your portal calendar.</p>
-            </div>
-            <div class="feature-card animate-on-scroll">
-                <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                        <circle cx="9" cy="7" r="4"></circle>
-                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                    </svg>
-                </div>
-                <h3>Patient Tutors</h3>
-                <p>Our volunteer math tutors are trained to be encouraging, clear, and patient — no question is too simple.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Subjects -->
-    <section class="section" id="subjects">
-        <h2 class="section-title animate-on-scroll">Subjects we cover</h2>
-        <p class="section-sub animate-on-scroll">From 6th grade math through Pre-Calculus foundations.</p>
-        <div class="subjects-grid">
-            <div class="subject-card animate-on-scroll">
-                <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="5" y1="9" x2="19" y2="9"></line>
-                        <line x1="5" y1="15" x2="19" y2="15"></line>
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                    </svg>
-                </div>
-                <h3>Pre-Algebra</h3>
-                <p>Grades 6–7</p>
-            </div>
-            <div class="subject-card animate-on-scroll">
-                <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 3v18h18"></path>
-                        <path d="M18.7 8c-1.2-2.3-3.7-4-6.7-4s-5.5 1.7-6.7 4L3 12"></path>
-                    </svg>
-                </div>
-                <h3>Algebra I</h3>
-                <p>Grades 7–9</p>
-            </div>
-            <div class="subject-card animate-on-scroll">
-                <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="4 8 4 20 16 20 16 8"></polygon>
-                        <polygon points="4 8 10 4 22 4 16 8"></polygon>
-                        <polygon points="16 8 22 4 22 16 16 20"></polygon>
-                    </svg>
-                </div>
-                <h3>Geometry</h3>
-                <p>Grades 8–10</p>
-            </div>
-            <div class="subject-card animate-on-scroll">
-                <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="3" y1="21" x2="3" y2="3"></line>
-                        <line x1="3" y1="21" x2="21" y2="21"></line>
-                        <path d="M4 18 Q7 2 12 10 Q17 18 20 4" fill="none"></path>
-                    </svg>
-                </div>
-                <h3>Algebra II</h3>
-                <p>Grades 9–11</p>
-            </div>
-            <div class="subject-card animate-on-scroll">
-                <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="12" y1="20" x2="12" y2="10"></line>
-                        <line x1="18" y1="20" x2="18" y2="4"></line>
-                        <line x1="6" y1="20" x2="6" y2="16"></line>
-                    </svg>
-                </div>
-                <h3>Statistics & Probability</h3>
-                <p>Grades 9–11</p>
-            </div>
-            <div class="subject-card animate-on-scroll">
-                <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3c-1.5 0-2.5 1-2.8 2.5L9.8 18.5C9.5 20 8.5 21 7 21" fill="none"></path>
-                        <path d="M13 3h4" fill="none"></path>
-                        <path d="M5 21h4" fill="none"></path>
-                    </svg>
-                </div>
-                <h3>Pre-Calculus</h3>
-                <p>Grades 10–12</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- How it Works -->
-    <section class="section" id="how">
-        <h2 class="section-title animate-on-scroll">How it works</h2>
-        <p class="section-sub animate-on-scroll">Getting started with free online math tutoring takes less than 5 minutes.</p>
-        <div class="steps">
-            <div class="step animate-on-scroll">
-                <div class="step-number">1</div>
-                <h3>Sign Up</h3>
-                <p>Fill out a short form telling us your grade level, what subjects you need help with, and your availability.</p>
-            </div>
-            <div class="step animate-on-scroll">
-                <div class="step-number">2</div>
-                <h3>Join a Class</h3>
-                <p>We'll place you in a small group class that fits your schedule and covers the subjects you need help with.</p>
-            </div>
-            <div class="step animate-on-scroll">
-                <div class="step-number">3</div>
-                <h3>Start Learning</h3>
-                <p>Attend your live small group sessions via Google Meet, practice problems in your portal, and watch your skills grow.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Impact Stats -->
-    <section class="impact-section">
-        <div class="section">
-            <h2 class="animate-on-scroll">Our impact so far</h2>
-            <p class="section-sub animate-on-scroll">Together, we're changing lives through free online math education that actually helps.</p>
-            <div class="impact-stats">
-                <div class="impact-stat animate-on-scroll">
-                    <div class="impact-number">4+</div>
-                    <div class="impact-label">Students Helped</div>
-                </div>
-                <div class="impact-stat animate-on-scroll">
-                    <div class="impact-number">20+</div>
-                    <div class="impact-label">Volunteer Tutors</div>
-                </div>
-                <div class="impact-stat animate-on-scroll">
-                    <div class="impact-number">500+</div>
-                    <div class="impact-label">Tests and Quizzes We've Looked At</div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-   <!-- Testimonials 
-<section class="testimonial-section">
-    <div class="section">
-        <h2 class="section-title animate-on-scroll">What students say</h2>
-        <p class="section-sub animate-on-scroll">Real stories from real students.</p>
-        <div class="testimonials-grid">
-            <div class="testimonial-card animate-on-scroll">
-                <p>"I went from a C- to a B+ in Algebra. My tutor explains things in a way that actually makes sense."</p>
-                <div class="testimonial-author">Sarah M.</div>
-                <div class="testimonial-role">8th Grade · Algebra I</div>
-            </div>
-            <div class="testimonial-card animate-on-scroll">
-                <p>"I was scared of math before. Now I actually enjoy doing the practice problems. It feels like a game."</p>
-                <div class="testimonial-author">James K.</div>
-                <div class="testimonial-role">7th Grade · Pre-Algebra</div>
-            </div>
-            <div class="testimonial-card animate-on-scroll">
-                <p>"The fact that this is free is amazing. My family couldn't afford a tutor and this changed everything for me."</p>
-                <div class="testimonial-author">Maria L.</div>
-                <div class="testimonial-role">10th Grade · Geometry</div>
-            </div>
-        </div>
-    </div>
-</section>
--->   
-
-    <!-- CTA -->
-    <section class="cta-section animate-on-scroll">
-        <h2>Ready to get started?</h2>
-        <p>Don't just improve, build confidence in math — all for free.</p>
-        <a href="studentportal.html" class="btn btn-primary">
-            Go to Student Portal 
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-left: 4px;">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-        </a>
-    </section>
-
-    <!-- FAQ -->
-    <section class="section" id="faq">
-        <h2 class="section-title animate-on-scroll">Frequently asked questions</h2>
-        <p class="section-sub animate-on-scroll">Everything you need to know about Lyon Math Prep's free online tutoring.</p>
-        <div class="faq-list">
-            <div class="faq-item animate-on-scroll">
-                <h3>Is this really completely free?</h3>
-                <p>Yes! Lyon Math Prep is a 100% non-profit organization based in South Lyon, MI. We don't charge anything, ever. All our online math tutors are volunteers who want to help students succeed.</p>
-            </div>
-            <div class="faq-item animate-on-scroll">
-                <h3>Who are the tutors?</h3>
-                <p>Our tutors are high school and college students from South Lyon, Novi, Canton, and surrounding areas who excel in math and are passionate about teaching. They're trained and supervised to ensure quality instruction in our small group classes.</p>
-            </div>
-            <div class="faq-item animate-on-scroll">
-                <h3>How do I sign up?</h3>
-                <p>Click the red 'Student Portal' button above, and fill out a quick form about your needs. We'll match you with a tutor within 2-3 days and send you your login information.</p>
-            </div>
-            <div class="faq-item animate-on-scroll">
-                <h3>How many students are in each class?</h3>
-                <p>We keep our classes small with 3-5 students per session. This allows for personalized attention while also creating a collaborative learning environment.</p>
-            </div>
-            <div class="faq-item animate-on-scroll">
-                <h3>How long are tutoring sessions?</h3>
-                <p>Standard sessions are 45-60 minutes, but we can adjust based on your needs and schedule. Most students attend 1-2 classes per week.</p>
-            </div>
-        </div>
-    </section>
-
-    <div class="contact-list" id="contact">
-    <!-- Email Contact (Keep your existing email item here) -->
-    <a href="mailto:your-email@example.com" class="contact-list-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-            <polyline points="22,6 12,13 2,6"></polyline>
-        </svg>
-        Contact us by Email
+<div id="portalScreen">
+  <header class="topbar">
+    <a href="index.html" class="logo">
+      <img src="logo.png" alt="Lyon Math Prep" style="height:40px;width:auto;display:block;" />
     </a>
 
-    <!-- Instagram Contact (New) -->
-    <a href="https://www.instagram.com/lyonmathprep/" target="_blank" rel="noopener noreferrer" class="contact-list-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-        </svg>
-        Follow us on Instagram
-    </a>
+    <nav>
+      <ul class="nav-links">
+        <li><button class="nav-btn active" data-page="dashboard" onclick="showPage('dashboard')">Dashboard</button></li>
+        <li><button class="nav-btn" data-page="calendar" onclick="showPage('calendar')">Calendar</button></li>
+      </ul>
+    </nav>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-links">
-                <a href="https://coachinbha.github.io/math/about.html">About</a>
-                <a href="#faq">FAQ</a>
-                <a href="studentportal.html">Student Portal</a>
-                <a href="mailto:lyonmathprep@gmail.com">Contact</a>
-            </div>
-            <p class="footer-copy">© 2026 Lyon Math Prep. A student-run, non-profit organization based in South Lyon, MI. Made with 
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="none" style="display: inline-block; vertical-align: middle; color: var(--primary);">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                </svg>
-                by students, for students.
-            </p>
-            <p style="font-size: 10px; color: #999; margin-top: 12px; opacity: 0.8;">
-                Disclaimer: Lyon Math Prep is a non-profit organization, but is not currently a 501(c)(3) tax-exempt entity.
-            </p>
+    <div class="topbar-right">
+      <div class="avatar-wrapper">
+        <div class="user-avatar" id="userAvatar" onclick="toggleAvatarDropdown()">T</div>
+        <div class="avatar-dropdown" id="avatarDropdown">
+          <div class="avatar-dropdown-header">
+            <div class="avatar-dropdown-name" id="dropdownName">Tutor</div>
+            <div class="avatar-dropdown-user" id="dropdownUser">@username</div>
+          </div>
+          <button class="avatar-dropdown-btn" onclick="logout()">
+            <svg width="16" height="16"><use href="#icon-logout"/></svg>
+            Log Out
+          </button>
         </div>
-    </footer>
+      </div>
+      <button class="hamburger" onclick="toggleMobile()" aria-label="Menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
 
-    <script>
-        function toggleMenu() {
-            document.getElementById('mobileMenu').classList.toggle('active');
+  <div class="mobile-menu" id="mobileMenu">
+    <button onclick="showPage('dashboard'); toggleMobile();">Dashboard</button>
+    <button onclick="showPage('calendar'); toggleMobile();">Calendar</button>
+    <button onclick="logout()">Log Out</button>
+  </div>
+
+  <main class="main">
+    <section class="page active" id="page-dashboard">
+      <div class="welcome-header">
+        <h1 id="welcomeName">Welcome back 👋</h1>
+        <p>View your next class and the students attending.</p>
+      </div>
+
+      <div class="next-class-card" id="nextClassCard">
+        <div class="next-class-info">
+          <div class="next-class-label">
+            <svg width="14" height="14"><use href="#icon-calendar"/></svg>
+            Next Class
+          </div>
+          <div class="next-class-title">No classes yet</div>
+          <div class="next-class-time">Once your classes are scheduled, they will appear here.</div>
+        </div>
+      </div>
+
+      <div class="section-header"><h2>Your Classes</h2></div>
+      <div class="upcoming-list" id="upcomingClassesList"></div>
+    </section>
+
+    <section class="page" id="page-calendar">
+      <div class="welcome-header">
+        <h1>
+          <svg width="28" height="28" style="vertical-align:middle;margin-right:6px;color:var(--primary)"><use href="#icon-calendar"/></svg>
+          Class Calendar
+        </h1>
+        <p>View your upcoming classes and students.</p>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="calendar-container">
+            <div class="calendar-header">
+              <h3 id="calendarTitle">January 2026</h3>
+              <div class="calendar-nav">
+                <button onclick="changeMonth(-1)">‹</button>
+                <button onclick="changeMonth(1)">›</button>
+              </div>
+            </div>
+            <div class="calendar-grid">
+              <div class="calendar-weekdays">
+                <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+              </div>
+              <div class="calendar-days" id="calendarDays"></div>
+            </div>
+          </div>
+          <div class="day-detail" id="dayDetail">
+            <h3 id="dayDetailTitle" style="margin-bottom:12px;">Classes on this day</h3>
+            <div id="dayDetailContent"></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="meet-section" id="calendarMeetings">
+            <h3>
+              <svg width="16" height="16" style="vertical-align:middle;margin-right:4px;color:var(--primary)"><use href="#icon-video"/></svg>
+              Your Classes
+            </h3>
+            <div class="empty-state">
+              <div class="es-icon"><svg width="44" height="44"><use href="#icon-inbox"/></svg></div>
+              <h3>No classes yet</h3>
+              <p>Once classes are scheduled, they'll appear here.</p>
+            </div>
+          </div>
+          <div style="margin-top:24px;">
+            <div class="section-header"><h2>Upcoming</h2></div>
+            <div class="upcoming-list" id="calendarUpcomingList"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =========================
+// CONFIG
+// =========================
+// Change this to your actual Cloudflare Worker URL
+const WORKER_URL = 'https://tutors-api.lyonmathprep.workers.dev/';
+
+// =========================
+// Local Storage Auth Persistence
+// =========================
+const AUTH_STORAGE_KEY = 'lyonmath_tutor_auth';
+
+function saveAuth(username, password) {
+  try {
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify({ username, password }));
+  } catch (e) {
+    console.warn('Could not save credentials:', e);
+  }
+}
+
+function loadAuth() {
+  try {
+    const raw = localStorage.getItem(AUTH_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !parsed.username || !parsed.password) return null;
+    return parsed;
+  } catch (e) {
+    return null;
+  }
+}
+
+function clearAuth() {
+  try {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch (e) {
+    console.warn('Could not clear credentials:', e);
+  }
+}
+
+// =========================
+// SVG icon helpers
+// =========================
+function svgUse(id, size=22) {
+  return `<svg width="${size}" height="${size}"><use href="#${id}"/></svg>`;
+}
+
+// =========================
+// State
+// =========================
+let currentTutor = null;
+let classesCache = [];
+let calendarEventMap = {};
+
+const nowInit = new Date();
+let calendarMonth = nowInit.getMonth();
+let calendarYear = nowInit.getFullYear();
+
+const daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+// =========================
+// Utilities
+// =========================
+function norm(v) { 
+  return String(v ?? '').toLowerCase().replace(/\s+/g, ''); 
+}
+
+function esc(str) {
+  return String(str ?? '').replace(/[&<>"']/g, m =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])
+  );
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+function capitalizeName(n) {
+  const s = String(n||'Tutor').trim();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function dateKey(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function formatShortDay(d) {
+  return new Intl.DateTimeFormat('en-US',{weekday:'long',month:'short',day:'numeric'}).format(d);
+}
+
+function extractTimeRange(text) {
+  const parts = String(text||'').split('·');
+  return (parts[1]||parts[0]||'').trim();
+}
+
+function parseTimeToHM(text) {
+  const m = String(text||'').match(/(\d{1,2}):(\d{2})\s*([AP]M)/i);
+  if (!m) return {h:12,min:0};
+  let h = parseInt(m[1],10), min = parseInt(m[2],10), ap = m[3].toUpperCase();
+  if (ap==='PM'&&h!==12) h+=12;
+  if (ap==='AM'&&h===12) h=0;
+  return {h,min};
+}
+
+function extractWeekdays(text) {
+  const out = [];
+  for (const day of daysOfWeek) {
+    if (new RegExp(`\\b${day}\\b`,'i').test(String(text||''))) out.push(day);
+  }
+  return [...new Set(out)];
+}
+
+function parseSpecificDate(text) {
+  const m = String(text||'').match(
+    /(?:Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday),?\s*([A-Za-z]{3,9})\s+(\d{1,2})(?:,\s*(\d{4}))?/i
+  );
+  if (!m) return null;
+  const mm={'jan':0,'feb':1,'mar':2,'apr':3,'may':4,'jun':5,'jul':6,'aug':7,'sep':8,'oct':9,'nov':10,'dec':11};
+  const mi = mm[m[1].toLowerCase().slice(0,3)];
+  if (mi===undefined) return null;
+  const t = parseTimeToHM(text);
+  const d = new Date(m[3]?parseInt(m[3]):new Date().getFullYear(), mi, parseInt(m[2],10), t.h, t.min, 0, 0);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+// =========================
+// Parse tutor data
+// =========================
+function normalizeClass(row) {
+  const tutorName = String(row['Tutor Name']||'').trim();
+  const password = String(row['Password']||'').trim();
+  const students = String(row['Students']||'').trim();
+  const meetingTime = String(row['Meeting time']||'').trim();
+  const date = String(row['Date']||'').trim();
+  const topic = String(row['Topic']||'').trim();
+  const meetingLink = String(row['Meeting Link']||'').trim();
+  
+  // Updated to not require password since Worker securely omits it
+  if (!tutorName || !meetingLink || !topic) return null;
+  
+  return {
+    tutorName,
+    password,
+    students: students.split(',').map(s => s.trim()).filter(Boolean),
+    meetingTime,
+    date,
+    topic,
+    meetingLink,
+    specificDate: parseSpecificDate(date),
+    weekdays: extractWeekdays(date)
+  };
+}
+
+function getTutorClasses() {
+  return classesCache.filter(c => norm(c.tutorName) === norm(currentTutor?.username||''));
+}
+
+function nextOccurrence(cls, from=new Date()) {
+  const candidates = [];
+  if (cls.specificDate && cls.specificDate > from) candidates.push(cls.specificDate);
+  const t = parseTimeToHM(cls.meetingTime);
+  (cls.weekdays||[]).forEach(dayName => {
+    const targetDow = daysOfWeek.indexOf(dayName);
+    if (targetDow<0) return;
+    const c = new Date(from);
+    let diff = (targetDow - c.getDay() + 7) % 7;
+    c.setDate(c.getDate()+diff);
+    c.setHours(t.h,t.min,0,0);
+    if (c<=from) c.setDate(c.getDate()+7);
+    candidates.push(c);
+  });
+  if (candidates.length) { candidates.sort((a,b)=>a-b); return candidates[0]; }
+  if (cls.specificDate) return cls.specificDate;
+  return null;
+}
+
+function classCardHTML(cls, nextDate) {
+  const day = nextDate.getDate();
+  const month = new Intl.DateTimeFormat('en-US',{month:'short'}).format(nextDate);
+  const timeRange = extractTimeRange(cls.meetingTime);
+  const studentsList = cls.students.join(', ');
+  
+  return `
+    <div class="upcoming-card">
+      <div class="upcoming-date"><div class="day">${day}</div><div class="month">${month}</div></div>
+      <div class="upcoming-info">
+        <div class="title">${esc(cls.topic)}</div>
+        <div class="time">${esc(formatShortDay(nextDate))} · ${esc(timeRange)}</div>
+        <div class="time">Students: ${esc(studentsList)}</div>
+      </div>
+      <a href="${esc(cls.meetingLink)}" target="_blank" class="meet-link">
+        ${svgUse('icon-video',14)} Join
+      </a>
+    </div>
+  `;
+}
+
+// =========================
+// Auth
+// =========================
+const authMsg = document.getElementById('authMessage');
+const authSubmit = document.getElementById('authSubmit');
+
+function showAuthMsg(text, type) {
+  authMsg.textContent = text;
+  authMsg.className = 'message ' + type;
+}
+
+function processAuthResponse(data, persistCredentials = null) {
+  if (!data.success) return false;
+
+  currentTutor = {
+    username: data.user.username,
+    displayName: data.user.displayName
+  };
+
+  classesCache = (data.classes || [])
+    .map(c => ({
+      'Tutor Name': currentTutor.username,
+      ...c
+    }))
+    .map(normalizeClass)
+    .filter(Boolean);
+
+  if (persistCredentials) {
+    saveAuth(persistCredentials.username, persistCredentials.password);
+  }
+
+  enterPortal();
+  return true;
+}
+
+async function handleAuth() {
+  const username = document.getElementById('authUsername').value.trim();
+  const password = document.getElementById('authPassword').value;
+
+  if (!username || !password) {
+    showAuthMsg('Please enter your username and password.', 'error');
+    return;
+  }
+
+  authSubmit.disabled = true;
+  authSubmit.textContent = 'Logging in…';
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      showAuthMsg(data.error || 'Login failed.', 'error');
+      clearAuth();
+      return;
+    }
+
+    processAuthResponse(data, { username, password });
+  } catch (err) {
+    showAuthMsg(err.message || 'Something went wrong.', 'error');
+  } finally {
+    authSubmit.disabled = false;
+    authSubmit.textContent = 'Log In';
+  }
+}
+
+// Auto-login on page load using stored credentials
+async function tryAutoLogin() {
+  const stored = loadAuth();
+  if (!stored) return;
+
+  // Show a subtle "restoring session…" hint
+  showAuthMsg('Restoring your session…', 'success');
+
+  try {
+    const res = await fetch(WORKER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: stored.username, password: stored.password })
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      // Credentials no longer valid — wipe them
+      clearAuth();
+      authMsg.className = 'message';
+      authMsg.textContent = '';
+      return;
+    }
+
+    authMsg.className = 'message';
+    authMsg.textContent = '';
+    processAuthResponse(data); // already persisted, no need to re-save
+  } catch (err) {
+    // Network error — keep stored credentials so the user can retry later
+    authMsg.className = 'message';
+    authMsg.textContent = '';
+  }
+}
+
+function logout() {
+  clearAuth();
+  currentTutor = null;
+  classesCache = [];
+  document.getElementById('portalScreen').classList.remove('active');
+  document.getElementById('authScreen').classList.remove('hidden');
+  document.getElementById('authUsername').value = '';
+  document.getElementById('authPassword').value = '';
+  authMsg.className = 'message';
+  authMsg.textContent = '';
+  closeAvatarDropdown();
+  window.scrollTo(0, 0);
+}
+
+function enterPortal() {
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('portalScreen').classList.add('active');
+
+  const displayName = capitalizeName(currentTutor.displayName || currentTutor.username);
+  document.getElementById('welcomeName').textContent = `Welcome back, ${displayName} 👋`;
+  document.getElementById('userAvatar').textContent = displayName.charAt(0).toUpperCase();
+  document.getElementById('dropdownName').textContent = displayName;
+  document.getElementById('dropdownUser').textContent = '@' + currentTutor.username;
+
+  renderDashboard();
+  showPage('dashboard');
+}
+
+// =========================
+// Avatar dropdown
+// =========================
+function toggleAvatarDropdown() {
+  document.getElementById('avatarDropdown').classList.toggle('open');
+}
+
+function closeAvatarDropdown() {
+  document.getElementById('avatarDropdown').classList.remove('open');
+}
+
+document.addEventListener('click', (e) => {
+  const wrapper = document.querySelector('.avatar-wrapper');
+  if (wrapper && !wrapper.contains(e.target)) closeAvatarDropdown();
+
+  const menu = document.getElementById('mobileMenu');
+  const ham = document.querySelector('.hamburger');
+  if (menu && ham && !menu.contains(e.target) && !ham.contains(e.target)) {
+    menu.classList.remove('active');
+  }
+});
+
+// =========================
+// Navigation
+// =========================
+function toggleMobile() {
+  document.getElementById('mobileMenu').classList.toggle('active');
+}
+
+function showPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById(`page-${page}`);
+  if (target) target.classList.add('active');
+
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  const activeBtn = document.querySelector(`.nav-btn[data-page="${page}"]`);
+  if (activeBtn) activeBtn.classList.add('active');
+
+  if (page === 'calendar') renderCalendar();
+  if (page === 'dashboard') renderDashboard();
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// =========================
+// Dashboard
+// =========================
+function renderDashboard() {
+  const classes = getTutorClasses();
+  const upcoming = classes
+    .map(c => ({...c, next: nextOccurrence(c)}))
+    .filter(c => c.next)
+    .sort((a,b) => a.next - b.next);
+
+  const nextCard = document.getElementById('nextClassCard');
+  if (nextCard) {
+    if (upcoming.length) {
+      const next = upcoming[0];
+      nextCard.innerHTML = `
+        <div class="next-class-info">
+          <div class="next-class-label">
+            ${svgUse('icon-calendar',14)}
+            Next Class
+          </div>
+          <div class="next-class-title">${esc(next.topic)}</div>
+          <div class="next-class-time"><strong>${esc(formatShortDay(next.next))}</strong> · ${esc(extractTimeRange(next.meetingTime))}</div>
+          <div class="next-class-time">Students: ${esc(next.students.join(', '))}</div>
+        </div>
+        <a href="${esc(next.meetingLink)}" target="_blank" class="btn btn-meet">
+          ${svgUse('icon-video',16)} Join Class
+        </a>
+      `;
+    } else {
+      nextCard.innerHTML = `
+        <div class="next-class-info">
+          <div class="next-class-label">
+            ${svgUse('icon-calendar',14)}
+            Next Class
+          </div>
+          <div class="next-class-title">No classes yet</div>
+          <div class="next-class-time">Once your classes are scheduled, they will appear here.</div>
+        </div>
+      `;
+    }
+  }
+
+  const upcomingList = document.getElementById('upcomingClassesList');
+  if (upcomingList) {
+    upcomingList.innerHTML = upcoming.length
+      ? upcoming.slice(0,5).map(c => classCardHTML(c, c.next)).join('')
+      : `<div class="empty-state"><div class="es-icon"><svg width="44" height="44"><use href="#icon-inbox"/></svg></div><h3>No upcoming classes</h3><p>Once classes are scheduled, they will appear here.</p></div>`;
+  }
+}
+
+// =========================
+// Calendar
+// =========================
+function buildCalendarEventMap(year, month) {
+  const map = {};
+  const seen = new Set();
+  const classes = getTutorClasses();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+
+  function push(dateObj, cls) {
+    const key = dateKey(dateObj);
+    const u = `${key}|${norm(cls.tutorName)}|${norm(cls.topic)}|${norm(cls.meetingLink)}`;
+    if (seen.has(u)) return;
+    seen.add(u);
+    if (!map[key]) map[key] = [];
+    map[key].push(cls);
+  }
+
+  classes.forEach(c => {
+    if (c.specificDate && c.specificDate.getFullYear()===year && c.specificDate.getMonth()===month) {
+      push(c.specificDate, c);
+    }
+    (c.weekdays||[]).forEach(dayName => {
+      const targetDow = daysOfWeek.indexOf(dayName);
+      if (targetDow<0) return;
+      for (let day=1; day<=daysInMonth; day++) {
+        const d = new Date(year, month, day);
+        if (d.getDay()===targetDow) {
+          const t = parseTimeToHM(c.meetingTime);
+          d.setHours(t.h,t.min,0,0);
+          push(d, c);
         }
-
-        document.addEventListener('click', function(e) {
-            const menu = document.getElementById('mobileMenu');
-            const hamburger = document.querySelector('.hamburger');
-            if (!menu.contains(e.target) && !hamburger.contains(e.target)) {
-                menu.classList.remove('active');
-            }
-        });
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('visible');
-                }
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-
-        document.querySelectorAll('.animate-on-scroll').forEach(el => {
-            observer.observe(el);
-        });
-
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }
-            });
-        });
-
-        // ============================================
-        // PARALLAX MATH BACKGROUND
-        // ============================================
-        (function() {
-            const parallaxLayers = document.querySelectorAll('.parallax-layer[data-speed]');
-            let mouseX = 0, mouseY = 0;
-            let pending = false;
-
-            // Generate floating particle dots
-            const particleLayer = document.querySelector('.layer-particles');
-            if (particleLayer) {
-                const particleCount = 42;
-                for (let i = 0; i < particleCount; i++) {
-                    const p = document.createElement('span');
-                    let cls = 'math-particle';
-                    const r = Math.random();
-                    if (r > 0.72) cls += ' dark';
-                    if (r > 0.86) cls += ' large';
-                    else if (r < 0.32) cls += ' small';
-                    p.className = cls;
-                    p.style.top = (Math.random() * 100) + '%';
-                    p.style.left = (Math.random() * 100) + '%';
-                    p.style.animationDelay = (-Math.random() * 7) + 's';
-                    p.style.animationDuration = (5 + Math.random() * 5) + 's';
-                    particleLayer.appendChild(p);
-                }
-            }
-
-            function update() {
-                const scrollY = window.pageYOffset;
-                parallaxLayers.forEach(layer => {
-                    const speed = parseFloat(layer.dataset.speed);
-                    const yPos = -(scrollY * speed);
-                    // Mouse-based parallax: faster layers shift more (closer to viewer)
-                    const xOffset = -mouseX * speed * 35;
-                    const yOffset = -mouseY * speed * 35;
-                    layer.style.transform = `translate3d(${xOffset}px, ${yPos + yOffset}px, 0)`;
-                });
-                pending = false;
-            }
-
-            function scheduleUpdate() {
-                if (!pending) {
-                    pending = true;
-                    requestAnimationFrame(update);
-                }
-            }
-
-            window.addEventListener('scroll', scheduleUpdate, { passive: true });
-            window.addEventListener('mousemove', (e) => {
-                mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
-                mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
-                scheduleUpdate();
-            }, { passive: true });
-
-            update();
-        })();
-    </script>
-    
-    <!-- SEO STRUCTURED DATA (JSON-LD) -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "EducationalOrganization",
-      "name": "Lyon Math Prep",
-      "url": "https://coachinbha.github.io/math/",
-      "logo": "https://coachinbha.github.io/math/logo.png",
-      "description": "Lyon Math Prep is a 100% free, student-run nonprofit providing online math tutoring for middle and high school students in South Lyon, Novi, Canton, and surrounding areas.",
-      "email": "mailto:lyonmathprep@gmail.com",
-      "address": {
-        "@type": "PostalAddress",
-        "addressLocality": "South Lyon",
-        "addressRegion": "MI",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "South Lyon" },
-        { "@type": "City", "name": "Novi" },
-        { "@type": "City", "name": "Canton" },
-        { "@type": "Place", "name": "Online" }
-      ],
-      "makesOffer": {
-        "@type": "Offer",
-        "itemOffered": {
-          "@type": "Service",
-          "name": "Free Online Math Tutoring",
-          "description": "Live small group math tutoring for Pre-Algebra, Algebra I, Geometry, Algebra II, Statistics, and Pre-Calculus."
-        },
-        "price": "0",
-        "priceCurrency": "USD"
       }
-    }
-    </script>
+    });
+  });
 
-    <!-- FAQ SCHEMA FOR RICH SNIPPETS -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      "mainEntity": [
-        {
-          "@type": "Question",
-          "name": "Is this really completely free?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Yes! Lyon Math Prep is a 100% non-profit organization based in South Lyon, MI. We don't charge anything, ever. All our online math tutors are volunteers who want to help students succeed."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "Who are the tutors?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Our tutors are high school and college students from South Lyon, Novi, Canton, and surrounding areas who excel in math and are passionate about teaching. They're trained and supervised to ensure quality instruction in our small group classes."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How do I sign up?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Click 'Student Portal' in the menu, and fill out a quick form about your needs. We'll match you with a tutor within 2-3 days and send you your login information."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How many students are in each class?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "We keep our classes small with 3-5 students per session. This allows for personalized attention while also creating a collaborative learning environment."
-          }
-        },
-        {
-          "@type": "Question",
-          "name": "How long are tutoring sessions?",
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": "Standard sessions are 45-60 minutes, but we can adjust based on your needs and schedule. Most students attend 1-2 classes per week."
-          }
-        }
-      ]
-    }
-    </script>
+  return map;
+}
 
+function renderCalendar() {
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('calendarTitle').textContent = `${months[calendarMonth]} ${calendarYear}`;
+  calendarEventMap = buildCalendarEventMap(calendarYear, calendarMonth);
+
+  const firstDay = new Date(calendarYear, calendarMonth, 1).getDay();
+  const daysInMonth = new Date(calendarYear, calendarMonth+1, 0).getDate();
+  const daysInPrev = new Date(calendarYear, calendarMonth, 0).getDate();
+  const today = new Date();
+  const container = document.getElementById('calendarDays');
+  container.innerHTML = '';
+
+  for (let i=firstDay-1; i>=0; i--) {
+    const d=document.createElement('div');
+    d.className='calendar-day other-month';
+    d.textContent=daysInPrev-i;
+    container.appendChild(d);
+  }
+
+  for (let day=1; day<=daysInMonth; day++) {
+    const d = document.createElement('div');
+    d.className = 'calendar-day';
+    const dateObj = new Date(calendarYear,calendarMonth,day);
+    const dateStr = dateKey(dateObj);
+    const isToday = today.getFullYear()===calendarYear&&today.getMonth()===calendarMonth&&today.getDate()===day;
+    const hasCls = !!(calendarEventMap[dateStr]?.length);
+    if (isToday) d.classList.add('today');
+    if (hasCls) { d.classList.add('has-class'); d.onclick=()=>showDayDetail(dateStr,day); }
+    d.innerHTML=`${day}${hasCls?'<div class="class-dot"></div>':''}`;
+    container.appendChild(d);
+  }
+
+  const totalCells = firstDay+daysInMonth;
+  const remaining = totalCells%7===0?0:7-(totalCells%7);
+  for (let i=1; i<=remaining; i++){
+    const d=document.createElement('div');
+    d.className='calendar-day other-month';
+    d.textContent=i;
+    container.appendChild(d);
+  }
+  document.getElementById('dayDetail').classList.remove('active');
+  renderCalendarMeetings();
+}
+
+function changeMonth(dir) {
+  calendarMonth += dir;
+  if (calendarMonth>11){calendarMonth=0;calendarYear++;}
+  if (calendarMonth<0){calendarMonth=11;calendarYear--;}
+  renderCalendar();
+}
+
+function showDayDetail(dateStr, day) {
+  const classes = calendarEventMap[dateStr]||[];
+  if (!classes.length) return;
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  document.getElementById('dayDetailTitle').textContent=`${months[calendarMonth]} ${day}, ${calendarYear}`;
+  document.getElementById('dayDetailContent').innerHTML=classes.map(c=>
+    `<div class="meet-item" style="margin-bottom:8px;">
+      <div class="meet-info">
+        <div class="title">${esc(c.topic)}</div>
+        <div class="time">${esc(c.meetingTime)}</div>
+        <div class="time">Students: ${esc(c.students.join(', '))}</div>
+      </div>
+      <a href="${esc(c.meetingLink)}" target="_blank" class="meet-link">${svgUse('icon-video',13)} Join</a>
+    </div>`).join('');
+  document.getElementById('dayDetail').classList.add('active');
+}
+
+function renderCalendarMeetings() {
+  const classes = getTutorClasses();
+  const upcoming = classes
+    .map(c => ({...c, next: nextOccurrence(c)}))
+    .filter(c => c.next)
+    .sort((a,b) => a.next - b.next);
+
+  const noMeetingsHTML = `
+    <div class="empty-state">
+      <div class="es-icon"><svg width="44" height="44"><use href="#icon-inbox"/></svg></div>
+      <h3>No classes yet</h3>
+      <p>Once classes are scheduled, they'll show up here.</p>
+    </div>
+  `;
+
+  const calMeetings = document.getElementById('calendarMeetings');
+  if (calMeetings) {
+    calMeetings.innerHTML = classes.length
+      ? `<h3>${svgUse('icon-video',16)} Your Classes</h3>${classes.map(c=>
+          `<div class="meet-item">
+            <div class="meet-info">
+              <div class="title">${esc(c.topic)}</div>
+              <div class="time">${esc(c.date)} · ${esc(c.meetingTime)}</div>
+              <div class="time">Students: ${esc(c.students.join(', '))}</div>
+            </div>
+            <a href="${esc(c.meetingLink)}" target="_blank" class="meet-link">${svgUse('icon-video',13)} Join</a>
+          </div>`).join('')}`
+      : `<h3>${svgUse('icon-video',16)} Your Classes</h3>${noMeetingsHTML}`;
+  }
+
+  const calList = document.getElementById('calendarUpcomingList');
+  if (calList) {
+    calList.innerHTML = upcoming.length
+      ? upcoming.slice(0,5).map(c => classCardHTML(c,c.next)).join('')
+      : `<div class="empty-state"><div class="es-icon"><svg width="44" height="44"><use href="#icon-inbox"/></svg></div><h3>No upcoming classes</h3><p>Once classes are scheduled, they will appear here.</p></div>`;
+  }
+}
+
+// =========================
+// Event Listeners
+// =========================
+document.getElementById('authSubmit').addEventListener('click', handleAuth);
+document.getElementById('authPassword').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
+document.getElementById('authUsername').addEventListener('keydown', e => { if (e.key==='Enter') handleAuth(); });
+
+// Attempt silent auto-login from localStorage on page load
+tryAutoLogin();
+</script>
 </body>
 </html>
