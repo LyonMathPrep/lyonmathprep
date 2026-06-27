@@ -68,10 +68,7 @@
     .prop-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); }
     .prop-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .prop-divider { height: 1px; background: var(--border); }
-    .color-swatch {
-      width: 26px; height: 26px; border-radius: 6px; border: 2px solid transparent;
-      cursor: pointer; transition: all 0.15s;
-    }
+    .color-swatch { width: 26px; height: 26px; border-radius: 6px; border: 2px solid transparent; cursor: pointer; transition: all 0.15s; }
     .color-swatch:hover { transform: scale(1.1); }
     .color-swatch.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(66,99,235,0.2); }
     .prop-slider { -webkit-appearance: none; appearance: none; flex: 1; height: 4px; border-radius: 2px; background: var(--surface2); outline: none; cursor: pointer; }
@@ -101,7 +98,6 @@
     }
     .grid-btn:hover { background: var(--surface); }
     .grid-btn.active { background: var(--accent); border-color: var(--accent); color: white; }
-
     #text-overlay {
       position: fixed; display: none; z-index: 400; background: white;
       border: 2px solid var(--accent); border-radius: 12px; box-shadow: var(--shadow-lg);
@@ -255,8 +251,8 @@
     <div class="prop-section" id="text-props" style="display:none">
       <div class="prop-label">Font Family</div>
       <select class="prop-select" id="sel-font" onchange="MB.setFont(this.value)">
+        <option value="Fredoka" selected>Fredoka</option>
         <option value="Inter">Inter</option>
-        <option value="Fredoka">Fredoka</option>
         <option value="Caveat">Caveat</option>
         <option value="Comic Neue">Comic Neue</option>
         <option value="Patrick Hand">Patrick Hand</option>
@@ -266,7 +262,7 @@
       </select>
       <div class="prop-label" style="margin-top:6px">Font Size</div>
       <div class="prop-row">
-        <input type="range" class="prop-slider" id="sl-fsize" min="12" max="72" value="22" oninput="MB.setFontSize(+this.value)">
+        <input type="range" class="prop-slider" id="sl-fsize" min="12" max="96" value="22" oninput="MB.setFontSize(+this.value)">
         <span class="prop-value" id="vl-fsize">22</span>
       </div>
     </div>
@@ -285,8 +281,8 @@
     <div style="margin-bottom:8px">
       <label style="font-size:12px;font-weight:500;color:var(--text-muted)">Font: </label>
       <select class="prop-select" id="editor-font-sel" onchange="MB.setFont(this.value)" style="display:inline-block;width:auto;min-width:140px;padding:5px 8px;font-size:12px">
+        <option value="Fredoka" selected>Fredoka</option>
         <option value="Inter">Inter</option>
-        <option value="Fredoka">Fredoka</option>
         <option value="Caveat">Caveat</option>
         <option value="Comic Neue">Comic Neue</option>
         <option value="Patrick Hand">Patrick Hand</option>
@@ -318,6 +314,7 @@
     'use strict';
     const MB = (() => {
       const ZOOM_MIN = 0.1, ZOOM_MAX = 5.0, MAX_HISTORY = 100;
+      const DPR = window.devicePixelRatio || 1;
       let canvas, ctx;
       let W = window.innerWidth, H = window.innerHeight;
       let panX = 0, panY = 0, zoom = 1.0;
@@ -325,28 +322,16 @@
       let liveStroke = null, liveShapeP0 = null, liveShapeP1 = null;
       let currentTool = 'pen';
       let color = '#212529', strokeW = 15, eraserR = 24, fontSize = 22;
-      let fontFamily = 'Inter';
+      let fontFamily = 'Fredoka';
       let texMode_ = 'plain', lineStyle = 'solid';
-      let gridMode = 'none'; // 'none' | 'grid' | 'dots' | 'cartesian'
+      let gridMode = 'none';
       let isDrawing = false, isPanning = false, spaceDown = false;
-      let panStart = { x:0, y:0 }, panOrigin = { x:0, y:0 }, lastPt = null;
+      let panStart = {x:0,y:0}, panOrigin = {x:0,y:0}, lastPt = null;
       let selObjs = new Set();
       let textWorldPos = null, editingObj = null;
       let draggingText = false, dragTextStart = null, dragTextObj = null;
       const imgCache = new Map();
       const shapeTools = ['line','rect','ellipse','arrow','triangle'];
-      
-      // Font mapping for Google Fonts CSS import in SVG
-      const fontImports = {
-        'Inter': "Inter:wght@400;500;600;700",
-        'Fredoka': "Fredoka:wght@400;500;600;700",
-        'Caveat': "Caveat:wght@400;500;600;700",
-        'Comic Neue': "Comic+Neue:wght@400;700",
-        'Patrick Hand': "Patrick+Hand",
-        'Indie Flower': "Indie+Flower",
-        'Architects Daughter': "Architects+Daughter",
-        'JetBrains Mono': "JetBrains+Mono:wght@400;500"
-      };
 
       let rafPending = false;
       function requestRender() {
@@ -355,7 +340,7 @@
 
       function init() {
         canvas = document.getElementById('main-canvas');
-        ctx = canvas.getContext('2d', { alpha: false, desynchronized: true });
+        ctx = canvas.getContext('2d', { alpha: false });
         resize();
         window.addEventListener('resize', resize);
         canvas.addEventListener('pointerdown', onPtrDown, { passive: false });
@@ -377,145 +362,81 @@
         toast('Welcome to MathBoard! Press T for text, P to draw.');
       }
 
-      function resize() { W = window.innerWidth; H = window.innerHeight; canvas.width = W; canvas.height = H; requestRender(); }
+      function resize() {
+        W = window.innerWidth; H = window.innerHeight;
+        canvas.width = W * DPR;
+        canvas.height = H * DPR;
+        canvas.style.width = W + 'px';
+        canvas.style.height = H + 'px';
+        requestRender();
+      }
 
-      // ── GRID DRAWING ────────────────────────────────────────
+      // ── GRID ────────────────────────────────────────────────
       function drawGrid() {
         if (gridMode === 'none') return;
         ctx.save();
-        
         const gridSize = 40;
-        // Calculate visible world bounds
-        const x0 = -panX / zoom;
-        const y0 = -panY / zoom;
-        const x1 = (W - panX) / zoom;
-        const y1 = (H - panY) / zoom;
-        
+        const x0 = -panX / zoom, y0 = -panY / zoom;
+        const x1 = (W - panX) / zoom, y1 = (H - panY) / zoom;
         const startX = Math.floor(x0 / gridSize) * gridSize;
         const startY = Math.floor(y0 / gridSize) * gridSize;
         const endX = Math.ceil(x1 / gridSize) * gridSize;
         const endY = Math.ceil(y1 / gridSize) * gridSize;
 
         if (gridMode === 'grid') {
-          ctx.strokeStyle = '#e0e0e0';
-          ctx.lineWidth = 1 / zoom;
-          ctx.setLineDash([]);
+          ctx.strokeStyle = '#e0e0e0'; ctx.lineWidth = 1 / zoom; ctx.setLineDash([]);
           ctx.beginPath();
-          for (let x = startX; x <= endX; x += gridSize) {
-            ctx.moveTo(x, startY); ctx.lineTo(x, endY);
-          }
-          for (let y = startY; y <= endY; y += gridSize) {
-            ctx.moveTo(startX, y); ctx.lineTo(endX, y);
-          }
+          for (let x = startX; x <= endX; x += gridSize) { ctx.moveTo(x, startY); ctx.lineTo(x, endY); }
+          for (let y = startY; y <= endY; y += gridSize) { ctx.moveTo(startX, y); ctx.lineTo(endX, y); }
           ctx.stroke();
         } else if (gridMode === 'dots') {
           ctx.fillStyle = '#c0c0c0';
           const dotR = 1.5 / zoom;
-          for (let x = startX; x <= endX; x += gridSize) {
+          for (let x = startX; x <= endX; x += gridSize)
             for (let y = startY; y <= endY; y += gridSize) {
-              ctx.beginPath();
-              ctx.arc(x, y, dotR, 0, Math.PI * 2);
-              ctx.fill();
+              ctx.beginPath(); ctx.arc(x, y, dotR, 0, Math.PI*2); ctx.fill();
             }
-          }
         } else if (gridMode === 'cartesian') {
-          // Minor grid
-          ctx.strokeStyle = '#eeeeee';
-          ctx.lineWidth = 0.5 / zoom;
-          ctx.setLineDash([]);
+          ctx.strokeStyle = '#eeeeee'; ctx.lineWidth = 0.5 / zoom; ctx.setLineDash([]);
           ctx.beginPath();
-          for (let x = startX; x <= endX; x += gridSize) {
-            if (x === 0) continue;
-            ctx.moveTo(x, startY); ctx.lineTo(x, endY);
-          }
-          for (let y = startY; y <= endY; y += gridSize) {
-            if (y === 0) continue;
-            ctx.moveTo(startX, y); ctx.lineTo(endX, y);
-          }
+          for (let x = startX; x <= endX; x += gridSize) { if (x===0) continue; ctx.moveTo(x, startY); ctx.lineTo(x, endY); }
+          for (let y = startY; y <= endY; y += gridSize) { if (y===0) continue; ctx.moveTo(startX, y); ctx.lineTo(endX, y); }
           ctx.stroke();
-
-          // Major grid every 5
           const majorSize = gridSize * 5;
-          const mStartX = Math.floor(x0 / majorSize) * majorSize;
-          const mStartY = Math.floor(y0 / majorSize) * majorSize;
-          const mEndX = Math.ceil(x1 / majorSize) * majorSize;
-          const mEndY = Math.ceil(y1 / majorSize) * majorSize;
-          ctx.strokeStyle = '#d8d8d8';
-          ctx.lineWidth = 0.8 / zoom;
+          const mSX = Math.floor(x0/majorSize)*majorSize, mSY = Math.floor(y0/majorSize)*majorSize;
+          const mEX = Math.ceil(x1/majorSize)*majorSize, mEY = Math.ceil(y1/majorSize)*majorSize;
+          ctx.strokeStyle = '#d8d8d8'; ctx.lineWidth = 0.8 / zoom;
           ctx.beginPath();
-          for (let x = mStartX; x <= mEndX; x += majorSize) {
-            if (x === 0) continue;
-            ctx.moveTo(x, startY); ctx.lineTo(x, endY);
-          }
-          for (let y = mStartY; y <= mEndY; y += majorSize) {
-            if (y === 0) continue;
-            ctx.moveTo(startX, y); ctx.lineTo(endX, y);
-          }
+          for (let x = mSX; x <= mEX; x += majorSize) { if (x===0) continue; ctx.moveTo(x, startY); ctx.lineTo(x, endY); }
+          for (let y = mSY; y <= mEY; y += majorSize) { if (y===0) continue; ctx.moveTo(startX, y); ctx.lineTo(endX, y); }
           ctx.stroke();
-
-          // X and Y axes
-          ctx.strokeStyle = '#555555';
-          ctx.lineWidth = 2 / zoom;
-          ctx.beginPath();
-          // X axis
-          ctx.moveTo(startX, 0); ctx.lineTo(endX, 0);
-          // Y axis
-          ctx.moveTo(0, startY); ctx.lineTo(0, endY);
-          ctx.stroke();
-
-          // Arrow heads on axes
-          const aSize = 10 / zoom;
-          ctx.fillStyle = '#555555';
-          // X axis arrow (right)
-          ctx.beginPath();
-          ctx.moveTo(endX, 0);
-          ctx.lineTo(endX - aSize, -aSize/2);
-          ctx.lineTo(endX - aSize, aSize/2);
-          ctx.closePath(); ctx.fill();
-          // Y axis arrow (up)
-          ctx.beginPath();
-          ctx.moveTo(0, startY);
-          ctx.lineTo(-aSize/2, startY + aSize);
-          ctx.lineTo(aSize/2, startY + aSize);
-          ctx.closePath(); ctx.fill();
-
-          // Tick labels
-          ctx.fillStyle = '#888888';
+          ctx.strokeStyle = '#555'; ctx.lineWidth = 2 / zoom; ctx.beginPath();
+          ctx.moveTo(startX, 0); ctx.lineTo(endX, 0); ctx.moveTo(0, startY); ctx.lineTo(0, endY); ctx.stroke();
+          const aS = 10 / zoom; ctx.fillStyle = '#555';
+          ctx.beginPath(); ctx.moveTo(endX, 0); ctx.lineTo(endX-aS, -aS/2); ctx.lineTo(endX-aS, aS/2); ctx.closePath(); ctx.fill();
+          ctx.beginPath(); ctx.moveTo(0, startY); ctx.lineTo(-aS/2, startY+aS); ctx.lineTo(aS/2, startY+aS); ctx.closePath(); ctx.fill();
+          ctx.fillStyle = '#888';
           const labelFs = Math.max(10, 12 / zoom);
           ctx.font = `${labelFs}px Inter, sans-serif`;
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'top';
-          const labelStep = zoom < 0.4 ? majorSize : (zoom < 0.8 ? gridSize * 2 : gridSize);
-          const lStartX = Math.floor(x0 / labelStep) * labelStep;
-          const lStartY = Math.floor(y0 / labelStep) * labelStep;
-          for (let x = lStartX; x <= endX; x += labelStep) {
-            if (x === 0) continue;
-            const label = Math.round(x / gridSize);
-            ctx.fillText(label, x, 4 / zoom);
-          }
-          ctx.textAlign = 'right';
-          ctx.textBaseline = 'middle';
-          for (let y = lStartY; y <= endY; y += labelStep) {
-            if (y === 0) continue;
-            const label = Math.round(-y / gridSize);
-            ctx.fillText(label, -6 / zoom, y);
-          }
-          // Origin
-          ctx.textAlign = 'right'; ctx.textBaseline = 'top';
-          ctx.fillText('0', -4 / zoom, 4 / zoom);
+          const labelStep = zoom < 0.4 ? majorSize : (zoom < 0.8 ? gridSize*2 : gridSize);
+          const lSX = Math.floor(x0/labelStep)*labelStep;
+          const lSY = Math.floor(y0/labelStep)*labelStep;
+          ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+          for (let x = lSX; x <= endX; x += labelStep) { if (x===0) continue; ctx.fillText(Math.round(x/gridSize), x, 4/zoom); }
+          ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+          for (let y = lSY; y <= endY; y += labelStep) { if (y===0) continue; ctx.fillText(Math.round(-y/gridSize), -6/zoom, y); }
+          ctx.textAlign = 'right'; ctx.textBaseline = 'top'; ctx.fillText('0', -4/zoom, 4/zoom);
         }
         ctx.restore();
       }
 
       // ── RENDER ──────────────────────────────────────────────
       function render() {
-        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, W, H);
-        ctx.setTransform(zoom, 0, 0, zoom, panX, panY);
-
+        ctx.setTransform(DPR * zoom, 0, 0, DPR * zoom, DPR * panX, DPR * panY);
         drawGrid();
-
         for (const obj of objects) drawObj(obj);
         if (liveStroke) drawObj(liveStroke);
         if (liveShapeP0 && liveShapeP1 && shapeTools.includes(currentTool)) {
@@ -527,14 +448,14 @@
           const bb = bbox(obj); if (!bb) continue;
           ctx.save(); ctx.strokeStyle = '#4263eb'; ctx.lineWidth = 2 / zoom;
           ctx.setLineDash([6/zoom, 3/zoom]); const pad = 4 / zoom;
-          ctx.strokeRect(bb.x - pad, bb.y - pad, bb.w + pad*2, bb.h + pad*2);
+          ctx.strokeRect(bb.x-pad, bb.y-pad, bb.w+pad*2, bb.h+pad*2);
           ctx.restore();
         }
       }
 
       function getDashPattern(style, width) {
-        if (style === 'dashed') return [Math.max(width * 2, 8), Math.max(width * 1.5, 6)];
-        if (style === 'dotted') return [Math.max(1, width * 0.15), Math.max(width * 1.8, width + 4)];
+        if (style === 'dashed') return [Math.max(width*2,8), Math.max(width*1.5,6)];
+        if (style === 'dotted') return [Math.max(1, width*0.15), Math.max(width*1.8, width+4)];
         return [];
       }
 
@@ -558,7 +479,7 @@
 
       function drawFreehand(obj) {
         const pts = obj.points; if (!pts || !pts.length) return;
-        if (obj.type === 'marker') { ctx.globalAlpha = 0.4; ctx.lineWidth = (obj.width || 2) * 4; }
+        if (obj.type === 'marker') { ctx.globalAlpha = 0.4; ctx.lineWidth = (obj.width||2)*4; }
         if (pts.length === 1) { ctx.beginPath(); ctx.arc(pts[0].x, pts[0].y, (obj.width||2)/2, 0, Math.PI*2); ctx.fill(); return; }
         ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
         for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i].x, pts[i].y);
@@ -571,120 +492,118 @@
       }
       function drawRect(obj) {
         if (!obj.points || obj.points.length < 2) return;
-        const [a, b] = [obj.points[0], obj.points[1]];
-        const x = Math.min(a.x,b.x), y = Math.min(a.y,b.y), w = Math.abs(b.x-a.x), h = Math.abs(b.y-a.y);
-        if (w < 1 || h < 1) return;
-        ctx.beginPath(); ctx.rect(x, y, w, h); ctx.stroke();
+        const [a,b] = [obj.points[0], obj.points[1]];
+        const x=Math.min(a.x,b.x), y=Math.min(a.y,b.y), w=Math.abs(b.x-a.x), h=Math.abs(b.y-a.y);
+        if (w<1||h<1) return; ctx.beginPath(); ctx.rect(x,y,w,h); ctx.stroke();
       }
       function drawEllipse(obj) {
         if (!obj.points || obj.points.length < 2) return;
-        const [a, b] = [obj.points[0], obj.points[1]];
-        const rx = Math.abs(b.x-a.x)/2, ry = Math.abs(b.y-a.y)/2;
-        if (rx < 1 || ry < 1) return;
-        ctx.beginPath(); ctx.ellipse((a.x+b.x)/2, (a.y+b.y)/2, rx, ry, 0, 0, Math.PI*2); ctx.stroke();
+        const [a,b] = [obj.points[0], obj.points[1]];
+        const rx=Math.abs(b.x-a.x)/2, ry=Math.abs(b.y-a.y)/2;
+        if (rx<1||ry<1) return;
+        ctx.beginPath(); ctx.ellipse((a.x+b.x)/2,(a.y+b.y)/2,rx,ry,0,0,Math.PI*2); ctx.stroke();
       }
       function drawTriangle(obj) {
         if (!obj.points || obj.points.length < 2) return;
-        const [a, b] = [obj.points[0], obj.points[1]];
-        const topX = (a.x+b.x)/2, topY = Math.min(a.y,b.y), botY = Math.max(a.y,b.y);
-        const leftX = Math.min(a.x,b.x), rightX = Math.max(a.x,b.x);
-        ctx.beginPath(); ctx.moveTo(topX, topY); ctx.lineTo(rightX, botY); ctx.lineTo(leftX, botY); ctx.closePath(); ctx.stroke();
+        const [a,b] = [obj.points[0], obj.points[1]];
+        const topX=(a.x+b.x)/2, topY=Math.min(a.y,b.y), botY=Math.max(a.y,b.y);
+        const leftX=Math.min(a.x,b.x), rightX=Math.max(a.x,b.x);
+        ctx.beginPath(); ctx.moveTo(topX,topY); ctx.lineTo(rightX,botY); ctx.lineTo(leftX,botY); ctx.closePath(); ctx.stroke();
       }
       function drawArrow(obj) {
         if (!obj.points || obj.points.length < 2) return;
-        const a = obj.points[0], b = obj.points[obj.points.length-1];
-        const dx = b.x-a.x, dy = b.y-a.y, len = Math.sqrt(dx*dx+dy*dy);
-        if (len < 2) return;
-        const angle = Math.atan2(dy, dx);
-        const w = obj.width || 2;
-        const head = Math.max(w * 3, Math.min(len * 0.4, 50));
-        const spread = Math.PI / 6;
-        ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
-        // Arrowhead solid
+        const a=obj.points[0], b=obj.points[obj.points.length-1];
+        const dx=b.x-a.x, dy=b.y-a.y, len=Math.sqrt(dx*dx+dy*dy);
+        if (len<2) return;
+        const angle=Math.atan2(dy,dx), w=obj.width||2;
+        const head = Math.max(w*3, Math.min(len*0.4, 50));
+        const spread = Math.PI/6;
+        ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
         ctx.setLineDash([]);
         ctx.lineWidth = Math.max(w, 2);
         ctx.beginPath();
-        ctx.moveTo(b.x, b.y);
-        ctx.lineTo(b.x - head*Math.cos(angle - spread), b.y - head*Math.sin(angle - spread));
-        ctx.moveTo(b.x, b.y);
-        ctx.lineTo(b.x - head*Math.cos(angle + spread), b.y - head*Math.sin(angle + spread));
+        ctx.moveTo(b.x,b.y); ctx.lineTo(b.x-head*Math.cos(angle-spread), b.y-head*Math.sin(angle-spread));
+        ctx.moveTo(b.x,b.y); ctx.lineTo(b.x-head*Math.cos(angle+spread), b.y-head*Math.sin(angle+spread));
         ctx.stroke();
       }
 
+      // ── TEXT RENDERING — high-DPI canvas baking ─────────────
       function drawText(obj) {
         if (!obj.text) return;
-        if (obj._img) { ctx.drawImage(obj._img, obj.x, obj.y); }
-        else { bakeText(obj).then(() => requestRender()); }
+        if (obj._img) {
+          // Draw at 1/DPR scale because the image is already at DPR resolution
+          const drawW = obj._img.width / obj._dpr;
+          const drawH = obj._img.height / obj._dpr;
+          ctx.drawImage(obj._img, obj.x, obj.y, drawW, drawH);
+        } else {
+          bakeText(obj).then(() => requestRender());
+        }
       }
 
-      // ── TEXT BAKING — now uses Canvas 2D rendering for accurate fonts ──
       async function bakeText(obj) {
-        const ff = obj.fontFamily || 'Inter';
+        const ff = obj.fontFamily || 'Fredoka';
         const fs = obj.fontSize || 22;
         const col = obj.color || '#212529';
         const mode = obj.texMode || 'plain';
-        const key = [obj.text, col, fs, mode, ff].join('|');
-        if (imgCache.has(key)) { obj._img = imgCache.get(key); return; }
-
-        // For LaTeX/mixed, use SVG foreignObject approach
-        if (mode !== 'plain' && window.katex) {
-          await bakeTextSVG(obj, key);
+        const bakeScale = Math.max(DPR, 2); // at least 2x for crispness
+        const key = [obj.text, col, fs, mode, ff, bakeScale].join('|');
+        if (imgCache.has(key)) {
+          const cached = imgCache.get(key);
+          obj._img = cached.img; obj._dpr = cached.dpr;
           return;
         }
 
-        // For plain text, render directly to a canvas for accurate font rendering
+        if (mode !== 'plain' && window.katex) {
+          await bakeTextSVG(obj, key, bakeScale);
+          return;
+        }
+
+        // Wait for fonts
         await document.fonts.ready;
-        
+
         const lines = obj.text.split('\n');
         const lineHeight = fs * 1.4;
         const padding = 8;
 
-        // Measure text
-        const measureCanvas = document.createElement('canvas');
-        const mCtx = measureCanvas.getContext('2d');
-        mCtx.font = `${fs}px '${ff}', sans-serif`;
-        
-        let maxWidth = 0;
-        for (const line of lines) {
-          const m = mCtx.measureText(line || ' ');
-          maxWidth = Math.max(maxWidth, m.width);
-        }
+        // Measure
+        const mc = document.createElement('canvas');
+        const mctx = mc.getContext('2d');
+        mctx.font = `${fs}px '${ff}', sans-serif`;
+        let maxW = 0;
+        for (const line of lines) { const m = mctx.measureText(line || ' '); maxW = Math.max(maxW, m.width); }
 
-        const cw = Math.ceil(maxWidth) + padding * 2 + 4;
-        const ch = Math.ceil(lines.length * lineHeight) + padding * 2;
+        const logW = Math.ceil(maxW) + padding * 2 + 4;
+        const logH = Math.ceil(lines.length * lineHeight) + padding * 2;
 
-        const offCanvas = document.createElement('canvas');
-        offCanvas.width = cw;
-        offCanvas.height = ch;
-        const oCtx = offCanvas.getContext('2d');
-
-        oCtx.font = `${fs}px '${ff}', sans-serif`;
-        oCtx.fillStyle = col;
-        oCtx.textBaseline = 'top';
+        const oc = document.createElement('canvas');
+        oc.width = Math.ceil(logW * bakeScale);
+        oc.height = Math.ceil(logH * bakeScale);
+        const octx = oc.getContext('2d');
+        octx.scale(bakeScale, bakeScale);
+        octx.font = `${fs}px '${ff}', sans-serif`;
+        octx.fillStyle = col;
+        octx.textBaseline = 'top';
+        octx.textRendering = 'optimizeLegibility';
 
         for (let i = 0; i < lines.length; i++) {
-          oCtx.fillText(lines[i], padding, padding + i * lineHeight);
+          octx.fillText(lines[i], padding, padding + i * lineHeight);
         }
 
-        const img = new Image(cw, ch);
-        const dataUrl = offCanvas.toDataURL();
-        await new Promise(res => {
-          img.onload = res;
-          img.onerror = res;
-          img.src = dataUrl;
-        });
+        const img = new Image();
+        const dataUrl = oc.toDataURL();
+        await new Promise(res => { img.onload = res; img.onerror = res; img.src = dataUrl; });
 
         obj._img = img;
-        imgCache.set(key, img);
+        obj._dpr = bakeScale;
+        imgCache.set(key, { img, dpr: bakeScale });
       }
 
-      async function bakeTextSVG(obj, key) {
-        const ff = obj.fontFamily || 'Inter';
+      async function bakeTextSVG(obj, key, bakeScale) {
+        const ff = obj.fontFamily || 'Fredoka';
         const fs = obj.fontSize || 22;
         const col = obj.color || '#212529';
         const mode = obj.texMode || 'plain';
         let html = '';
-
         if (mode === 'latex') {
           try { html = window.katex.renderToString(obj.text, { throwOnError: false }); }
           catch(e) { html = `<span>${esc(obj.text)}</span>`; }
@@ -694,7 +613,13 @@
           html = `<span>${esc(obj.text)}</span>`;
         }
 
-        const fontParam = fontImports[ff] || 'Inter:wght@400;500;600;700';
+        const fontImports = {
+          'Inter': "Inter:wght@400;500;600;700", 'Fredoka': "Fredoka:wght@400;500;600;700",
+          'Caveat': "Caveat:wght@400;500;600;700", 'Comic Neue': "Comic+Neue:wght@400;700",
+          'Patrick Hand': "Patrick+Hand", 'Indie Flower': "Indie+Flower",
+          'Architects Daughter': "Architects+Daughter", 'JetBrains Mono': "JetBrains+Mono:wght@400;500"
+        };
+        const fontParam = fontImports[ff] || 'Fredoka:wght@400;500;600;700';
 
         const probe = document.createElement('div');
         probe.style.cssText = `position:fixed;visibility:hidden;top:-9999px;font-family:'${ff}',sans-serif;font-size:${fs}px;color:${col};max-width:700px;white-space:pre-wrap;line-height:1.5;padding:4px 8px;`;
@@ -705,14 +630,18 @@
         const bh = Math.ceil(r.height) + 16;
         document.body.removeChild(probe);
 
+        // Render SVG at bakeScale for crispness
+        const scaledW = Math.ceil(bw * bakeScale);
+        const scaledH = Math.ceil(bh * bakeScale);
+
         const escapedFf = ff.replace(/'/g, "\\'");
-        const svgSrc = `<svg xmlns="http://www.w3.org/2000/svg" width="${bw}" height="${bh}">
+        const svgSrc = `<svg xmlns="http://www.w3.org/2000/svg" width="${scaledW}" height="${scaledH}">
           <defs><style>@import url('https://fonts.googleapis.com/css2?family=${fontParam}&amp;display=swap');@import url('https://cdn.jsdelivr.net/npm/katex@0.16.25/dist/katex.min.css');</style></defs>
-          <foreignObject width="${bw}" height="${bh}">
+          <foreignObject width="${scaledW}" height="${scaledH}" transform="scale(${bakeScale})">
             <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:'${escapedFf}',sans-serif;font-size:${fs}px;color:${col};max-width:${bw}px;white-space:pre-wrap;line-height:1.5;padding:4px 8px;">${html}</div>
           </foreignObject></svg>`;
 
-        const img = new Image(bw, bh);
+        const img = new Image();
         const blob = new Blob([svgSrc], { type: 'image/svg+xml;charset=utf-8' });
         const url = URL.createObjectURL(blob);
         await new Promise(res => {
@@ -721,7 +650,8 @@
           img.src = url;
         });
         obj._img = img;
-        imgCache.set(key, img);
+        obj._dpr = bakeScale;
+        imgCache.set(key, { img, dpr: bakeScale });
       }
 
       function parseMixed(text) {
@@ -738,7 +668,9 @@
 
       function bbox(obj) {
         if (obj.type === 'text') {
-          const iw = obj._img?.width || 200, ih = obj._img?.height || 40;
+          const dpr = obj._dpr || DPR;
+          const iw = obj._img ? obj._img.width / dpr : 200;
+          const ih = obj._img ? obj._img.height / dpr : 40;
           return { x: obj.x, y: obj.y, w: iw, h: ih };
         }
         if (!obj.points || !obj.points.length) return null;
@@ -751,369 +683,231 @@
 
       function getGeometryPoints(obj) {
         if (!obj.points || !obj.points.length) return [];
-        if (obj.type === 'pen' || obj.type === 'marker') return obj.points;
-        if (obj.type === 'line' || obj.type === 'arrow') return [obj.points[0], obj.points[obj.points.length-1]];
-        if (obj.type === 'rect') {
-          const [a,b] = [obj.points[0], obj.points[1]];
+        if (obj.type==='pen'||obj.type==='marker') return obj.points;
+        if (obj.type==='line'||obj.type==='arrow') return [obj.points[0], obj.points[obj.points.length-1]];
+        if (obj.type==='rect') {
+          const [a,b]=[obj.points[0],obj.points[1]];
           return [{x:Math.min(a.x,b.x),y:Math.min(a.y,b.y)},{x:Math.max(a.x,b.x),y:Math.min(a.y,b.y)},{x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)},{x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)}];
         }
-        if (obj.type === 'triangle') {
-          const [a,b] = [obj.points[0], obj.points[1]];
+        if (obj.type==='triangle') {
+          const [a,b]=[obj.points[0],obj.points[1]];
           return [{x:(a.x+b.x)/2,y:Math.min(a.y,b.y)},{x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)},{x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)}];
         }
-        if (obj.type === 'ellipse') {
-          const [a,b] = [obj.points[0], obj.points[1]];
+        if (obj.type==='ellipse') {
+          const [a,b]=[obj.points[0],obj.points[1]];
           const cx=(a.x+b.x)/2, cy=(a.y+b.y)/2, rx=Math.abs(b.x-a.x)/2, ry=Math.abs(b.y-a.y)/2;
-          const pts = [];
-          for (let i = 0; i < 36; i++) { const ang = (i/36)*Math.PI*2; pts.push({x:cx+rx*Math.cos(ang),y:cy+ry*Math.sin(ang)}); }
-          return pts;
+          const pts=[]; for (let i=0;i<36;i++){const ang=(i/36)*Math.PI*2;pts.push({x:cx+rx*Math.cos(ang),y:cy+ry*Math.sin(ang)});} return pts;
         }
         return obj.points;
       }
 
       function getEdgeSegments(obj) {
-        if (!obj.points || !obj.points.length) return [];
-        if (obj.type === 'pen' || obj.type === 'marker') {
-          const segs = [];
-          for (let i = 0; i < obj.points.length - 1; i++) segs.push([obj.points[i], obj.points[i+1]]);
-          return segs;
+        if (!obj.points||!obj.points.length) return [];
+        if (obj.type==='pen'||obj.type==='marker') { const s=[]; for(let i=0;i<obj.points.length-1;i++) s.push([obj.points[i],obj.points[i+1]]); return s; }
+        if (obj.type==='line') return [[obj.points[0],obj.points[obj.points.length-1]]];
+        if (obj.type==='arrow') {
+          const a=obj.points[0],b=obj.points[obj.points.length-1],dx=b.x-a.x,dy=b.y-a.y,len=Math.sqrt(dx*dx+dy*dy),angle=Math.atan2(dy,dx);
+          const w=obj.width||2,head=Math.max(w*3,Math.min(len*0.4,50)),spread=Math.PI/6;
+          return [[a,b],[b,{x:b.x-head*Math.cos(angle-spread),y:b.y-head*Math.sin(angle-spread)}],[b,{x:b.x-head*Math.cos(angle+spread),y:b.y-head*Math.sin(angle+spread)}]];
         }
-        if (obj.type === 'line') return [[obj.points[0], obj.points[obj.points.length-1]]];
-        if (obj.type === 'arrow') {
-          const a = obj.points[0], b = obj.points[obj.points.length-1];
-          const dx=b.x-a.x, dy=b.y-a.y, len=Math.sqrt(dx*dx+dy*dy), angle=Math.atan2(dy,dx);
-          const w = obj.width||2, head = Math.max(w*3, Math.min(len*0.4, 50)), spread = Math.PI/6;
-          const h1={x:b.x-head*Math.cos(angle-spread),y:b.y-head*Math.sin(angle-spread)};
-          const h2={x:b.x-head*Math.cos(angle+spread),y:b.y-head*Math.sin(angle+spread)};
-          return [[a,b],[b,h1],[b,h2]];
-        }
-        if (obj.type === 'rect') {
+        if (obj.type==='rect') {
           const [a,b]=[obj.points[0],obj.points[1]];
-          const tl={x:Math.min(a.x,b.x),y:Math.min(a.y,b.y)}, tr={x:Math.max(a.x,b.x),y:Math.min(a.y,b.y)};
-          const br={x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)}, bl={x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)};
+          const tl={x:Math.min(a.x,b.x),y:Math.min(a.y,b.y)},tr={x:Math.max(a.x,b.x),y:Math.min(a.y,b.y)},br={x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)},bl={x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)};
           return [[tl,tr],[tr,br],[br,bl],[bl,tl]];
         }
-        if (obj.type === 'triangle') {
+        if (obj.type==='triangle') {
           const [a,b]=[obj.points[0],obj.points[1]];
-          const p1={x:(a.x+b.x)/2,y:Math.min(a.y,b.y)}, p2={x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)}, p3={x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)};
+          const p1={x:(a.x+b.x)/2,y:Math.min(a.y,b.y)},p2={x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)},p3={x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)};
           return [[p1,p2],[p2,p3],[p3,p1]];
         }
-        if (obj.type === 'ellipse') {
-          const pts = getGeometryPoints(obj), segs = [];
-          for (let i = 0; i < pts.length; i++) segs.push([pts[i], pts[(i+1)%pts.length]]);
-          return segs;
-        }
+        if (obj.type==='ellipse') { const pts=getGeometryPoints(obj),s=[]; for(let i=0;i<pts.length;i++) s.push([pts[i],pts[(i+1)%pts.length]]); return s; }
         return [];
       }
 
-      function s2w(sx, sy) { return {x:(sx-panX)/zoom, y:(sy-panY)/zoom}; }
+      function s2w(sx,sy){return{x:(sx-panX)/zoom,y:(sy-panY)/zoom};}
 
       // ── POINTER EVENTS ──────────────────────────────────────
       function onPtrDown(e) {
         e.preventDefault(); canvas.setPointerCapture(e.pointerId);
-        const sx = e.clientX, sy = e.clientY; lastPt = {x:sx,y:sy};
-        if (currentTool === 'select' || currentTool === 'text') {
-          const w = s2w(sx, sy);
-          for (let i = objects.length-1; i >= 0; i--) {
-            const obj = objects[i]; if (obj.type !== 'text') continue;
-            const bb = bbox(obj); if (!bb) continue;
-            if (w.x >= bb.x && w.x <= bb.x+bb.w && w.y >= bb.y && w.y <= bb.y+bb.h) {
-              draggingText = true; dragTextObj = obj;
-              dragTextStart = {wx:w.x,wy:w.y,ox:obj.x,oy:obj.y}; return;
+        const sx=e.clientX,sy=e.clientY; lastPt={x:sx,y:sy};
+        if (currentTool==='select'||currentTool==='text') {
+          const w=s2w(sx,sy);
+          for(let i=objects.length-1;i>=0;i--){
+            const obj=objects[i]; if(obj.type!=='text') continue;
+            const bb=bbox(obj); if(!bb) continue;
+            if(w.x>=bb.x&&w.x<=bb.x+bb.w&&w.y>=bb.y&&w.y<=bb.y+bb.h){
+              draggingText=true; dragTextObj=obj;
+              dragTextStart={wx:w.x,wy:w.y,ox:obj.x,oy:obj.y}; return;
             }
           }
         }
-        if (spaceDown || e.button === 1 || currentTool === 'pan') {
-          isPanning = true; panStart = {x:sx,y:sy}; panOrigin = {x:panX,y:panY};
+        if(spaceDown||e.button===1||currentTool==='pan'){
+          isPanning=true; panStart={x:sx,y:sy}; panOrigin={x:panX,y:panY};
           document.body.classList.add('cur-panning'); return;
         }
-        let w = s2w(sx, sy);
-        switch (currentTool) {
-          case 'pen': case 'marker':
-            saveHistory(); isDrawing = true;
-            liveStroke = {type:currentTool, points:[{x:w.x,y:w.y}], color, width:strokeW, lineStyle}; break;
-          case 'eraser': saveHistory(); isDrawing = true; eraseAt(w.x, w.y); break;
-          case 'line': case 'rect': case 'ellipse': case 'arrow': case 'triangle':
-            saveHistory(); isDrawing = true; liveShapeP0 = w; liveShapeP1 = w; break;
-          case 'text': openTextEditor(sx, sy, w); break;
-          case 'select': startSelection(sx, sy); break;
+        let w=s2w(sx,sy);
+        switch(currentTool){
+          case 'pen':case 'marker': saveHistory(); isDrawing=true; liveStroke={type:currentTool,points:[{x:w.x,y:w.y}],color,width:strokeW,lineStyle}; break;
+          case 'eraser': saveHistory(); isDrawing=true; eraseAt(w.x,w.y); break;
+          case 'line':case 'rect':case 'ellipse':case 'arrow':case 'triangle': saveHistory(); isDrawing=true; liveShapeP0=w; liveShapeP1=w; break;
+          case 'text': openTextEditor(sx,sy,w); break;
+          case 'select': startSelection(sx,sy); break;
         }
         requestRender();
       }
-
       function onPtrMove(e) {
-        e.preventDefault();
-        const sx = e.clientX, sy = e.clientY; lastPt = {x:sx,y:sy};
-        if (currentTool === 'eraser') {
-          const ec = document.getElementById('eraser-cursor');
-          ec.style.display = 'block'; ec.style.width = ec.style.height = eraserR+'px';
-          ec.style.left = sx+'px'; ec.style.top = sy+'px';
-        }
-        if (draggingText && dragTextObj) {
-          const w = s2w(sx, sy);
-          dragTextObj.x = dragTextStart.ox + (w.x - dragTextStart.wx);
-          dragTextObj.y = dragTextStart.oy + (w.y - dragTextStart.wy);
-          requestRender(); return;
-        }
-        if (isPanning) { panX = panOrigin.x+(sx-panStart.x); panY = panOrigin.y+(sy-panStart.y); requestRender(); return; }
-        if (!isDrawing && currentTool !== 'select') { requestRender(); return; }
-        let w = s2w(sx, sy);
-        switch (currentTool) {
-          case 'pen': case 'marker':
-            if (liveStroke) { const last = liveStroke.points[liveStroke.points.length-1]; if (Math.hypot(w.x-last.x,w.y-last.y) > 2/zoom) liveStroke.points.push({x:w.x,y:w.y}); } break;
-          case 'eraser': eraseAt(w.x, w.y); break;
-          case 'line': case 'rect': case 'ellipse': case 'arrow': case 'triangle': liveShapeP1 = w; break;
-          case 'select': updateSelection(sx, sy); break;
+        e.preventDefault(); const sx=e.clientX,sy=e.clientY; lastPt={x:sx,y:sy};
+        if(currentTool==='eraser'){const ec=document.getElementById('eraser-cursor');ec.style.display='block';ec.style.width=ec.style.height=eraserR+'px';ec.style.left=sx+'px';ec.style.top=sy+'px';}
+        if(draggingText&&dragTextObj){const w=s2w(sx,sy);dragTextObj.x=dragTextStart.ox+(w.x-dragTextStart.wx);dragTextObj.y=dragTextStart.oy+(w.y-dragTextStart.wy);requestRender();return;}
+        if(isPanning){panX=panOrigin.x+(sx-panStart.x);panY=panOrigin.y+(sy-panStart.y);requestRender();return;}
+        if(!isDrawing&&currentTool!=='select'){requestRender();return;}
+        let w=s2w(sx,sy);
+        switch(currentTool){
+          case 'pen':case 'marker': if(liveStroke){const last=liveStroke.points[liveStroke.points.length-1];if(Math.hypot(w.x-last.x,w.y-last.y)>2/zoom)liveStroke.points.push({x:w.x,y:w.y});}break;
+          case 'eraser': eraseAt(w.x,w.y); break;
+          case 'line':case 'rect':case 'ellipse':case 'arrow':case 'triangle': liveShapeP1=w; break;
+          case 'select': updateSelection(sx,sy); break;
         }
         requestRender();
       }
-
       function onPtrUp(e) {
         document.body.classList.remove('cur-panning');
-        const ec = document.getElementById('eraser-cursor'); if (ec) ec.style.display = 'none';
-        if (draggingText) { draggingText = false; dragTextObj = null; dragTextStart = null; return; }
-        if (isPanning) { isPanning = false; return; }
-        if (!isDrawing) return; isDrawing = false;
-        const sx = e.clientX ?? lastPt?.x ?? 0, sy = e.clientY ?? lastPt?.y ?? 0;
-        let w = s2w(sx, sy);
-        switch (currentTool) {
-          case 'pen': case 'marker':
-            if (liveStroke && liveStroke.points.length > 0) objects.push(liveStroke);
-            liveStroke = null; break;
-          case 'line': case 'rect': case 'ellipse': case 'arrow': case 'triangle':
-            if (liveShapeP0) {
-              if (Math.hypot(w.x-liveShapeP0.x, w.y-liveShapeP0.y) > 3/zoom)
-                objects.push({type:currentTool, points:[liveShapeP0, w], color, width:strokeW, lineStyle});
-              liveShapeP0 = liveShapeP1 = null;
-            } break;
+        const ec=document.getElementById('eraser-cursor'); if(ec) ec.style.display='none';
+        if(draggingText){draggingText=false;dragTextObj=null;dragTextStart=null;return;}
+        if(isPanning){isPanning=false;return;} if(!isDrawing) return; isDrawing=false;
+        const sx=e.clientX??lastPt?.x??0,sy=e.clientY??lastPt?.y??0; let w=s2w(sx,sy);
+        switch(currentTool){
+          case 'pen':case 'marker': if(liveStroke&&liveStroke.points.length>0) objects.push(liveStroke); liveStroke=null; break;
+          case 'line':case 'rect':case 'ellipse':case 'arrow':case 'triangle':
+            if(liveShapeP0){if(Math.hypot(w.x-liveShapeP0.x,w.y-liveShapeP0.y)>3/zoom) objects.push({type:currentTool,points:[liveShapeP0,w],color,width:strokeW,lineStyle}); liveShapeP0=liveShapeP1=null;} break;
           case 'select': commitSelection(); break;
         }
         requestRender();
       }
-
       function onDblClick(e) {
-        if (currentTool !== 'select' && currentTool !== 'text') return;
-        const w = s2w(e.clientX, e.clientY);
-        for (let i = objects.length-1; i >= 0; i--) {
-          const obj = objects[i]; if (obj.type !== 'text') continue;
-          const bb = bbox(obj); if (!bb) continue;
-          if (w.x >= bb.x && w.x <= bb.x+bb.w && w.y >= bb.y && w.y <= bb.y+bb.h) {
-            editingObj = obj; openTextEditor(e.clientX, e.clientY, {x:obj.x,y:obj.y}, obj); return;
-          }
-        }
+        if(currentTool!=='select'&&currentTool!=='text') return;
+        const w=s2w(e.clientX,e.clientY);
+        for(let i=objects.length-1;i>=0;i--){const obj=objects[i];if(obj.type!=='text')continue;const bb=bbox(obj);if(!bb)continue;
+          if(w.x>=bb.x&&w.x<=bb.x+bb.w&&w.y>=bb.y&&w.y<=bb.y+bb.h){editingObj=obj;openTextEditor(e.clientX,e.clientY,{x:obj.x,y:obj.y},obj);return;}}
       }
-
       function onWheel(e) {
         e.preventDefault();
-        if (e.ctrlKey || e.metaKey) {
-          const factor = e.deltaY < 0 ? 1.10 : 0.91;
-          const nz = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom * factor));
-          panX = e.clientX - (e.clientX - panX) * (nz / zoom);
-          panY = e.clientY - (e.clientY - panY) * (nz / zoom);
-          zoom = nz; updateZoom();
-        } else { panX -= e.deltaX; panY -= e.deltaY; }
+        if(e.ctrlKey||e.metaKey){const f=e.deltaY<0?1.10:0.91;const nz=Math.min(ZOOM_MAX,Math.max(ZOOM_MIN,zoom*f));panX=e.clientX-(e.clientX-panX)*(nz/zoom);panY=e.clientY-(e.clientY-panY)*(nz/zoom);zoom=nz;updateZoom();}
+        else{panX-=e.deltaX;panY-=e.deltaY;}
         requestRender();
       }
 
       // ── ERASER ──────────────────────────────────────────────
-      function eraseAt(wx, wy) {
-        const r = (eraserR / 2) / zoom; let changed = false; const keep = [];
-        for (const obj of objects) { if (hitTestObj(obj, wx, wy, r)) changed = true; else keep.push(obj); }
-        if (changed) { objects = keep; requestRender(); }
-      }
-      function hitTestObj(obj, wx, wy, r) {
-        if (obj.type === 'text') {
-          const bb = bbox(obj); if (!bb) return false;
-          return wx >= bb.x-r && wx <= bb.x+bb.w+r && wy >= bb.y-r && wy <= bb.y+bb.h+r;
-        }
-        const hitR = r + (obj.width||2)/2;
-        const segs = getEdgeSegments(obj);
-        for (const [p1, p2] of segs) { if (distPtSeg(wx,wy,p1.x,p1.y,p2.x,p2.y) < hitR) return true; }
-        if (segs.length === 0 && obj.points) { for (const p of obj.points) if (Math.hypot(p.x-wx,p.y-wy) < hitR) return true; }
+      function eraseAt(wx,wy){const r=(eraserR/2)/zoom;let changed=false;const keep=[];for(const obj of objects){if(hitTestObj(obj,wx,wy,r))changed=true;else keep.push(obj);}if(changed){objects=keep;requestRender();}}
+      function hitTestObj(obj,wx,wy,r){
+        if(obj.type==='text'){const bb=bbox(obj);if(!bb)return false;return wx>=bb.x-r&&wx<=bb.x+bb.w+r&&wy>=bb.y-r&&wy<=bb.y+bb.h+r;}
+        const hitR=r+(obj.width||2)/2;const segs=getEdgeSegments(obj);
+        for(const[p1,p2]of segs){if(distPtSeg(wx,wy,p1.x,p1.y,p2.x,p2.y)<hitR)return true;}
+        if(segs.length===0&&obj.points){for(const p of obj.points)if(Math.hypot(p.x-wx,p.y-wy)<hitR)return true;}
         return false;
       }
-      function distPtSeg(px,py,ax,ay,bx,by) {
-        const dx=bx-ax, dy=by-ay, lenSq=dx*dx+dy*dy;
-        if (lenSq === 0) return Math.hypot(px-ax,py-ay);
-        let t = ((px-ax)*dx+(py-ay)*dy)/lenSq; t = Math.max(0,Math.min(1,t));
-        return Math.hypot(px-(ax+t*dx), py-(ay+t*dy));
-      }
+      function distPtSeg(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l2=dx*dx+dy*dy;if(l2===0)return Math.hypot(px-ax,py-ay);let t=((px-ax)*dx+(py-ay)*dy)/l2;t=Math.max(0,Math.min(1,t));return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));}
 
       // ── SELECTION ───────────────────────────────────────────
-      let selSX0, selSY0;
-      function startSelection(sx, sy) {
-        selObjs.clear(); selSX0 = sx; selSY0 = sy; isDrawing = true;
-        const box = document.getElementById('selection-box');
-        box.style.display = 'block'; box.style.left = sx+'px'; box.style.top = sy+'px';
-        box.style.width = '0px'; box.style.height = '0px';
+      let selSX0,selSY0;
+      function startSelection(sx,sy){selObjs.clear();selSX0=sx;selSY0=sy;isDrawing=true;const box=document.getElementById('selection-box');box.style.display='block';box.style.left=sx+'px';box.style.top=sy+'px';box.style.width='0px';box.style.height='0px';}
+      function updateSelection(sx,sy){const box=document.getElementById('selection-box');box.style.left=Math.min(sx,selSX0)+'px';box.style.top=Math.min(sy,selSY0)+'px';box.style.width=Math.abs(sx-selSX0)+'px';box.style.height=Math.abs(sy-selSY0)+'px';}
+      function commitSelection(){
+        const box=document.getElementById('selection-box');box.style.display='none';
+        const x0=parseInt(box.style.left),y0=parseInt(box.style.top),x1=x0+parseInt(box.style.width),y1=y0+parseInt(box.style.height);
+        if(Math.abs(x1-x0)<4&&Math.abs(y1-y0)<4){const w=s2w((x0+x1)/2,(y0+y1)/2);for(let i=objects.length-1;i>=0;i--){const bb=bbox(objects[i]);if(!bb)continue;if(w.x>=bb.x&&w.x<=bb.x+bb.w&&w.y>=bb.y&&w.y<=bb.y+bb.h){selObjs.add(objects[i]);break;}}}
+        else{const wa=s2w(x0,y0),wb=s2w(x1,y1);const[wx0,wy0,wx1,wy1]=[Math.min(wa.x,wb.x),Math.min(wa.y,wb.y),Math.max(wa.x,wb.x),Math.max(wa.y,wb.y)];for(const obj of objects){const bb=bbox(obj);if(!bb)continue;if(bb.x<wx1&&bb.x+bb.w>wx0&&bb.y<wy1&&bb.y+bb.h>wy0)selObjs.add(obj);}}
+        if(selObjs.size>0)toast(`Selected ${selObjs.size} object(s)`);requestRender();
       }
-      function updateSelection(sx, sy) {
-        const box = document.getElementById('selection-box');
-        box.style.left = Math.min(sx,selSX0)+'px'; box.style.top = Math.min(sy,selSY0)+'px';
-        box.style.width = Math.abs(sx-selSX0)+'px'; box.style.height = Math.abs(sy-selSY0)+'px';
-      }
-      function commitSelection() {
-        const box = document.getElementById('selection-box'); box.style.display = 'none';
-        const x0=parseInt(box.style.left), y0=parseInt(box.style.top);
-        const x1=x0+parseInt(box.style.width), y1=y0+parseInt(box.style.height);
-        if (Math.abs(x1-x0)<4 && Math.abs(y1-y0)<4) {
-          const w = s2w((x0+x1)/2,(y0+y1)/2);
-          for (let i=objects.length-1;i>=0;i--) { const bb=bbox(objects[i]); if (!bb) continue; if (w.x>=bb.x&&w.x<=bb.x+bb.w&&w.y>=bb.y&&w.y<=bb.y+bb.h) { selObjs.add(objects[i]); break; } }
-        } else {
-          const wa=s2w(x0,y0), wb=s2w(x1,y1);
-          const [wx0,wy0,wx1,wy1]=[Math.min(wa.x,wb.x),Math.min(wa.y,wb.y),Math.max(wa.x,wb.x),Math.max(wa.y,wb.y)];
-          for (const obj of objects) { const bb=bbox(obj); if (!bb) continue; if (bb.x<wx1&&bb.x+bb.w>wx0&&bb.y<wy1&&bb.y+bb.h>wy0) selObjs.add(obj); }
-        }
-        if (selObjs.size>0) toast(`Selected ${selObjs.size} object(s)`);
-        requestRender();
-      }
-      function deleteSelected() {
-        if (!selObjs.size) return; saveHistory();
-        objects = objects.filter(o => !selObjs.has(o)); selObjs.clear(); requestRender(); toast('Deleted selection');
-      }
+      function deleteSelected(){if(!selObjs.size)return;saveHistory();objects=objects.filter(o=>!selObjs.has(o));selObjs.clear();requestRender();toast('Deleted selection');}
 
       // ── KEYBOARD ────────────────────────────────────────────
-      function onKeyDown(e) {
-        const tag=e.target.tagName, inInput=tag==='TEXTAREA'||tag==='INPUT'||tag==='SELECT';
-        const ctrl=e.ctrlKey||e.metaKey;
-        if (ctrl&&e.key==='z') { e.preventDefault(); MB.undo(); return; }
-        if (ctrl&&(e.key==='y'||(e.shiftKey&&e.key==='z'))) { e.preventDefault(); MB.redo(); return; }
-        if (inInput) return;
-        switch(e.key.toLowerCase()) {
-          case 'p': tool('pen'); break; case 'm': tool('marker'); break; case 'e': tool('eraser'); break;
-          case 't': tool('text'); break; case 's': tool('select'); break; case 'l': tool('line'); break;
-          case 'r': tool('rect'); break; case 'o': tool('ellipse'); break; case 'g': tool('triangle'); break;
-          case 'a': if (!ctrl) tool('arrow'); break;
-          case ' ': if (!spaceDown) { spaceDown=true; document.body.classList.add('cur-pan'); } e.preventDefault(); break;
-          case 'delete': case 'backspace': deleteSelected(); break;
-          case 'escape': selObjs.clear(); cancelText(); requestRender(); break;
+      function onKeyDown(e){
+        const tag=e.target.tagName,inInput=tag==='TEXTAREA'||tag==='INPUT'||tag==='SELECT',ctrl=e.ctrlKey||e.metaKey;
+        if(ctrl&&e.key==='z'){e.preventDefault();MB.undo();return;}
+        if(ctrl&&(e.key==='y'||(e.shiftKey&&e.key==='z'))){e.preventDefault();MB.redo();return;}
+        if(inInput)return;
+        switch(e.key.toLowerCase()){
+          case 'p':tool('pen');break;case 'm':tool('marker');break;case 'e':tool('eraser');break;
+          case 't':tool('text');break;case 's':tool('select');break;case 'l':tool('line');break;
+          case 'r':tool('rect');break;case 'o':tool('ellipse');break;case 'g':tool('triangle');break;
+          case 'a':if(!ctrl)tool('arrow');break;
+          case ' ':if(!spaceDown){spaceDown=true;document.body.classList.add('cur-pan');}e.preventDefault();break;
+          case 'delete':case 'backspace':deleteSelected();break;
+          case 'escape':selObjs.clear();cancelText();requestRender();break;
         }
       }
-      function onKeyUp(e) { if (e.key===' ') { spaceDown=false; if (currentTool!=='pan') document.body.classList.remove('cur-pan'); } }
+      function onKeyUp(e){if(e.key===' '){spaceDown=false;if(currentTool!=='pan')document.body.classList.remove('cur-pan');}}
 
       // ── UNDO / REDO ─────────────────────────────────────────
-      function saveHistory() {
-        history.push(objects.map(o=>({...o,points:o.points?o.points.map(p=>({...p})):undefined})));
-        if (history.length>MAX_HISTORY) history.shift(); redoStack=[];
-      }
-      function cloneObjs(arr) { return arr.map(o=>({...o,points:o.points?o.points.map(p=>({...p})):undefined})); }
-      function undo() { if (!history.length) { toast('Nothing to undo'); return; } redoStack.push(cloneObjs(objects)); objects=history.pop(); selObjs.clear(); requestRender(); toast('Undo'); }
-      function redo() { if (!redoStack.length) { toast('Nothing to redo'); return; } history.push(cloneObjs(objects)); objects=redoStack.pop(); selObjs.clear(); requestRender(); toast('Redo'); }
+      function saveHistory(){history.push(objects.map(o=>({...o,points:o.points?o.points.map(p=>({...p})):undefined})));if(history.length>MAX_HISTORY)history.shift();redoStack=[];}
+      function cloneObjs(arr){return arr.map(o=>({...o,points:o.points?o.points.map(p=>({...p})):undefined}));}
+      function undo(){if(!history.length){toast('Nothing to undo');return;}redoStack.push(cloneObjs(objects));objects=history.pop();selObjs.clear();requestRender();toast('Undo');}
+      function redo(){if(!redoStack.length){toast('Nothing to redo');return;}history.push(cloneObjs(objects));objects=redoStack.pop();selObjs.clear();requestRender();toast('Redo');}
 
       // ── TOOL ────────────────────────────────────────────────
-      function tool(name) {
-        document.body.className = `cur-${name}`; currentTool = name;
+      function tool(name){
+        document.body.className=`cur-${name}`;currentTool=name;
         document.querySelectorAll('.tool-btn[id^="btn-"]').forEach(b=>b.classList.remove('active'));
-        const btn = document.getElementById(`btn-${name}`); if (btn) btn.classList.add('active');
-        document.getElementById('text-props').style.display = name==='text'?'block':'none';
-        selObjs.clear(); if (name !== 'text') cancelText(); requestRender();
+        const btn=document.getElementById(`btn-${name}`);if(btn)btn.classList.add('active');
+        document.getElementById('text-props').style.display=name==='text'?'block':'none';
+        selObjs.clear();if(name!=='text')cancelText();requestRender();
       }
 
       // ── TEXT EDITOR ─────────────────────────────────────────
-      function openTextEditor(sx, sy, worldPos, existingObj = null) {
-        textWorldPos = worldPos; editingObj = existingObj;
-        const ov = document.getElementById('text-overlay');
-        let ox = sx+18, oy = sy-16;
-        if (ox+500>W) ox = Math.max(10, sx-510);
-        if (oy+320>H) oy = Math.max(10, H-330);
-        if (oy<80) oy = 90;
-        ov.style.left = ox+'px'; ov.style.top = oy+'px'; ov.classList.add('open');
-        const inp = document.getElementById('tex-input');
-        if (existingObj) {
-          inp.value = existingObj.text || '';
-          texMode(existingObj.texMode || 'plain');
-          if (existingObj.fontFamily) setFont(existingObj.fontFamily);
-        } else { inp.value = ''; updatePreview(); }
-        setTimeout(() => inp.focus(), 60);
+      function openTextEditor(sx,sy,worldPos,existingObj=null){
+        textWorldPos=worldPos;editingObj=existingObj;
+        const ov=document.getElementById('text-overlay');
+        let ox=sx+18,oy=sy-16;
+        if(ox+500>W)ox=Math.max(10,sx-510);if(oy+320>H)oy=Math.max(10,H-330);if(oy<80)oy=90;
+        ov.style.left=ox+'px';ov.style.top=oy+'px';ov.classList.add('open');
+        const inp=document.getElementById('tex-input');
+        if(existingObj){inp.value=existingObj.text||'';texMode(existingObj.texMode||'plain');if(existingObj.fontFamily)setFont(existingObj.fontFamily);}
+        else{inp.value='';updatePreview();}
+        setTimeout(()=>inp.focus(),60);
       }
-
-      function texMode(mode) {
-        texMode_ = mode;
-        document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
-        const tab = document.getElementById('tab-'+mode); if (tab) tab.classList.add('active');
-        document.getElementById('tex-input').placeholder =
-          mode==='latex'?'\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}':mode==='mixed'?'The area is $\\pi r^2$ square units':'Type notes here...';
+      function texMode(mode){
+        texMode_=mode;document.querySelectorAll('.mode-tab').forEach(t=>t.classList.remove('active'));
+        const tab=document.getElementById('tab-'+mode);if(tab)tab.classList.add('active');
+        document.getElementById('tex-input').placeholder=mode==='latex'?'\\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}':mode==='mixed'?'The area is $\\pi r^2$ square units':'Type notes here...';
         updatePreview();
       }
-
-      function updatePreview() {
-        const text = document.getElementById('tex-input').value;
-        const prev = document.getElementById('tex-preview');
-        if (!text.trim()) { prev.innerHTML = '<span style="color:var(--text-muted);font-size:13px">Preview appears here...</span>'; return; }
-        prev.style.fontFamily = `'${fontFamily}', sans-serif`;
-        prev.style.fontSize = fontSize+'px'; prev.style.color = color;
-        if (!window.katex || texMode_==='plain') { prev.textContent = text; return; }
-        try {
-          if (texMode_==='latex') prev.innerHTML = window.katex.renderToString(text, {throwOnError:false,displayMode:false});
-          else prev.innerHTML = parseMixed(text);
-        } catch(e) { prev.textContent = text; }
+      function updatePreview(){
+        const text=document.getElementById('tex-input').value,prev=document.getElementById('tex-preview');
+        if(!text.trim()){prev.innerHTML='<span style="color:var(--text-muted);font-size:13px">Preview appears here...</span>';return;}
+        prev.style.fontFamily=`'${fontFamily}', sans-serif`;prev.style.fontSize=fontSize+'px';prev.style.color=color;
+        if(!window.katex||texMode_==='plain'){prev.textContent=text;return;}
+        try{if(texMode_==='latex')prev.innerHTML=window.katex.renderToString(text,{throwOnError:false,displayMode:false});else prev.innerHTML=parseMixed(text);}catch(e){prev.textContent=text;}
       }
-
-      function commitText() {
-        const text = document.getElementById('tex-input').value.trim();
-        if (!text) { cancelText(); return; }
-        if (editingObj) {
-          saveHistory();
-          editingObj.text = text; editingObj.color = color; editingObj.fontSize = fontSize;
-          editingObj.texMode = texMode_; editingObj.fontFamily = fontFamily;
-          delete editingObj._img; cancelText();
-          bakeText(editingObj).then(() => requestRender());
-        } else {
-          saveHistory();
-          const obj = {type:'text', text, x:textWorldPos.x, y:textWorldPos.y, color, fontSize, texMode:texMode_, fontFamily};
-          objects.push(obj); cancelText();
-          bakeText(obj).then(() => requestRender());
-        }
+      function commitText(){
+        const text=document.getElementById('tex-input').value.trim();
+        if(!text){cancelText();return;}
+        if(editingObj){saveHistory();editingObj.text=text;editingObj.color=color;editingObj.fontSize=fontSize;editingObj.texMode=texMode_;editingObj.fontFamily=fontFamily;delete editingObj._img;delete editingObj._dpr;cancelText();bakeText(editingObj).then(()=>requestRender());}
+        else{saveHistory();const obj={type:'text',text,x:textWorldPos.x,y:textWorldPos.y,color,fontSize,texMode:texMode_,fontFamily};objects.push(obj);cancelText();bakeText(obj).then(()=>requestRender());}
         toast('Text placed');
       }
-      function cancelText() { document.getElementById('text-overlay').classList.remove('open'); textWorldPos=null; editingObj=null; }
+      function cancelText(){document.getElementById('text-overlay').classList.remove('open');textWorldPos=null;editingObj=null;}
 
       // ── ZOOM ────────────────────────────────────────────────
-      function zoomBy(delta) {
-        const nz = Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, zoom+delta));
-        const cx=W/2, cy=H/2; panX=cx-(cx-panX)*(nz/zoom); panY=cy-(cy-panY)*(nz/zoom);
-        zoom=nz; updateZoom(); requestRender();
-      }
-      function resetView() { zoom=1; panX=0; panY=0; updateZoom(); requestRender(); }
-      function updateZoom() { document.getElementById('zoom-val').textContent = Math.round(zoom*100)+'%'; }
+      function zoomBy(delta){const nz=Math.min(ZOOM_MAX,Math.max(ZOOM_MIN,zoom+delta));const cx=W/2,cy=H/2;panX=cx-(cx-panX)*(nz/zoom);panY=cy-(cy-panY)*(nz/zoom);zoom=nz;updateZoom();requestRender();}
+      function resetView(){zoom=1;panX=0;panY=0;updateZoom();requestRender();}
+      function updateZoom(){document.getElementById('zoom-val').textContent=Math.round(zoom*100)+'%';}
 
       // ── PROPS ───────────────────────────────────────────────
-      function setStroke(v) { strokeW=v; document.getElementById('vl-stroke').textContent=v; }
-      function setEraser(v) { eraserR=v; document.getElementById('vl-eraser').textContent=v; }
-      function setFontSize(v) { fontSize=v; document.getElementById('vl-fsize').textContent=v; updatePreview(); }
-      function setFont(v) {
-        fontFamily = v;
-        document.getElementById('sel-font').value = v;
-        document.getElementById('editor-font-sel').value = v;
-        updatePreview();
-      }
-      function setLineStyle(style) {
-        lineStyle = style;
-        document.querySelectorAll('.line-style-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.style===style));
-      }
-      function setGrid(mode) {
-        gridMode = mode;
-        document.querySelectorAll('.grid-btn').forEach(btn => btn.classList.toggle('active', btn.dataset.grid===mode));
-        requestRender();
-      }
-
-      function clearAll() {
-        if (!objects.length) return; if (!confirm('Clear all objects?')) return;
-        saveHistory(); objects=[]; selObjs.clear(); liveStroke=null; imgCache.clear();
-        requestRender(); toast('Canvas cleared');
-      }
+      function setStroke(v){strokeW=v;document.getElementById('vl-stroke').textContent=v;}
+      function setEraser(v){eraserR=v;document.getElementById('vl-eraser').textContent=v;}
+      function setFontSize(v){fontSize=v;document.getElementById('vl-fsize').textContent=v;updatePreview();}
+      function setFont(v){fontFamily=v;document.getElementById('sel-font').value=v;document.getElementById('editor-font-sel').value=v;updatePreview();}
+      function setLineStyle(style){lineStyle=style;document.querySelectorAll('.line-style-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.style===style));}
+      function setGrid(mode){gridMode=mode;document.querySelectorAll('.grid-btn').forEach(btn=>btn.classList.toggle('active',btn.dataset.grid===mode));requestRender();}
+      function clearAll(){if(!objects.length)return;if(!confirm('Clear all objects?'))return;saveHistory();objects=[];selObjs.clear();liveStroke=null;imgCache.clear();requestRender();toast('Canvas cleared');}
 
       let toastTid;
-      function toast(msg, dur=2400) {
-        const el=document.getElementById('toast'); el.textContent=msg; el.classList.add('show');
-        clearTimeout(toastTid); toastTid=setTimeout(()=>el.classList.remove('show'), dur);
-      }
+      function toast(msg,dur=2400){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');clearTimeout(toastTid);toastTid=setTimeout(()=>el.classList.remove('show'),dur);}
 
-      return { init, undo, redo, clearAll, tool, texMode, commitText, cancelText, updatePreview,
-        setStroke, setEraser, setFontSize, setFont, setLineStyle, setGrid, zoomBy, resetView, toast };
+      return{init,undo,redo,clearAll,tool,texMode,commitText,cancelText,updatePreview,setStroke,setEraser,setFontSize,setFont,setLineStyle,setGrid,zoomBy,resetView,toast};
     })();
-
-    window.addEventListener('DOMContentLoaded', () => { setTimeout(() => MB.init(), 200); });
+    window.addEventListener('DOMContentLoaded',()=>{setTimeout(()=>MB.init(),200);});
   </script>
 </body>
 </html>
