@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathBoard - Digital Whiteboard for Algebra & Geometry</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            height: 100%;
+            width: 100%;
+        }
+        
+        /* Infinite scroll container - uses virtual scrolling technique */
+        #canvas-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        /* Canvas is positioned to cover the scrollable area */
+        #main-canvas {
+            display: block;
+            cursor: crosshair;
+        }
+        
+        /* Grid overlay for graph paper mode */
+        #grid-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        #drawing-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 2;
+        }
+        
+        /* Toolbar styles */
+        .toolbar {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 20px;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .toolbar.collapsed {
+            bottom: -60px;
+        }
+        
+        .toolbar-toggle {
+            position: fixed;
+            bottom: 10px;
+            right: 20px;
+            z-index: 1001;
+            transition: bottom 0.3s ease;
+        }
+        
+        .toolbar.collapsed + .toolbar-toggle {
+            bottom: 20px;
+        }
+        
+        /* Tool button styles */
+        .tool-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .tool-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .tool-btn.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+        
+        .tool-btn svg {
+            width: 22px;
+            height: 22px;
+        }
+        
+        /* Color swatch */
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.15s ease;
+        }
+        
+        .color-swatch:hover {
+            transform: scale(1.1);
+        }
+        
+        .color-swatch.active {
+            border-color: #1e293b;
+            box-shadow: 0 0 0 2px white;
+        }
+        
+        .tool-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding-right: 12px;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .tool-group:last-child {
+            border-right: 0;
+            padding-right: 0;
+        }
+
+        .toggle-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .toggle-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .toggle-btn.active {
+            border-color: #3b82f6;
+            background: #eff6ff;
+        }
+
+        .shape-btn svg,
+        .toggle-btn svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .shape-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 2px solid transparent;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .shape-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.14);
+        }
+
+        .shape-btn.active {
+            border-color: #10b981;
+            background: #ecfdf5;
+        }
+
+        .grid-select {
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            padding: 0.4rem 0.6rem;
+            font-size: 0.875rem;
+            background: white;
+        }
+        
+        /* Tooltip */
+        [data-tooltip] {
+            position: relative;
+        }
+        
+        [data-tooltip]:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 10px;
+            background: #1e293b;
+            color: white;
+            font-size: 12px;
+            border-radius: 6px;
+            white-space: nowrap;
+            margin-bottom: 8px;
+            pointer-events: none;
+        }
+        
+        /* Mobile optimization */
+        @media (max-width: 768px) {
+            .toolbar {
+                left: 10px;
+                right: 10px;
+                transform: none;
+                bottom: 10px;
+            }
+            
+            .tool-btn, .toggle-btn, .shape-btn {
+                width: 40px;
+                height: 40px;
+            }
+
+            .grid-select {
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Main Canvas Container with Infinite Scroll -->
+    <div id="canvas-container">
+        <canvas id="grid-canvas"></canvas>
+        <canvas id="drawing-canvas"></canvas>
+    </div>
+
+    <!-- Main Toolbar -->
+    <div class="toolbar bg-white rounded-2xl shadow-xl p-3 flex items-center gap-2 flex-wrap justify-center" id="main-toolbar">
+        <div class="tool-group">
+            <button class="tool-btn active" id="pen-tool" data-tool="pen" data-tooltip="Pen (P)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                </svg>
+            </button>
+            <button class="tool-btn" id="highlighter-tool" data-tool="highlighter" data-tooltip="Highlighter (H)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l-6 6v3h9l3-3"/>
+                    <path d="M22 12l-4.6 4.6a2 2 0 01-2.8 0l-5.2-5.2a2 2 0 010-2.8L14 4"/>
+                </svg>
+            </button>
+            <button class="tool-btn" id="eraser-tool" data-tool="eraser" data-tooltip="Eraser (E)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 20H7L3 16a1 1 0 010-1.4l9.9-9.9a1 1 0 011.4 0l5.3 5.3a1 1 0 010 1.4L11 20"/>
+                </svg>
+            </button>
+            <button class="tool-btn" id="text-tool" data-tool="text" data-tooltip="Text">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 7V4h16v3"/>
+                    <path d="M12 4v16"/>
+                    <path d="M8 20h8"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="tool-group">
+            <button class="shape-btn" id="line-tool" data-tool="line" data-tooltip="Line">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="19" x2="19" y2="5"/>
+                </svg>
+            </button>
+            <button class="shape-btn" id="circle-tool" data-tool="circle" data-tooltip="Circle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="8"/>
+                </svg>
+            </button>
+            <button class="shape-btn" id="triangle-tool" data-tool="triangle" data-tooltip="Triangle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 5l8 14H4z"/>
+                </svg>
+            </button>
+            <button class="shape-btn" id="rectangle-tool" data-tool="rectangle" data-tooltip="Rectangle">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="6" width="16" height="12" rx="1"/>
+                </svg>
+            </button>
+            <button class="shape-btn" id="square-tool" data-tool="square" data-tooltip="Square">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="5" y="5" width="14" height="14" rx="1"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="tool-group">
+            <button class="toggle-btn" id="focus-toggle" data-tooltip="Only show the current drawing">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+            </button>
+            <button class="toggle-btn" id="grid-toggle" data-tooltip="Toggle Grid (G)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <line x1="3" y1="9" x2="21" y2="9"/>
+                    <line x1="3" y1="15" x2="21" y2="15"/>
+                    <line x1="9" y1="3" x2="9" y2="21"/>
+                    <line x1="15" y1="3" x2="15" y2="21"/>
+                </svg>
+            </button>
+            <button class="toggle-btn" id="pixel-toggle" data-tooltip="Snap pen strokes to grid boxes">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="4" y="4" width="6" height="6"/>
+                    <rect x="14" y="4" width="6" height="6"/>
+                    <rect x="4" y="14" width="6" height="6"/>
+                    <rect x="14" y="14" width="6" height="6"/>
+                </svg>
+            </button>
+            <select id="grid-type" class="grid-select" data-tooltip="Grid type">
+                <option value="cartesian">Cartesian</option>
+                <option value="isometric">Isometric</option>
+            </select>
+        </div>
+
+        <div class="flex items-center gap-1 px-3 border-r border-gray-200">
+            <div class="color-swatch active" style="background: #1e293b" data-color="#1e293b" data-tooltip="Black"></div>
+            <div class="color-swatch" style="background: #dc2626" data-color="#dc2626" data-tooltip="Red (Variable)"></div>
+            <div class="color-swatch" style="background: #2563eb" data-color="#2563eb" data-tooltip="Blue (Constant)"></div>
+            <div class="color-swatch" style="background: #16a34a" data-color="green" data-tooltip="Green"></div>
+            <div class="color-swatch" style="background: #9333ea" data-color="#9333ea" data-tooltip="Purple"></div>
+            <div class="color-swatch" style="background: #ea580c" data-color="#ea580c" data-tooltip="Orange"></div>
+        </div>
+        
+        <div class="flex items-center gap-2 px-3 border-r border-gray-200">
+            <span class="text-xs text-gray-500">Size:</span>
+            <input type="range" id="stroke-width" min="1" max="20" value="3" class="w-20 h-2 bg-gray-200 rounded-lg cursor-pointer">
+            <span id="stroke-value" class="text-xs text-gray-600 w-6">3px</span>
+        </div>
+        <div class="flex items-center gap-1 pl-3">
+            <button class="tool-btn" id="undo-btn" data-tooltip="Undo (Ctrl+Z)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 7v6h6"/>
+                    <path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/>
+                </svg>
+            </button>
+            <button class="tool-btn" id="redo-btn" data-tooltip="Redo (Ctrl+Y)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 7v6h-6"/>
+                    <path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"/>
+                </svg>
+            </button>
+            <button class="tool-btn" id="clear-btn" data-tooltip="Clear Canvas">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3,6 5,6 21,6"/>
+                    <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                </svg>
+            </button>
+            <button class="tool-btn" id="export-btn" data-tooltip="Export PNG">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                    <polyline points="7,10 12,15 17,10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Collapse Toggle Button -->
+    <button class="toolbar-toggle tool-btn bg-blue-500 text-white hover:bg-blue-600" id="toggle-toolbar" data-tooltip="Toggle Toolbar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="transition-transform" id="toggle-icon">
+            <polyline points="18,15 12,9 6,15"/>
+        </svg>
+    </button>
+
+    <!-- Status indicator -->
+    <div class="fixed top-4 right-4 bg-white rounded-lg shadow px-4 py-2 text-sm text-gray-600 z-50" id="status">
+        Ready | Scroll for more space
+    </div>
+
+    <!-- Custom modal for confirmations and text input -->
+    <div id="dialog-backdrop" class="fixed inset-0 bg-black/45 hidden items-center justify-center z-[2000] px-4">
+        <div class="w-full max-w-md rounded-3xl bg-white shadow-2xl border border-slate-200 p-6">
+            <div class="flex items-start gap-3 mb-4">
+                <div class="w-11 h-11 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-700 shrink-0">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-5 h-5">
+                        <path d="M12 9v4"/>
+                        <path d="M12 17h.01"/>
+                        <path d="M10.3 4.3L2 20h20L13.7 4.3a2 2 0 00-3.4 0z"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <h3 id="dialog-title" class="text-lg font-semibold text-slate-900">Notice</h3>
+                    <p id="dialog-message" class="text-sm text-slate-600 mt-1">Message</p>
+                </div>
+            </div>
+
+            <div id="dialog-input-wrap" class="hidden mb-4">
+                <input id="dialog-input" type="text" class="w-full rounded-2xl border border-slate-300 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Type here">
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button id="dialog-cancel" class="rounded-2xl px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors">Cancel</button>
+                <button id="dialog-confirm" class="rounded-2xl px-4 py-2.5 text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('canvas-container');
+        const gridCanvas = document.getElementById('grid-canvas');
+        const drawingCanvas = document.getElementById('drawing-canvas');
+        const gridCtx = gridCanvas.getContext('2d');
+        const ctx = drawingCanvas.getContext('2d');
+
+        // Infinite scroll uses a tall virtual document so notes can continue downward
+        // without ever forcing us to allocate a huge bitmap.
+        const VIRTUAL_HEIGHT = 50000;
+        const BUFFER_HEIGHT = 1000;
+        const GRID_SIZE = 20;
+
+        let scrollTop = 0;
+        let canvasWidth = window.innerWidth;
+        let canvasHeight = window.innerHeight + BUFFER_HEIGHT;
+
+        let currentTool = 'pen';
+        let currentColor = '#1e293b';
+        let strokeWidth = 3;
+        let gridEnabled = false;
+        let gridType = 'cartesian';
+        let pixelateMode = false;
+        let focusMode = false;
+
+        let isDrawing = false;
+        let isErasing = false;
+        let activePointerId = null;
+        let currentStroke = null;
+        let strokes = [];
+        let textObjects = [];
+        let undoStack = [];
+        let redoStack = [];
+        let renderQueued = false;
+        let pendingDialogResolver = null;
+
+        const dialogBackdrop = document.getElementById('dialog-backdrop');
+        const dialogTitle = document.getElementById('dialog-title');
+        const dialogMessage = document.getElementById('dialog-message');
+        const dialogInputWrap = document.getElementById('dialog-input-wrap');
+        const dialogInput = document.getElementById('dialog-input');
+        const dialogConfirm = document.getElementById('dialog-confirm');
+        const dialogCancel = document.getElementById('dialog-cancel');
+
+        function init() {
+            // Create virtual scroll space
+            const scrollContent = document.createElement('div');
+            scrollContent.style.height = VIRTUAL_HEIGHT + 'px';
+            scrollContent.style.width = '1px';
+            scrollContent.style.pointerEvents = 'none';
+            container.appendChild(scrollContent);
+            
+            resizeCanvases();
+            bindUI();
+            scheduleRender();
+            updateStatus('Ready | Scroll for more space');
+        }
+
+        function resizeCanvases() {
+            canvasWidth = window.innerWidth;
+            canvasHeight = window.innerHeight + BUFFER_HEIGHT;
+
+            [gridCanvas, drawingCanvas].forEach(canvas => {
+                canvas.width = canvasWidth;
+                canvas.height = canvasHeight;
+                canvas.style.width = canvasWidth + 'px';
+                canvas.style.height = canvasHeight + 'px';
+                canvas.style.top = scrollTop + 'px';
+                canvas.style.left = '0';
+            });
+
+            scheduleRender();
+        }
+
+        function handleScroll() {
+            scrollTop = container.scrollTop;
+            gridCanvas.style.top = scrollTop + 'px';
+            drawingCanvas.style.top = scrollTop + 'px';
+            scheduleRender();
+        }
+
+        function scheduleRender() {
+            if (renderQueued) return;
+            renderQueued = true;
+            requestAnimationFrame(() => {
+                renderQueued = false;
+                renderCanvas();
+            });
+        }
+
+        function bindUI() {
+            document.getElementById('pen-tool').addEventListener('click', () => setTool('pen'));
+            document.getElementById('highlighter-tool').addEventListener('click', () => {
+                setTool('highlighter');
+                document.getElementById('stroke-width').value = 20;
+                strokeWidth = 20;
+                document.getElementById('stroke-value').textContent = '20px';
+            });
+            document.getElementById('eraser-tool').addEventListener('click', () => setTool('eraser'));
+            document.getElementById('text-tool').addEventListener('click', () => setTool('text'));
+
+            ['line', 'circle', 'triangle', 'rectangle', 'square'].forEach(shape => {
+                document.getElementById(`${shape}-tool`).addEventListener('click', () => setTool(shape));
+            });
+
+            document.querySelectorAll('.color-swatch').forEach(swatch => {
+                swatch.addEventListener('click', () => {
+                    currentColor = swatch.dataset.color;
+                    document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
+                    swatch.classList.add('active');
+                });
+            });
+
+            document.getElementById('stroke-width').addEventListener('input', e => {
+                strokeWidth = Number(e.target.value);
+                document.getElementById('stroke-value').textContent = strokeWidth + 'px';
+            });
+
+            document.getElementById('grid-toggle').addEventListener('click', () => {
+                gridEnabled = !gridEnabled;
+                document.getElementById('grid-toggle').classList.toggle('active', gridEnabled);
+                scheduleRender();
+                updateStatus(gridEnabled ? 'Grid enabled' : 'Grid disabled');
+            });
+
+            document.getElementById('pixel-toggle').addEventListener('click', () => {
+                pixelateMode = !pixelateMode;
+                document.getElementById('pixel-toggle').classList.toggle('active', pixelateMode);
+                updateStatus(pixelateMode ? 'Grid snapping on' : 'Grid snapping off');
+            });
+
+            document.getElementById('focus-toggle').addEventListener('click', () => {
+                focusMode = !focusMode;
+                document.getElementById('focus-toggle').classList.toggle('active', focusMode);
+                scheduleRender();
+                updateStatus(focusMode ? 'Preview-only drawing on' : 'Full canvas view on');
+            });
+
+            document.getElementById('grid-type').addEventListener('change', e => {
+                gridType = e.target.value;
+                scheduleRender();
+            });
+
+            document.getElementById('undo-btn').addEventListener('click', undo);
+            document.getElementById('redo-btn').addEventListener('click', redo);
+            document.getElementById('clear-btn').addEventListener('click', clearCanvas);
+            document.getElementById('export-btn').addEventListener('click', exportCanvas);
+
+            dialogConfirm.addEventListener('click', resolveDialogWithValue);
+            dialogCancel.addEventListener('click', () => resolveDialog(false));
+            dialogBackdrop.addEventListener('click', e => {
+                if (e.target === dialogBackdrop) resolveDialog(false);
+            });
+            dialogInput.addEventListener('keydown', e => {
+                if (e.key === 'Enter') resolveDialogWithValue();
+                if (e.key === 'Escape') resolveDialog(false);
+            });
+
+            document.getElementById('toggle-toolbar').addEventListener('click', () => {
+                const toolbar = document.getElementById('main-toolbar');
+                const icon = document.getElementById('toggle-icon');
+                toolbar.classList.toggle('collapsed');
+                icon.style.transform = toolbar.classList.contains('collapsed') ? 'rotate(180deg)' : '';
+            });
+
+            drawingCanvas.addEventListener('pointerdown', onPointerDown);
+            drawingCanvas.addEventListener('pointermove', onPointerMove);
+            drawingCanvas.addEventListener('pointerup', onPointerUp);
+            drawingCanvas.addEventListener('pointercancel', onPointerUp);
+            drawingCanvas.addEventListener('pointerleave', onPointerLeave);
+
+            window.addEventListener('resize', resizeCanvases);
+            container.addEventListener('scroll', handleScroll, { passive: true });
+
+            document.addEventListener('keydown', onKeyDown);
+        }
+
+        function openDialog({ title, message, input = false, placeholder = '', value = '', confirmText = 'OK', cancelText = 'Cancel' }) {
+            dialogTitle.textContent = title;
+            dialogMessage.textContent = message;
+            dialogInputWrap.classList.toggle('hidden', !input);
+            dialogInput.value = value;
+            dialogInput.placeholder = placeholder;
+            dialogConfirm.textContent = confirmText;
+            dialogCancel.textContent = cancelText;
+            dialogBackdrop.classList.remove('hidden');
+            dialogBackdrop.classList.add('flex');
+
+            if (input) {
+                setTimeout(() => dialogInput.focus(), 0);
+            } else {
+                setTimeout(() => dialogConfirm.focus(), 0);
+            }
+
+            return new Promise(resolve => {
+                pendingDialogResolver = resolve;
+            });
+        }
+
+        function resolveDialogWithValue() {
+            const value = dialogInputWrap.classList.contains('hidden') ? true : dialogInput.value;
+            resolveDialog(value);
+        }
+
+        function resolveDialog(result) {
+            if (!pendingDialogResolver) return;
+            const resolver = pendingDialogResolver;
+            pendingDialogResolver = null;
+            dialogBackdrop.classList.add('hidden');
+            dialogBackdrop.classList.remove('flex');
+            resolver(result);
+        }
+
+        function setTool(tool) {
+            currentTool = tool;
+            document.querySelectorAll('[data-tool]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tool === tool);
+            });
+        }
+
+        function onKeyDown(e) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+
+            const key = e.key.toLowerCase();
+            if (key === 'p') setTool('pen');
+            if (key === 'h') setTool('highlighter');
+            if (key === 'e') setTool('eraser');
+            if (key === 't') setTool('text');
+            if (key === 'g') {
+                gridEnabled = !gridEnabled;
+                document.getElementById('grid-toggle').classList.toggle('active', gridEnabled);
+                scheduleRender();
+            }
+            if (key === 'f') {
+                focusMode = !focusMode;
+                document.getElementById('focus-toggle').classList.toggle('active', focusMode);
+                scheduleRender();
+            }
+            if (key === 'x') {
+                pixelateMode = !pixelateMode;
+                document.getElementById('pixel-toggle').classList.toggle('active', pixelateMode);
+            }
+            if (key === 'z' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                e.shiftKey ? redo() : undo();
+            }
+            if (key === 'y' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                redo();
+            }
+            if (key === '1') setTool('line');
+            if (key === '2') setTool('circle');
+            if (key === '3') setTool('triangle');
+            if (key === '4') setTool('rectangle');
+            if (key === '5') setTool('square');
+        }
+
+        function getPoint(e) {
+            // Calculate relative to container, not canvas
+            const containerRect = container.getBoundingClientRect();
+            const scrollY = container.scrollTop;
+            
+            let x = e.clientX - containerRect.left;
+            let y = e.clientY - containerRect.top + scrollY;
+
+            if (gridEnabled && pixelateMode && currentTool !== 'text') {
+                x = snapValue(x);
+                y = snapValue(y);
+            }
+
+            return {
+                x,
+                y,
+                pressure: Math.max(0.2, e.pressure || (e.buttons ? 0.5 : 0.5))
+            };
+        }
+
+        function snapValue(value) {
+            return Math.round(value / GRID_SIZE) * GRID_SIZE;
+        }
+
+        function saveState() {
+            undoStack.push(JSON.parse(JSON.stringify({ strokes, textObjects })));
+            if (undoStack.length > 60) undoStack.shift();
+            redoStack.length = 0;
+        }
+
+        function undo() {
+            if (!undoStack.length) return;
+            redoStack.push(JSON.parse(JSON.stringify({ strokes, textObjects })));
+            const state = undoStack.pop();
+            strokes = state.strokes;
+            textObjects = state.textObjects;
+            scheduleRender();
+            updateStatus('Undo');
+        }
+
+        function redo() {
+            if (!redoStack.length) return;
+            undoStack.push(JSON.parse(JSON.stringify({ strokes, textObjects })));
+            const state = redoStack.pop();
+            strokes = state.strokes;
+            textObjects = state.textObjects;
+            scheduleRender();
+            updateStatus('Redo');
+        }
+
+        async function clearCanvas() {
+            const confirmed = await openDialog({
+                title: 'Clear Canvas',
+                message: 'Remove everything from the board? This cannot be undone.',
+                confirmText: 'Clear',
+                cancelText: 'Keep'
+            });
+
+            if (!confirmed) return;
+
+            saveState();
+            strokes = [];
+            textObjects = [];
+            scheduleRender();
+            updateStatus('Canvas cleared');
+        }
+
+        function onPointerDown(e) {
+            if (e.button !== undefined && e.button !== 0) return;
+            activePointerId = e.pointerId;
+            drawingCanvas.setPointerCapture?.(activePointerId);
+
+            const point = getPoint(e);
+
+            if (currentTool === 'eraser') {
+                saveState();
+                isErasing = true;
+                eraseAt(point.x, point.y);
+                return;
+            }
+
+            if (currentTool === 'text') {
+                openDialog({
+                    title: 'Add Note',
+                    message: 'Enter a short text note for this point on the board.',
+                    input: true,
+                    placeholder: 'Type note here',
+                    confirmText: 'Insert',
+                    cancelText: 'Cancel'
+                }).then(value => {
+                    if (typeof value === 'string' && value.trim()) {
+                        saveState();
+                        textObjects.push({
+                            id: Date.now(),
+                            text: value.trim(),
+                            x: point.x,
+                            y: point.y,
+                            color: currentColor,
+                            size: 20
+                        });
+                        scheduleRender();
+                        updateStatus('Text inserted');
+                    }
+                });
+                activePointerId = null;
+                drawingCanvas.releasePointerCapture?.(e.pointerId);
+                return;
+            }
+
+            saveState();
+            isDrawing = true;
+            currentStroke = createStroke(point);
+            scheduleRender();
+        }
+
+        function onPointerMove(e) {
+            if (activePointerId !== null && e.pointerId !== activePointerId) return;
+            const point = getPoint(e);
+
+            if (isErasing) {
+                eraseAt(point.x, point.y);
+                return;
+            }
+
+            if (!isDrawing || !currentStroke) return;
+
+            if (currentStroke.kind === 'shape') {
+                currentStroke.end = point;
+                currentStroke.bounds = getShapeBounds(currentStroke.shapeType, currentStroke.anchor, currentStroke.end);
+            } else {
+                appendPoint(currentStroke, point);
+                currentStroke.bounds = getPointsBounds(currentStroke.points);
+            }
+
+            scheduleRender();
+        }
+
+        function onPointerUp(e) {
+            if (activePointerId !== null && e.pointerId !== activePointerId) return;
+
+            if (isErasing) {
+                isErasing = false;
+                activePointerId = null;
+                scheduleRender();
+                return;
+            }
+
+            if (!isDrawing || !currentStroke) {
+                activePointerId = null;
+                return;
+            }
+
+            if (currentStroke.kind === 'shape') {
+                const shapeStroke = finalizeShapeStroke(currentStroke);
+                if (shapeStroke) strokes.push(shapeStroke);
+            } else {
+                const finalized = finalizeFreehandStroke(currentStroke);
+                if (finalized) strokes.push(finalized);
+            }
+
+            currentStroke = null;
+            isDrawing = false;
+            activePointerId = null;
+            scheduleRender();
+        }
+
+        function onPointerLeave() {
+            if (focusMode && isDrawing) scheduleRender();
+        }
+
+        function createStroke(point) {
+            if (['line', 'circle', 'triangle', 'rectangle', 'square'].includes(currentTool)) {
+                return {
+                    id: Date.now(),
+                    kind: 'shape',
+                    shapeType: currentTool,
+                    anchor: { x: point.x, y: point.y },
+                    end: { x: point.x, y: point.y },
+                    color: currentColor,
+                    width: strokeWidth,
+                    bounds: { left: point.x, right: point.x, top: point.y, bottom: point.y }
+                };
+            }
+
+            return {
+                id: Date.now(),
+                kind: 'freehand',
+                tool: currentTool,
+                pixelated: gridEnabled && pixelateMode && (currentTool === 'pen' || currentTool === 'highlighter'),
+                color: currentColor,
+                width: strokeWidth,
+                opacity: currentTool === 'highlighter' ? 0.3 : 1,
+                points: [{ x: point.x, y: point.y, pressure: point.pressure }],
+                bounds: { left: point.x, right: point.x, top: point.y, bottom: point.y }
+            };
+        }
+
+        function appendPoint(stroke, point) {
+            const last = stroke.points[stroke.points.length - 1];
+            if (!last || distance(last, point) > (stroke.pixelated ? GRID_SIZE * 0.3 : 2)) {
+                stroke.points.push({ x: point.x, y: point.y, pressure: point.pressure });
+            }
+        }
+
+        function finalizeFreehandStroke(stroke) {
+            if (!stroke.points || stroke.points.length < 2) return null;
+
+            const rawPoints = stroke.points.slice();
+
+            const points = stroke.pixelated ? rawPoints : smoothStroke(rawPoints);
+            return {
+                ...stroke,
+                points,
+                bounds: getPointsBounds(points)
+            };
+        }
+
+        function finalizeShapeStroke(stroke) {
+            const shapeData = buildShapeFromDrag(stroke.shapeType, stroke.anchor, stroke.end);
+            return {
+                ...stroke,
+                shapeData,
+                bounds: getShapeDataBounds(stroke.shapeType, shapeData)
+            };
+        }
+
+        function buildShapeFromDrag(type, anchor, end) {
+            const dx = end.x - anchor.x;
+            const dy = end.y - anchor.y;
+
+            if (type === 'line') {
+                return { x1: anchor.x, y1: anchor.y, x2: end.x, y2: end.y };
+            }
+
+            if (type === 'circle') {
+                const side = Math.max(Math.abs(dx), Math.abs(dy));
+                const cx = (anchor.x + end.x) / 2;
+                const cy = (anchor.y + end.y) / 2;
+                return { cx, cy, r: Math.max(6, side / 2) };
+            }
+
+            if (type === 'triangle') {
+                const x = Math.min(anchor.x, end.x);
+                const y = Math.min(anchor.y, end.y);
+                const w = Math.max(20, Math.abs(dx));
+                const h = Math.max(20, Math.abs(dy));
+                return {
+                    p1: { x: x + w / 2, y },
+                    p2: { x, y: y + h },
+                    p3: { x: x + w, y: y + h }
+                };
+            }
+
+            if (type === 'square') {
+                const side = Math.max(Math.abs(dx), Math.abs(dy));
+                return {
+                    x: dx >= 0 ? anchor.x : anchor.x - side,
+                    y: dy >= 0 ? anchor.y : anchor.y - side,
+                    size: Math.max(10, side)
+                };
+            }
+
+            return {
+                x: Math.min(anchor.x, end.x),
+                y: Math.min(anchor.y, end.y),
+                w: Math.max(10, Math.abs(dx)),
+                h: Math.max(10, Math.abs(dy))
+            };
+        }
+
+        function smoothStroke(points) {
+            if (points.length < 4) return points.slice();
+            const output = [points[0]];
+            for (let i = 1; i < points.length - 2; i++) {
+                const p0 = points[i - 1];
+                const p1 = points[i];
+                const p2 = points[i + 1];
+                const p3 = points[i + 2];
+                for (let t = 0; t < 1; t += 0.25) {
+                    const t2 = t * t;
+                    const t3 = t2 * t;
+                    output.push({
+                        x: 0.5 * ((2 * p1.x) + (-p0.x + p2.x) * t + (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 + (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3),
+                        y: 0.5 * ((2 * p1.y) + (-p0.y + p2.y) * t + (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 + (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3),
+                        pressure: (p1.pressure + p2.pressure) / 2
+                    });
+                }
+            }
+            output.push(points[points.length - 1]);
+            return output;
+        }
+
+        function pathLength(points) {
+            let total = 0;
+            for (let i = 1; i < points.length; i++) total += distance(points[i - 1], points[i]);
+            return total;
+        }
+
+        function getPointsBounds(points) {
+            const left = Math.min(...points.map(p => p.x));
+            const right = Math.max(...points.map(p => p.x));
+            const top = Math.min(...points.map(p => p.y));
+            const bottom = Math.max(...points.map(p => p.y));
+            return {
+                left,
+                right,
+                top,
+                bottom,
+                width: right - left,
+                height: bottom - top,
+                cx: (left + right) / 2,
+                cy: (top + bottom) / 2
+            };
+        }
+
+        function getShapeBounds(type, anchor, end) {
+            return getShapeDataBounds(type, buildShapeFromDrag(type, anchor, end));
+        }
+
+        function getShapeDataBounds(type, data) {
+            if (type === 'line') {
+                return {
+                    left: Math.min(data.x1, data.x2),
+                    right: Math.max(data.x1, data.x2),
+                    top: Math.min(data.y1, data.y2),
+                    bottom: Math.max(data.y1, data.y2)
+                };
+            }
+            if (type === 'circle') {
+                return {
+                    left: data.cx - data.r,
+                    right: data.cx + data.r,
+                    top: data.cy - data.r,
+                    bottom: data.cy + data.r
+                };
+            }
+            if (type === 'triangle') {
+                const xs = [data.p1.x, data.p2.x, data.p3.x];
+                const ys = [data.p1.y, data.p2.y, data.p3.y];
+                return {
+                    left: Math.min(...xs),
+                    right: Math.max(...xs),
+                    top: Math.min(...ys),
+                    bottom: Math.max(...ys)
+                };
+            }
+            if (type === 'square') {
+                return { left: data.x, right: data.x + data.size, top: data.y, bottom: data.y + data.size };
+            }
+            return { left: data.x, right: data.x + data.w, top: data.y, bottom: data.y + data.h };
+        }
+
+        function distance(a, b) {
+            return Math.hypot(a.x - b.x, a.y - b.y);
+        }
+
+        function clamp(value, min, max) {
+            return Math.max(min, Math.min(max, value));
+        }
+
+        function drawGrid(targetCtx, offsetY) {
+            if (!gridEnabled) return;
+            const small = '#e2e8f0';
+            const major = '#cbd5e1';
+            const width = targetCtx.canvas.width;
+            const height = targetCtx.canvas.height;
+            targetCtx.save();
+            targetCtx.lineWidth = 1;
+
+            if (gridType === 'cartesian') {
+                const shiftY = ((offsetY % GRID_SIZE) + GRID_SIZE) % GRID_SIZE;
+                for (let x = 0; x <= width; x += GRID_SIZE) {
+                    targetCtx.strokeStyle = x % (GRID_SIZE * 5) === 0 ? major : small;
+                    targetCtx.beginPath();
+                    targetCtx.moveTo(x, 0);
+                    targetCtx.lineTo(x, height);
+                    targetCtx.stroke();
+                }
+                for (let y = -shiftY; y <= height; y += GRID_SIZE) {
+                    const absY = y + offsetY;
+                    targetCtx.strokeStyle = absY % (GRID_SIZE * 5) === 0 ? major : small;
+                    targetCtx.beginPath();
+                    targetCtx.moveTo(0, y);
+                    targetCtx.lineTo(width, y);
+                    targetCtx.stroke();
+                }
+            } else {
+                const spacing = GRID_SIZE;
+                const angle = Math.PI / 6;
+                const shiftY = ((offsetY % spacing) + spacing) % spacing;
+                targetCtx.strokeStyle = small;
+                for (let i = -height - spacing; i < width + height; i += spacing) {
+                    targetCtx.beginPath();
+                    targetCtx.moveTo(i, -shiftY);
+                    targetCtx.lineTo(i + height * Math.tan(angle), height - shiftY);
+                    targetCtx.stroke();
+
+                    targetCtx.beginPath();
+                    targetCtx.moveTo(i, -shiftY);
+                    targetCtx.lineTo(i - height * Math.tan(angle), height - shiftY);
+                    targetCtx.stroke();
+                }
+                for (let y = -shiftY; y <= height; y += spacing) {
+                    targetCtx.beginPath();
+                    targetCtx.moveTo(0, y);
+                    targetCtx.lineTo(width, y);
+                    targetCtx.stroke();
+                }
+            }
+
+            targetCtx.restore();
+        }
+
+        function renderCanvas() {
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+            const previewOnly = focusMode && isDrawing;
+
+            if (!previewOnly) {
+                drawGrid(ctx, scrollTop);
+                drawVisibleContent(ctx);
+            }
+
+            if (currentStroke && isDrawing) {
+                drawStroke(ctx, currentStroke, true, scrollTop);
+            }
+        }
+
+        function drawVisibleContent(targetCtx) {
+            const visibleTop = scrollTop;
+            const visibleBottom = scrollTop + window.innerHeight;
+
+            for (const stroke of strokes) {
+                if (!stroke.bounds) continue;
+                if (stroke.bounds.bottom < visibleTop - 100 || stroke.bounds.top > visibleBottom + 100) continue;
+                drawStroke(targetCtx, stroke, false, scrollTop);
+            }
+
+            for (const text of textObjects) {
+                if (text.y < visibleTop - 60 || text.y > visibleBottom + 60) continue;
+                drawText(targetCtx, text, scrollTop);
+            }
+        }
+
+        function drawStroke(targetCtx, stroke, isPreview, offsetY) {
+            targetCtx.save();
+            targetCtx.strokeStyle = stroke.color;
+            targetCtx.fillStyle = stroke.color;
+            targetCtx.globalAlpha = stroke.opacity || 1;
+            targetCtx.lineCap = stroke.pixelated ? 'butt' : 'round';
+            targetCtx.lineJoin = stroke.pixelated ? 'miter' : 'round';
+
+            if (stroke.kind === 'shape') {
+                drawShape(targetCtx, stroke.shapeType, stroke.shapeData || buildShapeFromDrag(stroke.shapeType, stroke.anchor, stroke.end), stroke.width, offsetY);
+                targetCtx.restore();
+                return;
+            }
+
+            const points = stroke.points || [];
+            if (points.length < 2) {
+                targetCtx.restore();
+                return;
+            }
+
+            const renderPoints = stroke.pixelated ? points : points;
+
+            for (let i = 1; i < renderPoints.length; i++) {
+                const a = renderPoints[i - 1];
+                const b = renderPoints[i];
+                targetCtx.lineWidth = stroke.width * (stroke.pixelated ? 1 : ((a.pressure + b.pressure) / 2 || 1));
+                targetCtx.beginPath();
+                targetCtx.moveTo(a.x, a.y - offsetY);
+                targetCtx.lineTo(b.x, b.y - offsetY);
+                targetCtx.stroke();
+            }
+
+            targetCtx.restore();
+        }
+
+        function drawShape(targetCtx, type, data, width, offsetY) {
+            targetCtx.beginPath();
+            targetCtx.lineWidth = width;
+
+            if (type === 'line') {
+                targetCtx.moveTo(data.x1, data.y1 - offsetY);
+                targetCtx.lineTo(data.x2, data.y2 - offsetY);
+            } else if (type === 'circle') {
+                targetCtx.arc(data.cx, data.cy - offsetY, data.r, 0, Math.PI * 2);
+            } else if (type === 'triangle') {
+                targetCtx.moveTo(data.p1.x, data.p1.y - offsetY);
+                targetCtx.lineTo(data.p2.x, data.p2.y - offsetY);
+                targetCtx.lineTo(data.p3.x, data.p3.y - offsetY);
+                targetCtx.closePath();
+            } else if (type === 'square') {
+                targetCtx.rect(data.x, data.y - offsetY, data.size, data.size);
+            } else {
+                targetCtx.rect(data.x, data.y - offsetY, data.w, data.h);
+            }
+
+            targetCtx.stroke();
+        }
+
+        function drawText(targetCtx, text, offsetY) {
+            targetCtx.save();
+            targetCtx.fillStyle = text.color;
+            targetCtx.font = `${text.size || 20}px Arial, sans-serif`;
+            targetCtx.textBaseline = 'top';
+            targetCtx.fillText(text.text, text.x, text.y - offsetY);
+            targetCtx.restore();
+        }
+
+        function hitTestStroke(stroke, x, y) {
+            if (!stroke.bounds) return false;
+            const threshold = Math.max(10, stroke.width * 2.5);
+            if (x < stroke.bounds.left - threshold || x > stroke.bounds.right + threshold || y < stroke.bounds.top - threshold || y > stroke.bounds.bottom + threshold) return false;
+
+            if (stroke.kind === 'shape') {
+                return hitTestShape(stroke.shapeType, stroke.shapeData, x, y, threshold);
+            }
+
+            const points = stroke.points || [];
+            for (let i = 1; i < points.length; i++) {
+                if (distanceToSegment({ x, y }, points[i - 1], points[i]) <= threshold) return true;
+            }
+            return false;
+        }
+
+        function hitTestShape(type, data, x, y, threshold) {
+            if (type === 'circle') {
+                const d = Math.abs(distance({ x, y }, { x: data.cx, y: data.cy }) - data.r);
+                return d <= threshold || pointInCircle(x, y, data.cx, data.cy, data.r);
+            }
+            if (type === 'line') {
+                return distanceToSegment({ x, y }, { x: data.x1, y: data.y1 }, { x: data.x2, y: data.y2 }) <= threshold;
+            }
+            if (type === 'triangle') {
+                return pointInPolygon({ x, y }, [data.p1, data.p2, data.p3]) ||
+                    distanceToSegment({ x, y }, data.p1, data.p2) <= threshold ||
+                    distanceToSegment({ x, y }, data.p2, data.p3) <= threshold ||
+                    distanceToSegment({ x, y }, data.p3, data.p1) <= threshold;
+            }
+            if (type === 'square') {
+                const pts = [
+                    { x: data.x, y: data.y },
+                    { x: data.x + data.size, y: data.y },
+                    { x: data.x + data.size, y: data.y + data.size },
+                    { x: data.x, y: data.y + data.size }
+                ];
+                return pointInPolygon({ x, y }, pts) ||
+                    distanceToSegment({ x, y }, pts[0], pts[1]) <= threshold ||
+                    distanceToSegment({ x, y }, pts[1], pts[2]) <= threshold ||
+                    distanceToSegment({ x, y }, pts[2], pts[3]) <= threshold ||
+                    distanceToSegment({ x, y }, pts[3], pts[0]) <= threshold;
+            }
+            const pts = [
+                { x: data.x, y: data.y },
+                { x: data.x + data.w, y: data.y },
+                { x: data.x + data.w, y: data.y + data.h },
+                { x: data.x, y: data.y + data.h }
+            ];
+            return pointInPolygon({ x, y }, pts) ||
+                distanceToSegment({ x, y }, pts[0], pts[1]) <= threshold ||
+                distanceToSegment({ x, y }, pts[1], pts[2]) <= threshold ||
+                distanceToSegment({ x, y }, pts[2], pts[3]) <= threshold ||
+                distanceToSegment({ x, y }, pts[3], pts[0]) <= threshold;
+        }
+
+        function pointInCircle(x, y, cx, cy, r) {
+            return Math.hypot(x - cx, y - cy) <= r;
+        }
+
+        function pointInPolygon(point, polygon) {
+            let inside = false;
+            for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+                const xi = polygon[i].x, yi = polygon[i].y;
+                const xj = polygon[j].x, yj = polygon[j].y;
+                const intersects = ((yi > point.y) !== (yj > point.y)) &&
+                    (point.x < (xj - xi) * (point.y - yi) / ((yj - yi) || 1) + xi);
+                if (intersects) inside = !inside;
+            }
+            return inside;
+        }
+
+        function distanceToSegment(p, a, b) {
+            const l2 = Math.pow(distance(a, b), 2) || 1;
+            let t = ((p.x - a.x) * (b.x - a.x) + (p.y - a.y) * (b.y - a.y)) / l2;
+            t = clamp(t, 0, 1);
+            return distance(p, { x: a.x + t * (b.x - a.x), y: a.y + t * (b.y - a.y) });
+        }
+
+        function eraseAt(x, y) {
+            const before = strokes.length + textObjects.length;
+            strokes = strokes.filter(stroke => !hitTestStroke(stroke, x, y));
+            textObjects = textObjects.filter(text => distance({ x, y }, { x: text.x, y: text.y }) > 24);
+            if (before !== strokes.length + textObjects.length) {
+                scheduleRender();
+                updateStatus('Erased');
+            }
+        }
+
+        function exportCanvas() {
+            const bounds = getSceneBounds();
+            const padding = 50;
+            const minX = bounds.left - padding;
+            const minY = bounds.top - padding;
+            const width = Math.max(1, bounds.right - bounds.left + padding * 2);
+            const height = Math.max(1, bounds.bottom - bounds.top + padding * 2);
+
+            const exportCanvas = document.createElement('canvas');
+            const exportCtx = exportCanvas.getContext('2d');
+            exportCanvas.width = width;
+            exportCanvas.height = height;
+
+            exportCtx.fillStyle = 'white';
+            exportCtx.fillRect(0, 0, width, height);
+            if (gridEnabled) drawGrid(exportCtx, minY);
+
+            for (const stroke of strokes) drawStrokeForExport(exportCtx, stroke, minX, minY);
+            for (const text of textObjects) drawTextForExport(exportCtx, text, minX, minY);
+
+            const link = document.createElement('a');
+            link.download = 'mathboard-export.png';
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
+            updateStatus('Exported as PNG');
+        }
+
+        function getSceneBounds() {
+            let left = Infinity, right = -Infinity, top = Infinity, bottom = -Infinity;
+
+            for (const stroke of strokes) {
+                if (!stroke.bounds) continue;
+                left = Math.min(left, stroke.bounds.left);
+                right = Math.max(right, stroke.bounds.right);
+                top = Math.min(top, stroke.bounds.top);
+                bottom = Math.max(bottom, stroke.bounds.bottom);
+            }
+
+            for (const text of textObjects) {
+                left = Math.min(left, text.x);
+                right = Math.max(right, text.x + 150);
+                top = Math.min(top, text.y);
+                bottom = Math.max(bottom, text.y + 30);
+            }
+
+            if (!isFinite(left)) {
+                left = 0; right = canvasWidth; top = 0; bottom = canvasHeight;
+            }
+
+            return { left, right, top, bottom };
+        }
+
+        function drawStrokeForExport(exportCtx, stroke, offsetX, offsetY) {
+            exportCtx.save();
+            exportCtx.strokeStyle = stroke.color;
+            exportCtx.fillStyle = stroke.color;
+            exportCtx.globalAlpha = stroke.opacity || 1;
+            exportCtx.lineCap = stroke.pixelated ? 'butt' : 'round';
+            exportCtx.lineJoin = stroke.pixelated ? 'miter' : 'round';
+
+            if (stroke.kind === 'shape') {
+                drawShape(exportCtx, stroke.shapeType, translateShapeData(stroke.shapeType, stroke.shapeData || buildShapeFromDrag(stroke.shapeType, stroke.anchor, stroke.end), offsetX, offsetY), stroke.width, 0);
+                exportCtx.restore();
+                return;
+            }
+
+            const points = stroke.points || [];
+            for (let i = 1; i < points.length; i++) {
+                const a = points[i - 1];
+                const b = points[i];
+                exportCtx.lineWidth = stroke.width * (stroke.pixelated ? 1 : ((a.pressure + b.pressure) / 2 || 1));
+                exportCtx.beginPath();
+                exportCtx.moveTo(a.x - offsetX, a.y - offsetY);
+                exportCtx.lineTo(b.x - offsetX, b.y - offsetY);
+                exportCtx.stroke();
+            }
+
+            exportCtx.restore();
+        }
+
+        function translateShapeData(type, data, offsetX, offsetY) {
+            if (type === 'line') return { x1: data.x1 - offsetX, y1: data.y1 - offsetY, x2: data.x2 - offsetX, y2: data.y2 - offsetY };
+            if (type === 'circle') return { cx: data.cx - offsetX, cy: data.cy - offsetY, r: data.r };
+            if (type === 'triangle') return {
+                p1: { x: data.p1.x - offsetX, y: data.p1.y - offsetY },
+                p2: { x: data.p2.x - offsetX, y: data.p2.y - offsetY },
+                p3: { x: data.p3.x - offsetX, y: data.p3.y - offsetY }
+            };
+            if (type === 'square') return { x: data.x - offsetX, y: data.y - offsetY, size: data.size };
+            return { x: data.x - offsetX, y: data.y - offsetY, w: data.w, h: data.h };
+        }
+
+        function drawTextForExport(exportCtx, text, offsetX, offsetY) {
+            exportCtx.save();
+            exportCtx.fillStyle = text.color;
+            exportCtx.font = `${text.size || 20}px Arial, sans-serif`;
+            exportCtx.textBaseline = 'top';
+            exportCtx.fillText(text.text, text.x - offsetX, text.y - offsetY);
+            exportCtx.restore();
+        }
+
+        function updateStatus(message) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            clearTimeout(updateStatus._timer);
+            updateStatus._timer = setTimeout(() => {
+                status.textContent = 'Ready | Scroll for more space';
+            }, 1800);
+        }
+
+        init();
+    </script>
+</body>
+</html>
