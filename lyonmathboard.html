@@ -67,7 +67,9 @@
 <div id="viewport"><canvas id="main-canvas"></canvas><div id="eraser-cursor"></div><div id="selection-box"></div><canvas id="flip-overlay"></canvas></div>
 <div id="sel-toolbar">
   <button class="sel-act" id="btn-edit-points" data-tip="Edit Points" onclick="MB.togglePointEdit()"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2"/><circle cx="18" cy="6" r="2"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/><path d="M6 6L18 18M18 6L6 18" stroke-dasharray="2,2"/></svg></button>
+  <button class="sel-act" data-tip="Rotate 90° Left" onclick="MB.rotateCCW()"><svg viewBox="0 0 24 24"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg></button>
   <div class="sel-rotate-box"><input type="number" id="rot-input" value="0" min="-360" max="360" step="1" onchange="MB.setRotation(+this.value)" onkeydown="if(event.key==='Enter')this.blur()" onclick="this.select()"><span>°</span></div>
+  <button class="sel-act" data-tip="Rotate 90° Right" onclick="MB.rotateCW()"><svg viewBox="0 0 24 24"><path d="M23 4v6h-6"/><path d="M20.49 15a9 9 0 1 1-2.13-9.36L23 10"/></svg></button>
   <div class="sel-divider"></div>
   <button class="sel-act" data-tip="Flip Horizontal" onclick="MB.flipH()"><svg viewBox="0 0 24 24"><path d="M12 3v18M8 7L4 12l4 5M16 7l4 5-4 5"/></svg></button>
   <button class="sel-act" data-tip="Flip Vertical" onclick="MB.flipV()"><svg viewBox="0 0 24 24"><path d="M3 12h18M7 8l5-4 5 4M7 16l5 4 5-4"/></svg></button>
@@ -169,8 +171,8 @@ let snapToGrid=false,clipboard=[],currentOpacity=1,fillMode='none';
 
 let textWorldPos=null,editingObj=null,rafId=0;
 
-// Flip animation state
-let flipAnim=null; // {startTime, duration, axis:'h'|'v', cx, cy, objects, origPoints}
+// Transform animation state (flip & rotate)
+let transformAnim=null; // {startTime, duration, kind, objects, data, onDone}
 
 function rr(){cancelAnimationFrame(rafId);rafId=requestAnimationFrame(render);}
 function s2w(sx,sy){return{x:(sx-panX)/zoom,y:(sy-panY)/zoom};}
@@ -210,13 +212,13 @@ function drawGrid(){
 
 // Render
 function render(){
-  // Handle flip animation
-  if(flipAnim){
+  // Handle transform animation (flip / rotate)
+  if(transformAnim){
     const now=performance.now();
-    const t=Math.min(1,(now-flipAnim.startTime)/flipAnim.duration);
+    const t=Math.min(1,(now-transformAnim.startTime)/transformAnim.duration);
     const ease=t<0.5?2*t*t:1-Math.pow(-2*t+2,2)/2; // easeInOutQuad
-    applyFlipFrame(flipAnim,ease);
-    if(t>=1){flipAnim=null;computeBB();}
+    applyAnimFrame(transformAnim,ease);
+    if(t>=1){transformAnim=null;computeBB();updateRotationInput();}
     else{cancelAnimationFrame(rafId);rafId=requestAnimationFrame(render);}
   }
 
@@ -227,7 +229,7 @@ function render(){
   if(liveStroke)drawObj(liveStroke);
   if(liveP0&&liveP1&&shapeTools.includes(currentTool)){ctx.save();ctx.globalAlpha=.6;drawObj({type:currentTool,points:[liveP0,liveP1],color,width:strokeW,lineStyle});ctx.restore();}
   // Selection viz
-  if(sel.length&&selBB&&!flipAnim){
+  if(sel.length&&selBB&&!transformAnim){
     ctx.save();const pad=5/zoom;
     if(pointEditMode&&sel.length===1){
       ctx.strokeStyle='#4263eb';ctx.lineWidth=1/zoom;ctx.setLineDash([3/zoom,3/zoom]);
@@ -298,11 +300,8 @@ function drawFree(o){const p=o.points;if(!p||!p.length)return;if(o.type==='marke
 function drawLine(o){if(!o.points||o.points.length<2)return;const a=o.points[0],b=o.points[o.points.length-1];ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
 function drawRect(o){if(!o.points||o.points.length<2)return;const[a,b]=o.points;const x=Math.min(a.x,b.x),y=Math.min(a.y,b.y),w=Math.abs(b.x-a.x),h=Math.abs(b.y-a.y);if(w<1||h<1)return;ctx.beginPath();ctx.rect(x,y,w,h);if(o.fill){ctx.fillStyle=o.fill;ctx.fill();}ctx.stroke();}
 function drawEllipse(o){if(!o.points||o.points.length<2)return;const[a,b]=o.points;const rx=Math.abs(b.x-a.x)/2,ry=Math.abs(b.y-a.y)/2;if(rx<1||ry<1)return;ctx.beginPath();ctx.ellipse((a.x+b.x)/2,(a.y+b.y)/2,rx,ry,0,0,Math.PI*2);if(o.fill){ctx.fillStyle=o.fill;ctx.fill();}ctx.stroke();}
-function drawTri(o){if(!o.points||o.points.length<2)return;const pts=o.points;
-  // Use all 3 points if available, otherwise derive from bounding pair
-  let p1,p2,p3;
-  if(pts.length>=3){p1=pts[0];p2=pts[1];p3=pts[2];}
-  else{const[a,b]=pts;p1={x:(a.x+b.x)/2,y:Math.min(a.y,b.y)};p2={x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)};p3={x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)};}
+function triVerts(pts){if(pts.length>=3)return[pts[0],pts[1],pts[2]];const[a,b]=pts;return[{x:(a.x+b.x)/2,y:Math.min(a.y,b.y)},{x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)},{x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)}];}
+function drawTri(o){if(!o.points||o.points.length<2)return;const[p1,p2,p3]=triVerts(o.points);
   ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.lineTo(p3.x,p3.y);ctx.closePath();if(o.fill){ctx.fillStyle=o.fill;ctx.fill();}ctx.stroke();}
 function drawArrow(o){if(!o.points||o.points.length<2)return;const a=o.points[0],b=o.points[o.points.length-1],dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy);if(len<2)return;const ang=Math.atan2(dy,dx),w=o.width||2,head=Math.max(w*3,Math.min(len*.4,50)),sp=Math.PI/6;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();ctx.setLineDash([]);ctx.lineWidth=Math.max(w,2);ctx.beginPath();ctx.moveTo(b.x,b.y);ctx.lineTo(b.x-head*Math.cos(ang-sp),b.y-head*Math.sin(ang-sp));ctx.moveTo(b.x,b.y);ctx.lineTo(b.x-head*Math.cos(ang+sp),b.y-head*Math.sin(ang+sp));ctx.stroke();}
 function drawText(o){if(!o.text)return;if(o._img){ctx.save();if(o.rotation){const iw=o._img.width/o._dpr,ih=o._img.height/o._dpr;ctx.translate(o.x+iw/2,o.y+ih/2);ctx.rotate(o.rotation);ctx.drawImage(o._img,-iw/2,-ih/2,iw,ih);}else{ctx.drawImage(o._img,o.x,o.y,o._img.width/o._dpr,o._img.height/o._dpr);}ctx.restore();}else bakeText(o).then(()=>rr());}
@@ -367,7 +366,7 @@ function edgeSegs(o){
   if(o.type==='line')return[[o.points[0],o.points[o.points.length-1]]];
   if(o.type==='arrow'){const a=o.points[0],b=o.points[o.points.length-1],dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy),ang=Math.atan2(dy,dx),w=o.width||2,head=Math.max(w*3,Math.min(len*.4,50)),sp=Math.PI/6;return[[a,b],[b,{x:b.x-head*Math.cos(ang-sp),y:b.y-head*Math.sin(ang-sp)}],[b,{x:b.x-head*Math.cos(ang+sp),y:b.y-head*Math.sin(ang+sp)}]];}
   if(o.type==='rect'){const[a,b]=o.points;const tl={x:Math.min(a.x,b.x),y:Math.min(a.y,b.y)},tr={x:Math.max(a.x,b.x),y:Math.min(a.y,b.y)},br={x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)},bl={x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)};return[[tl,tr],[tr,br],[br,bl],[bl,tl]];}
-  if(o.type==='triangle'){const pts=o.points;let p1,p2,p3;if(pts.length>=3){p1=pts[0];p2=pts[1];p3=pts[2];}else{const[a,b]=pts;p1={x:(a.x+b.x)/2,y:Math.min(a.y,b.y)};p2={x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)};p3={x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)};}return[[p1,p2],[p2,p3],[p3,p1]];}
+  if(o.type==='triangle'){const[p1,p2,p3]=triVerts(o.points);return[[p1,p2],[p2,p3],[p3,p1]];}
   if(o.type==='ellipse'){const[a,b]=o.points;const cx=(a.x+b.x)/2,cy=(a.y+b.y)/2,rx=Math.abs(b.x-a.x)/2,ry=Math.abs(b.y-a.y)/2;const pts=[];for(let i=0;i<36;i++){const an=(i/36)*Math.PI*2;pts.push({x:cx+rx*Math.cos(an),y:cy+ry*Math.sin(an)});}const s=[];for(let i=0;i<pts.length;i++)s.push([pts[i],pts[(i+1)%pts.length]]);return s;}
   return[];
 }
@@ -375,7 +374,7 @@ function dPS(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l2=dx*dx+dy*dy;if(!l2)re
 function pointInShape(o,wx,wy){
   if(o.type==='rect'){const[a,b]=o.points;const x=Math.min(a.x,b.x),y=Math.min(a.y,b.y),w=Math.abs(b.x-a.x),h=Math.abs(b.y-a.y);return wx>=x&&wx<=x+w&&wy>=y&&wy<=y+h;}
   if(o.type==='ellipse'){const[a,b]=o.points;const cx=(a.x+b.x)/2,cy=(a.y+b.y)/2,rx=Math.abs(b.x-a.x)/2,ry=Math.abs(b.y-a.y)/2;if(rx<1||ry<1)return false;return((wx-cx)/rx)**2+((wy-cy)/ry)**2<=1;}
-  if(o.type==='triangle'){const pts=o.points;let p1,p2,p3;if(pts.length>=3){p1=pts[0];p2=pts[1];p3=pts[2];}else{const[a,b]=pts;p1={x:(a.x+b.x)/2,y:Math.min(a.y,b.y)};p2={x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)};p3={x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)};}const d=(p2.x-p1.x)*(p3.y-p1.y)-(p3.x-p1.x)*(p2.y-p1.y);if(!d)return false;const aa=((p2.x-wx)*(p3.y-wy)-(p3.x-wx)*(p2.y-wy))/d,bb=((p3.x-wx)*(p1.y-wy)-(p1.x-wx)*(p3.y-wy))/d,cc=1-aa-bb;return aa>=0&&bb>=0&&cc>=0;}
+  if(o.type==='triangle'){const[p1,p2,p3]=triVerts(o.points);const d=(p2.x-p1.x)*(p3.y-p1.y)-(p3.x-p1.x)*(p2.y-p1.y);if(!d)return false;const aa=((p2.x-wx)*(p3.y-wy)-(p3.x-wx)*(p2.y-wy))/d,bb=((p3.x-wx)*(p1.y-wy)-(p1.x-wx)*(p3.y-wy))/d,cc=1-aa-bb;return aa>=0&&bb>=0&&cc>=0;}
   return false;
 }
 function hitWorld(wx,wy){
@@ -431,24 +430,37 @@ function applyRotationFromOrig(delta){
   }
   computeBB();
 }
+// Compute centroid of selection (stable under rotation unlike bbox center)
+function selCentroid(){
+  let sx=0,sy=0,n=0;
+  for(const o of sel){
+    if(o.type==='text'){const d=o._dpr||DPR,iw=o._img?o._img.width/d:200,ih=o._img?o._img.height/d:40;sx+=o.x+iw/2;sy+=o.y+ih/2;n++;}
+    else if(o.points){for(const p of o.points){sx+=p.x;sy+=p.y;n++;}}
+  }
+  return n?{x:sx/n,y:sy/n}:selBB?{x:selBB.x+selBB.w/2,y:selBB.y+selBB.h/2}:{x:0,y:0};
+}
 function applyRotationDelta(delta){
-  if(!sel.length||!selBB)return;
-  const cx=selBB.x+selBB.w/2,cy=selBB.y+selBB.h/2;
+  if(!sel.length)return;
+  const c=selCentroid();
   const cos=Math.cos(delta),sin=Math.sin(delta);
   for(const o of sel){
-    if(o.type==='text'){const dx=o.x-cx,dy=o.y-cy;o.x=cx+dx*cos-dy*sin;o.y=cy+dx*sin+dy*cos;o.rotation=(o.rotation||0)+delta;}
-    else if(o.points){for(const p of o.points){const dx=p.x-cx,dy=p.y-cy;p.x=cx+dx*cos-dy*sin;p.y=cy+dx*sin+dy*cos;}o.rotation=(o.rotation||0)+delta;}
+    if(o.type==='text'){const dx=o.x-c.x,dy=o.y-c.y;o.x=c.x+dx*cos-dy*sin;o.y=c.y+dx*sin+dy*cos;o.rotation=(o.rotation||0)+delta;}
+    else if(o.points){for(const p of o.points){const dx=p.x-c.x,dy=p.y-c.y;p.x=c.x+dx*cos-dy*sin;p.y=c.y+dx*sin+dy*cos;}o.rotation=(o.rotation||0)+delta;}
   }
   computeBB();
 }
 function setRotation(deg){
-  if(!sel.length)return;saveHist();
+  if(!sel.length)return;
+  if(transformAnim)return;
+  saveHist();
   const newRot=deg*Math.PI/180;
-  if(sel.length===1){const o=sel[0];const delta=newRot-(o.rotation||0);applyRotationDelta(delta);}
-  else{const delta=newRot-selRotation;applyRotationDelta(delta);}
+  const curRot=sel.length===1?(sel[0].rotation||0):selRotation;
+  const delta=newRot-curRot;
+  if(Math.abs(delta)<1e-9)return;
   selRotation=newRot;
-  updateRotationInput();rr();
+  startTransformAnim('rotate',buildRotateData(delta));
 }
+
 function updateRotationInput(){
   const input=document.getElementById('rot-input');if(!input)return;
   if(sel.length===1){selRotation=sel[0].rotation||0;}else{selRotation=0;}
@@ -473,11 +485,18 @@ function setCursorForHandle(h){
 }
 function showSelToolbar(){
   const tb=document.getElementById('sel-toolbar');
-  if(!sel.length||!selBB){tb.classList.remove('visible');return;}
+  if(!sel.length||!selBB||transformAnim){tb.classList.remove('visible');return;}
   const s=w2s(selBB.x+selBB.w/2,selBB.y);
   const tbW=tb.offsetWidth||400;
+  const tbH=tb.offsetHeight||42;
+  // Account for rotation handle (28/zoom in world, converted to screen) + padding
+  const rotHandleScreen=28+10;
+  const topY=s.y-rotHandleScreen-tbH-6;
+  // If not enough room above, place below the selection
+  const sBottom=w2s(selBB.x,selBB.y+selBB.h);
+  const finalY=topY<10?sBottom.y+12:topY;
   tb.style.left=Math.max(10,Math.min(W-tbW-10,s.x-tbW/2))+'px';
-  tb.style.top=Math.max(10,s.y-55)+'px';
+  tb.style.top=Math.max(10,finalY)+'px';
   tb.classList.add('visible');
 }
 function hideSelTB(){document.getElementById('sel-toolbar').classList.remove('visible');}
@@ -552,11 +571,6 @@ function syncPropsToSelection(){
 function togglePointEdit(){
   if(sel.length!==1){toast('Select a single shape to edit points');return;}
   if(sel[0].type==='text'){toast('Text has no points to edit');return;}
-  // For triangles with only 2 points, expand to 3 explicit points
-  if(sel[0].type==='triangle'&&sel[0].points&&sel[0].points.length===2){
-    const[a,b]=sel[0].points;
-    sel[0].points=[{x:(a.x+b.x)/2,y:Math.min(a.y,b.y)},{x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)},{x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)}];
-  }
   pointEditMode=!pointEditMode;
   const btn=document.getElementById('btn-edit-points');
   if(btn)btn.classList.toggle('active',pointEditMode);
@@ -565,50 +579,82 @@ function togglePointEdit(){
 }
 
 // === FIXED FLIPPING with animation ===
+// Build animation data: compute target positions for each object
+function buildFlipData(axis){
+  const cx=selBB.x+selBB.w/2,cy=selBB.y+selBB.h/2;
+  return sel.map(o=>{
+    if(o.type==='text'){
+      const d=o._dpr||DPR,iw=o._img?o._img.width/d:200,ih=o._img?o._img.height/d:40;
+      return{type:'text',x:o.x,y:o.y,
+        targetX:axis==='h'?2*cx-o.x-iw:o.x,
+        targetY:axis==='v'?2*cy-o.y-ih:o.y};
+    }
+    const origPts=o.points?o.points.map(p=>({...p})):[];
+    const targetPts=origPts.map(p=>({
+      x:axis==='h'?2*cx-p.x:p.x,
+      y:axis==='v'?2*cy-p.y:p.y}));
+    return{type:o.type,origPts,targetPts};
+  });
+}
+function buildRotateData(delta){
+  const c=selCentroid();
+  const cos=Math.cos(delta),sin=Math.sin(delta);
+  return sel.map(o=>{
+    if(o.type==='text'){
+      const dx=o.x-c.x,dy=o.y-c.y;
+      return{type:'text',x:o.x,y:o.y,
+        targetX:c.x+dx*cos-dy*sin,targetY:c.y+dx*sin+dy*cos,
+        origRot:o.rotation||0,targetRot:(o.rotation||0)+delta};
+    }
+    const origPts=o.points?o.points.map(p=>({...p})):[];
+    const targetPts=origPts.map(p=>{
+      const dx=p.x-c.x,dy=p.y-c.y;
+      return{x:c.x+dx*cos-dy*sin,y:c.y+dx*sin+dy*cos};
+    });
+    return{type:o.type,origPts,targetPts,
+      origRot:o.rotation||0,targetRot:(o.rotation||0)+delta};
+  });
+}
+
+function startTransformAnim(kind,data,msg){
+  transformAnim={startTime:performance.now(),duration:250,kind,objects:sel.slice(),data};
+  rr();
+  if(msg)toast(msg);
+}
+
 function flipH(){
   if(!sel.length||!selBB)return;
+  if(transformAnim)return;
   saveHist();
-  // Compute center of selection
-  const cx=selBB.x+selBB.w/2;
-  // Store original points for animation
-  const origData=sel.map(o=>{
-    if(o.type==='text'){
-      const d=o._dpr||DPR,iw=o._img?o._img.width/d:200;
-      return{type:'text',x:o.x,y:o.y,targetX:2*cx-o.x-iw,targetY:o.y};
-    }
-    const origPts=o.points?o.points.map(p=>({...p})):[];
-    const targetPts=origPts.map(p=>({x:2*cx-p.x,y:p.y}));
-    return{type:o.type,origPts,targetPts};
-  });
-  flipAnim={startTime:performance.now(),duration:300,axis:'h',cx,objects:sel.slice(),data:origData};
-  rr();
-  toast('Flipped horizontal');
+  startTransformAnim('flip',buildFlipData('h'),'Flipped horizontal');
 }
-
 function flipV(){
   if(!sel.length||!selBB)return;
+  if(transformAnim)return;
   saveHist();
-  const cy=selBB.y+selBB.h/2;
-  const origData=sel.map(o=>{
-    if(o.type==='text'){
-      const d=o._dpr||DPR,ih=o._img?o._img.height/d:40;
-      return{type:'text',x:o.x,y:o.y,targetX:o.x,targetY:2*cy-o.y-ih};
-    }
-    const origPts=o.points?o.points.map(p=>({...p})):[];
-    const targetPts=origPts.map(p=>({x:p.x,y:2*cy-p.y}));
-    return{type:o.type,origPts,targetPts};
-  });
-  flipAnim={startTime:performance.now(),duration:300,axis:'v',objects:sel.slice(),data:origData};
-  rr();
-  toast('Flipped vertical');
+  startTransformAnim('flip',buildFlipData('v'),'Flipped vertical');
 }
 
-function applyFlipFrame(anim,t){
+function rotateCW(){
+  if(!sel.length)return;
+  if(transformAnim)return;
+  saveHist();
+  startTransformAnim('rotate',buildRotateData(Math.PI/2),'Rotated 90° right');
+}
+function rotateCCW(){
+  if(!sel.length)return;
+  if(transformAnim)return;
+  saveHist();
+  startTransformAnim('rotate',buildRotateData(-Math.PI/2),'Rotated 90° left');
+}
+
+function applyAnimFrame(anim,t){
   for(let i=0;i<anim.objects.length;i++){
     const o=anim.objects[i],d=anim.data[i];
     if(d.type==='text'){
       o.x=d.x+(d.targetX-d.x)*t;
       o.y=d.y+(d.targetY-d.y)*t;
+      if(d.targetRot!==undefined)o.rotation=d.origRot+(d.targetRot-d.origRot)*t;
     } else if(o.points&&d.origPts){
       for(let j=0;j<o.points.length;j++){
         if(j<d.origPts.length&&j<d.targetPts.length){
@@ -616,6 +662,7 @@ function applyFlipFrame(anim,t){
           o.points[j].y=d.origPts[j].y+(d.targetPts[j].y-d.origPts[j].y)*t;
         }
       }
+      if(d.targetRot!==undefined)o.rotation=d.origRot+(d.targetRot-d.origRot)*t;
     }
   }
   computeBB();
@@ -772,7 +819,7 @@ function ptrUp(e){
   const sp=snapPoint(w);
   switch(currentTool){
     case'pen':case'marker':if(liveStroke&&liveStroke.points.length)objects.push(liveStroke);liveStroke=null;break;
-    case'line':case'rect':case'ellipse':case'arrow':case'triangle':if(liveP0&&Math.hypot(sp.x-liveP0.x,sp.y-liveP0.y)>3/zoom){const fill=getFill();objects.push({type:currentTool,points:[liveP0,sp],color,width:strokeW,lineStyle,opacity:currentOpacity<1?currentOpacity:undefined,fill});}liveP0=liveP1=null;break;
+    case'line':case'rect':case'ellipse':case'arrow':case'triangle':if(liveP0&&Math.hypot(sp.x-liveP0.x,sp.y-liveP0.y)>3/zoom){const fill=getFill();let pts=[liveP0,sp];if(currentTool==='triangle'){const a=liveP0,b=sp;pts=[{x:(a.x+b.x)/2,y:Math.min(a.y,b.y)},{x:Math.max(a.x,b.x),y:Math.max(a.y,b.y)},{x:Math.min(a.x,b.x),y:Math.max(a.y,b.y)}];}objects.push({type:currentTool,points:pts,color,width:strokeW,lineStyle,opacity:currentOpacity<1?currentOpacity:undefined,fill});}liveP0=liveP1=null;break;
   }
   rr();
 }
@@ -912,7 +959,7 @@ function clearAll(){if(!objects.length)return;if(!confirm('Clear all?'))return;s
 
 let toastTid;function toast(m,d=2e3){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(toastTid);toastTid=setTimeout(()=>el.classList.remove('show'),d);}
 
-return{init,undo,redo,clearAll,tool,texMode,commitText,cancelText,updatePreview,setStroke,setEraser,setFontSize,setFont,setLineStyle,setGrid,toggleSnap,setOpacity,setFill,zoomBy,resetView,fitToView,exportPNG,toast,deleteSelected,duplicateSel,bringForward,sendBackward,flipH,flipV,align,copySel,paste,togglePointEdit,setRotation};
+return{init,undo,redo,clearAll,tool,texMode,commitText,cancelText,updatePreview,setStroke,setEraser,setFontSize,setFont,setLineStyle,setGrid,toggleSnap,setOpacity,setFill,zoomBy,resetView,fitToView,exportPNG,toast,deleteSelected,duplicateSel,bringForward,sendBackward,flipH,flipV,align,copySel,paste,togglePointEdit,setRotation,rotateCW,rotateCCW};
 })();
 addEventListener('DOMContentLoaded',()=>setTimeout(()=>MB.init(),150));
 </script>
