@@ -194,7 +194,7 @@ function init(){
     if(sel.length){saveHist();for(const o of sel){o.color=color;if(o.fill){if(o.fill.length===9)o.fill=color+'80';else o.fill=color;}if(o.type==='text'){delete o._img;delete o._dpr;}}rr();}
   });});
   document.getElementById('tex-input').addEventListener('input',updatePreview);
-  render();toast('MathBoard ready — S to select, P to draw');
+  resetView();toast('MathBoard ready — S to select, P to draw');
 }
 function resize(){W=innerWidth;H=innerHeight;canvas.width=W*DPR;canvas.height=H*DPR;canvas.style.width=W+'px';canvas.style.height=H+'px';rr();}
 
@@ -872,7 +872,7 @@ function cancelText(){document.getElementById('text-overlay').classList.remove('
 
 // Zoom
 function zoomBy(d){const nz=Math.min(ZOOM_MAX,Math.max(ZOOM_MIN,zoom+d));const cx=W/2,cy=H/2;panX=cx-(cx-panX)*(nz/zoom);panY=cy-(cy-panY)*(nz/zoom);zoom=nz;updateZoom();rr();}
-function resetView(){zoom=1;panX=0;panY=0;updateZoom();rr();}
+function resetView(){zoom=1;panX=Math.round(W/2);panY=Math.round(H/2);updateZoom();rr();}
 function updateZoom(){document.getElementById('zoom-val').textContent=Math.round(zoom*100)+'%';}
 
 // Props - apply to selection if selected
