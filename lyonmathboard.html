@@ -79,6 +79,28 @@
     .modal-btn.primary{background:var(--danger);color:#fff}.modal-btn.primary:hover{background:#e03131}
     .modal-btn.secondary{background:var(--surface2);color:var(--text)}.modal-btn.secondary:hover{background:var(--border)}
     .modal-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+    /* Equation panel */
+    #eq-panel{position:fixed;top:20px;left:20px;z-index:200;width:280px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-lg);overflow:hidden;transition:width .2s}
+    #eq-panel.collapsed{width:42px}
+    #eq-panel.collapsed .eq-body{display:none}
+    #eq-panel.collapsed #eq-toggle-label{display:none}
+    #eq-header{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;position:relative}
+    #eq-header svg{width:18px;height:18px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+    #eq-panel.collapsed #eq-header::after{content:'Equations (F)';position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);background:var(--text);color:#fff;font-size:11px;font-weight:500;white-space:nowrap;padding:4px 8px;border-radius:4px;opacity:0;pointer-events:none;transition:opacity .15s;z-index:300}
+    #eq-panel.collapsed #eq-header:hover::after{opacity:1}
+    #eq-toggle-label{font-size:13px;font-weight:600;color:var(--text);flex:1}
+    .eq-body{padding:10px 12px;display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow-y:auto}
+    .eq-row{display:flex;align-items:center;gap:6px}
+    .eq-color-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;cursor:pointer;border:2px solid transparent;transition:all .15s}
+    .eq-color-dot:hover{transform:scale(1.2)}
+    .eq-input{flex:1;background:#fff;border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);outline:none;min-width:0}
+    .eq-input:focus{border-color:var(--accent)}
+    .eq-input.error{border-color:var(--danger);background:rgba(250,82,82,.04)}
+    .eq-remove{width:22px;height:22px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:4px;font-size:16px;flex-shrink:0;transition:all .15s}
+    .eq-remove:hover{background:rgba(250,82,82,.1);color:var(--danger)}
+    .eq-add-btn{display:flex;align-items:center;justify-content:center;gap:5px;padding:6px;border-radius:6px;border:1px dashed var(--border);background:transparent;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;margin-top:2px}
+    .eq-add-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(66,99,235,.04)}
+    .eq-hint{font-size:10px;color:var(--text-muted);line-height:1.4;margin-top:4px}
   </style>
 </head>
 <body class="cur-pen">
@@ -155,6 +177,17 @@
   <textarea id="tex-input" placeholder="Type here..."></textarea>
   <div id="tex-preview"><span style="color:var(--text-muted);font-size:13px">Preview appears here...</span></div>
   <div class="text-buttons"><button class="text-btn secondary" onclick="MB.cancelText()">Cancel</button><button class="text-btn primary" onclick="MB.commitText()">Place</button></div>
+</div>
+<div id="eq-panel" class="collapsed">
+  <div id="eq-header" onclick="MB.toggleEqPanel()">
+    <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4z"/><path d="M14 4h6v6h-6z"/><path d="M4 14h6v6H4z"/><circle cx="17" cy="17" r="3"/><path d="M12 12c2-3 5-3 8 0"/></svg>
+    <span id="eq-toggle-label">Equations</span>
+  </div>
+  <div class="eq-body" id="eq-body">
+    <div id="eq-list"></div>
+    <button class="eq-add-btn" onclick="MB.addEquation()">+ Add equation</button>
+    <div class="eq-hint">x^2, sin(x), tan(x), e^x, ln(x), sqrt(x), |x|, 1/x, x^(1/3), floor(x), sinh(x), sec(x), min(x,2), mod(x,3), …</div>
+  </div>
 </div>
 <div id="zoom-bar"><button class="zoom-btn" onclick="MB.zoomBy(-.15)">−</button><span id="zoom-val">100%</span><button class="zoom-btn" onclick="MB.zoomBy(.15)">+</button><button class="zoom-btn" onclick="MB.fitToView()" title="Fit to View">⊡</button><button class="zoom-btn" onclick="MB.resetView()" title="Reset">⟲</button></div>
 <div id="coord-display">x: 0, y: 0</div>
@@ -254,6 +287,7 @@ function render(){
   ctx.setTransform(DPR,0,0,DPR,0,0);ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);
   ctx.setTransform(DPR*zoom,0,0,DPR*zoom,DPR*panX,DPR*panY);
   drawGrid();
+  drawEquations();
   for(const o of objects)drawObj(o);
   if(liveStroke)drawObj(liveStroke);
   if(liveP0&&liveP1&&shapeTools.includes(currentTool)){ctx.save();ctx.globalAlpha=.6;drawObj({type:currentTool,points:[liveP0,liveP1],color,width:strokeW,lineStyle});ctx.restore();}
@@ -367,7 +401,7 @@ async function bakeSVG(o,key,bs){
   o._img=img;o._dpr=bs;imgCache.set(key,{img,dpr:bs});
 }
 function parseMixed(t){if(!window.katex)return`<span>${esc(t)}</span>`;return t.split(/(\$[^$]+\$)/g).map(p=>/^\$[^$]+\$$/.test(p)?(()=>{try{return katex.renderToString(p.slice(1,-1),{throwOnError:false});}catch(e){return`<span>${esc(p)}</span>`;}})():`<span>${esc(p)}</span>`).join('');}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
 // BBox & hit testing
 function bbox(o){
@@ -919,6 +953,7 @@ function onKeyDown(e){
     case't':tool('text');break;case's':tool('select');break;case'l':tool('line');break;
     case'r':tool('rect');break;case'o':tool('ellipse');break;case'g':tool('triangle');break;
     case'a':if(!ctrl)tool('arrow');break;
+    case'f':toggleEqPanel();break;
     case' ':if(!spaceDown){spaceDown=true;document.body.classList.add('cur-pan');}e.preventDefault();break;
     case'delete':case'backspace':if(sel.length)deleteSelected();break;
     case'escape':if(pointEditMode){pointEditMode=false;const ep=document.getElementById('btn-edit-points');if(ep)ep.classList.remove('active');rr();}else{clearSel();cancelText();}break;
@@ -1028,7 +1063,289 @@ async function clearAll(){
 
 let toastTid;function toast(m,d=2e3){const el=document.getElementById('toast');el.textContent=m;el.classList.add('show');clearTimeout(toastTid);toastTid=setTimeout(()=>el.classList.remove('show'),d);}
 
-return{init,undo,redo,clearAll,tool,texMode,commitText,cancelText,updatePreview,setStroke,setEraser,setFontSize,setFont,setLineStyle,setGrid,toggleSnap,setOpacity,setFill,zoomBy,resetView,fitToView,exportPNG,toast,deleteSelected,duplicateSel,bringForward,sendBackward,flipH,flipV,align,copySel,paste,togglePointEdit,setRotation,rotateCW,rotateCCW};
+// === Equation Plotter ===
+const EQ_COLORS=['#4263eb','#fa5252','#51cf66','#f76707','#ae3ec9','#20c997','#e64980','#1098ad'];
+let equations=[]; // {id, expr, color, fn, error}
+let eqIdCounter=0;
+
+function toggleEqPanel(){
+  const panel=document.getElementById('eq-panel');
+  panel.classList.toggle('collapsed');
+  // Auto-add first equation if empty
+  if(!panel.classList.contains('collapsed')&&equations.length===0)addEquation();
+}
+
+function addEquation(){
+  const eq={id:++eqIdCounter,expr:'',color:EQ_COLORS[(equations.length)%EQ_COLORS.length],fn:null,error:false};
+  equations.push(eq);
+  renderEqList();
+  // Focus the new input
+  setTimeout(()=>{const inp=document.getElementById('eq-inp-'+eq.id);if(inp)inp.focus();},50);
+}
+
+function removeEquation(id){
+  equations=equations.filter(e=>e.id!==id);
+  renderEqList();rr();
+}
+
+function cycleEqColor(id){
+  const eq=equations.find(e=>e.id===id);if(!eq)return;
+  const ci=EQ_COLORS.indexOf(eq.color);
+  eq.color=EQ_COLORS[(ci+1)%EQ_COLORS.length];
+  renderEqList();rr();
+}
+
+function updateEquation(id,expr){
+  const eq=equations.find(e=>e.id===id);if(!eq)return;
+  eq.expr=expr;
+  eq.error=false;eq.fn=null;
+  if(!expr.trim()){rr();return;}
+  try{
+    eq.fn=compileExpr(expr);
+    // Test evaluation
+    eq.fn(1);eq.fn(-1);eq.fn(0.5);
+    eq.error=false;
+  }catch(e){eq.fn=null;eq.error=true;}
+  // Switch to cartesian grid if not already
+  if(eq.fn&&gridMode==='none'){setGrid('cartesian');}
+  const inp=document.getElementById('eq-inp-'+id);
+  if(inp){inp.classList.toggle('error',eq.error);}
+  rr();
+}
+
+function compileExpr(expr){
+  // Tokenizer + recursive-descent parser for safe math evaluation
+  let s=expr.trim();
+  // Strip leading "y=", "f(x)=", "y(x)=" etc.
+  s=s.replace(/^\s*(?:[yf]\s*\(?\s*x?\s*\)?\s*=\s*)/i,'');
+  if(!s)throw new Error('Empty');
+
+  // Known functions and constants
+  const FUNCS={
+    sin:Math.sin,cos:Math.cos,tan:Math.tan,
+    asin:Math.asin,acos:Math.acos,atan:Math.atan,atan2:Math.atan2,
+    sinh:Math.sinh,cosh:Math.cosh,tanh:Math.tanh,
+    asinh:Math.asinh,acosh:Math.acosh,atanh:Math.atanh,
+    sqrt:Math.sqrt,cbrt:Math.cbrt,abs:Math.abs,
+    ln:Math.log,log:Math.log10,log2:Math.log2,exp:Math.exp,
+    floor:Math.floor,ceil:Math.ceil,round:Math.round,sign:Math.sign,
+    min:Math.min,max:Math.max,pow:Math.pow,
+    sec:x=>1/Math.cos(x),csc:x=>1/Math.sin(x),cot:x=>Math.cos(x)/Math.sin(x),
+    fact:function f(n){n=Math.round(n);if(n<0)return NaN;if(n<=1)return 1;let r=1;for(let i=2;i<=n&&i<171;i++)r*=i;return r;},
+    mod:(a,b)=>((a%b)+b)%b
+  };
+  const CONSTS={pi:Math.PI,e:Math.E,tau:Math.PI*2,phi:(1+Math.sqrt(5))/2,inf:Infinity};
+
+  // Tokenize
+  function tokenize(str){
+    const toks=[];let i=0;
+    while(i<str.length){
+      const ch=str[i];
+      if(/\s/.test(ch)){i++;continue;}
+      // Number (including decimals like .5)
+      if(/[0-9.]/.test(ch)){
+        let n='';
+        while(i<str.length&&/[0-9.]/.test(str[i]))n+=str[i++];
+        // Scientific notation e.g. 2e3, 1.5e-2
+        if(i<str.length&&(str[i]==='e'||str[i]==='E')&&(i+1<str.length)&&(/[0-9+\-]/.test(str[i+1]))){
+          n+=str[i++];
+          if(str[i]==='+'||str[i]==='-')n+=str[i++];
+          while(i<str.length&&/[0-9]/.test(str[i]))n+=str[i++];
+        }
+        toks.push({type:'num',val:parseFloat(n)});continue;
+      }
+      // Identifier (function name, variable, constant)
+      if(/[a-zA-Z_]/.test(ch)){
+        let id='';
+        while(i<str.length&&/[a-zA-Z0-9_]/.test(str[i]))id+=str[i++];
+        toks.push({type:'id',val:id.toLowerCase()});continue;
+      }
+      // Operators and parens
+      if('+-*/^%(),|'.includes(ch)){toks.push({type:'op',val:ch});i++;continue;}
+      // Pipe for abs: |expr|
+      if(ch==='|'){toks.push({type:'pipe'});i++;continue;}
+      throw new Error('Unexpected: '+ch);
+    }
+    return toks;
+  }
+
+  // Insert implicit multiplication tokens
+  function insertImplicitMul(toks){
+    const out=[];
+    for(let i=0;i<toks.length;i++){
+      const t=toks[i],prev=out[out.length-1];
+      if(prev){
+        const needMul=
+          // num followed by id or (: 2x, 2sin(x), 2(x)
+          (prev.type==='num'&&(t.type==='id'||t.type==='pipe'||(t.type==='op'&&t.val==='(')))||
+          // ) followed by ( or id or num or pipe: (2)(3), (x)x, (x)2
+          (prev.type==='op'&&prev.val===')'&&(t.type==='id'||t.type==='num'||t.type==='pipe'||(t.type==='op'&&t.val==='(')))||
+          // id/x followed by ( only if NOT a function: x(2), but sin( is a function call
+          (prev.type==='id'&&!FUNCS[prev.val]&&(t.type==='op'&&t.val==='('))||
+          // id(non-func) or x followed by num: x2
+          (prev.type==='id'&&t.type==='num')||
+          // num followed by pipe: 2|x|
+          (prev.type==='num'&&t.type==='pipe')||
+          // ) followed by pipe
+          (prev.type==='op'&&prev.val===')'&&t.type==='pipe')||
+          // id followed by id (like x pi)
+          (prev.type==='id'&&t.type==='id'&&!FUNCS[t.val]);
+        if(needMul)out.push({type:'op',val:'*'});
+      }
+      out.push(t);
+    }
+    return out;
+  }
+
+  const tokens=insertImplicitMul(tokenize(s));
+  let pos=0;
+  function peek(){return pos<tokens.length?tokens[pos]:null;}
+  function next(){return tokens[pos++];}
+  function expect(type,val){const t=next();if(!t||t.type!==type||(val!==undefined&&t.val!==val))throw new Error('Expected '+type+' '+(val||''));return t;}
+
+  // Grammar: expr → term ((+|-) term)*
+  function parseExpr(){
+    let left=parseTerm();
+    while(peek()&&peek().type==='op'&&(peek().val==='+'||peek().val==='-')){
+      const op=next().val;const right=parseTerm();
+      const l=left,r=right;
+      left=op==='+'?(x=>l(x)+r(x)):(x=>l(x)-r(x));
+    }
+    return left;
+  }
+  // term → power ((*|/|%) power)*
+  function parseTerm(){
+    let left=parsePower();
+    while(peek()&&peek().type==='op'&&(peek().val==='*'||peek().val==='/'||peek().val==='%')){
+      const op=next().val;const right=parsePower();
+      const l=left,r=right;
+      if(op==='*')left=(x=>l(x)*r(x));
+      else if(op==='/')left=(x=>l(x)/r(x));
+      else left=(x=>l(x)%r(x));
+    }
+    return left;
+  }
+  // power → unary (^ power)?   (right-associative)
+  function parsePower(){
+    let base=parseUnary();
+    if(peek()&&peek().type==='op'&&peek().val==='^'){
+      next();const exp=parsePower();
+      const b=base,e=exp;
+      base=(x=>Math.pow(b(x),e(x)));
+    }
+    return base;
+  }
+  // unary → (+|-) unary | atom
+  function parseUnary(){
+    if(peek()&&peek().type==='op'&&(peek().val==='-'||peek().val==='+')){
+      const op=next().val;const operand=parseUnary();
+      return op==='-'?(x=>-operand(x)):operand;
+    }
+    return parseAtom();
+  }
+  // atom → number | x | constant | func(args) | (expr) | |expr| | atom with implicit factorial !
+  function parseAtom(){
+    const t=peek();
+    if(!t)throw new Error('Unexpected end');
+    // Number
+    if(t.type==='num'){next();const v=t.val;return(x=>v);}
+    // Pipe → absolute value |expr|
+    if(t.type==='pipe'){
+      next();const inner=parseExpr();
+      if(!peek()||peek().type!=='pipe')throw new Error('Missing |');
+      next();return(x=>Math.abs(inner(x)));
+    }
+    // Parenthesized expression
+    if(t.type==='op'&&t.val==='('){
+      next();const inner=parseExpr();
+      expect('op',')');return inner;
+    }
+    // Identifier
+    if(t.type==='id'){
+      const name=t.val;next();
+      // Variable
+      if(name==='x')return(x=>x);
+      // Constant
+      if(CONSTS[name]!==undefined){const v=CONSTS[name];return(x=>v);}
+      // Function call
+      if(FUNCS[name]){
+        const fn=FUNCS[name];
+        if(peek()&&peek().type==='op'&&peek().val==='('){
+          next(); // consume (
+          const args=[parseExpr()];
+          while(peek()&&peek().type==='op'&&peek().val===','){next();args.push(parseExpr());}
+          expect('op',')');
+          if(args.length===1)return(x=>fn(args[0](x)));
+          if(args.length===2){const a0=args[0],a1=args[1];return(x=>fn(a0(x),a1(x)));}
+          return(x=>fn(...args.map(a=>a(x))));
+        }
+        // Function without parens applied to next atom: sin x, ln x
+        const arg=parsePower();
+        return(x=>fn(arg(x)));
+      }
+      throw new Error('Unknown: '+name);
+    }
+    throw new Error('Unexpected token');
+  }
+
+  const ast=parseExpr();
+  if(pos<tokens.length)throw new Error('Trailing tokens');
+  return ast;
+}
+
+function renderEqList(){
+  const list=document.getElementById('eq-list');
+  list.innerHTML=equations.map(eq=>`<div class="eq-row">
+    <div class="eq-color-dot" style="background:${eq.color}" onclick="MB.cycleEqColor(${eq.id})" title="Click to change color"></div>
+    <input class="eq-input${eq.error?' error':''}" id="eq-inp-${eq.id}" type="text" value="${esc(eq.expr)}" placeholder="e.g. sin(x)" oninput="MB.updateEquation(${eq.id},this.value)" spellcheck="false" autocomplete="off">
+    <button class="eq-remove" onclick="MB.removeEquation(${eq.id})" title="Remove">×</button>
+  </div>`).join('');
+}
+
+function drawEquations(){
+  if(!equations.length)return;
+  const gs=GRID_SIZE;
+  const wx0=-panX/zoom,wy0=-panY/zoom,wx1=(W-panX)/zoom,wy1=(H-panY)/zoom;
+  const mx0=wx0/gs,mx1=wx1/gs;
+  const steps=Math.max(600,Math.ceil(W*1.5));
+  const dx=(mx1-mx0)/steps;
+  // Adaptive discontinuity threshold: based on visible y-range in math units
+  const visH=(wy1-wy0)/gs;
+  const discoThresh=Math.max(visH*0.45,8);
+
+  for(const eq of equations){
+    if(!eq.fn)continue;
+    ctx.save();
+    ctx.strokeStyle=eq.color;
+    ctx.lineWidth=2.5/zoom;
+    ctx.lineJoin='round';
+    ctx.lineCap='round';
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    let penDown=false;
+    let prevMy=null;
+    for(let i=0;i<=steps;i++){
+      const mx=mx0+i*dx;
+      let my;
+      try{my=eq.fn(mx);}catch(e){penDown=false;prevMy=null;continue;}
+      if(!isFinite(my)||isNaN(my)){penDown=false;prevMy=null;continue;}
+      const wyVal=-my*gs;
+      // Detect discontinuities (sign change + large jump)
+      if(prevMy!==null){
+        const jump=Math.abs(my-prevMy);
+        const signFlip=(my>0&&prevMy<0)||(my<0&&prevMy>0);
+        if(jump>discoThresh&&signFlip){penDown=false;}
+      }
+      if(!penDown){ctx.moveTo(mx*gs,wyVal);penDown=true;}
+      else{ctx.lineTo(mx*gs,wyVal);}
+      prevMy=my;
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+return{init,undo,redo,clearAll,tool,texMode,commitText,cancelText,updatePreview,setStroke,setEraser,setFontSize,setFont,setLineStyle,setGrid,toggleSnap,setOpacity,setFill,zoomBy,resetView,fitToView,exportPNG,toast,deleteSelected,duplicateSel,bringForward,sendBackward,flipH,flipV,align,copySel,paste,togglePointEdit,setRotation,rotateCW,rotateCCW,toggleEqPanel,addEquation,removeEquation,updateEquation,cycleEqColor};
 })();
 addEventListener('DOMContentLoaded',()=>setTimeout(()=>MB.init(),150));
 </script>
