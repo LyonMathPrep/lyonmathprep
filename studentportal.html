@@ -330,7 +330,224 @@ body {
   padding: 24px;
   display:flex; align-items:center; justify-content:space-between;
   gap: 18px; flex-wrap:wrap; margin-bottom: 26px;
+  transition: background .4s ease, border-color .4s ease, box-shadow .4s ease;
 }
+
+/* ==================== LIVE MEETING HIGHLIGHT ==================== */
+
+/* --- LIVE (green) --- */
+.next-class-card.meeting-live {
+  background: linear-gradient(135deg, #e6f4ea 0%, #d4edda 100%);
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(45, 122, 58, 0.15), 0 4px 16px rgba(45, 122, 58, 0.12);
+  animation: livePulse 2.5s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(45, 122, 58, 0.15), 0 4px 16px rgba(45, 122, 58, 0.12); }
+  50% { box-shadow: 0 0 0 6px rgba(45, 122, 58, 0.25), 0 4px 24px rgba(45, 122, 58, 0.22); }
+}
+
+.meeting-live .next-class-label {
+  color: var(--green) !important;
+}
+
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--white);
+  background: var(--green);
+  border: 2px solid var(--green);
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin-left: 8px;
+  animation: liveBadgePulse 1.5s ease-in-out infinite;
+}
+
+@keyframes liveBadgePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .7; }
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--white);
+  animation: liveDotBlink 1s ease-in-out infinite;
+}
+
+@keyframes liveDotBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .3; }
+}
+
+.upcoming-card.meeting-live {
+  background: linear-gradient(135deg, #e6f4ea 0%, #d4edda 100%);
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(45, 122, 58, 0.12), 0 4px 12px rgba(45, 122, 58, 0.1);
+  animation: livePulse 2.5s ease-in-out infinite;
+}
+
+.upcoming-card.meeting-live .upcoming-date {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.upcoming-card.meeting-live .upcoming-date .day {
+  color: var(--white);
+}
+
+.upcoming-card.meeting-live .upcoming-date .month {
+  color: rgba(255,255,255,.85);
+}
+
+.meet-item.meeting-live {
+  background: linear-gradient(135deg, #e6f4ea 0%, #d4edda 100%);
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(45, 122, 58, 0.12);
+  animation: livePulse 2.5s ease-in-out infinite;
+}
+
+.calendar-day.meeting-live {
+  background: var(--green) !important;
+  color: var(--white) !important;
+  border-color: var(--green) !important;
+  animation: livePulse 2.5s ease-in-out infinite;
+}
+
+.calendar-day.meeting-live .class-dot {
+  background: var(--white) !important;
+}
+
+.meeting-live .btn-meet {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.meeting-live .btn-meet:hover {
+  background: #1e5e2a;
+}
+
+.meeting-live .meet-link {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.meeting-live .meet-link:hover {
+  background: #1e5e2a;
+}
+
+/* --- STARTING SOON (amber/orange) --- */
+.next-class-card.meeting-soon {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+  border-color: #e6a200;
+  box-shadow: 0 0 0 3px rgba(230, 162, 0, 0.15), 0 4px 16px rgba(230, 162, 0, 0.12);
+  animation: soonPulse 3s ease-in-out infinite;
+}
+
+@keyframes soonPulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(230, 162, 0, 0.15), 0 4px 16px rgba(230, 162, 0, 0.12); }
+  50% { box-shadow: 0 0 0 6px rgba(230, 162, 0, 0.22), 0 4px 24px rgba(230, 162, 0, 0.2); }
+}
+
+.meeting-soon .next-class-label {
+  color: #b37a00 !important;
+}
+
+.soon-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: #fff;
+  background: #e6a200;
+  border: 2px solid #e6a200;
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin-left: 8px;
+  animation: soonBadgePulse 2s ease-in-out infinite;
+}
+
+@keyframes soonBadgePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .65; }
+}
+
+.soon-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #fff;
+  animation: liveDotBlink 1.2s ease-in-out infinite;
+}
+
+.upcoming-card.meeting-soon {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+  border-color: #e6a200;
+  box-shadow: 0 0 0 3px rgba(230, 162, 0, 0.12), 0 4px 12px rgba(230, 162, 0, 0.1);
+  animation: soonPulse 3s ease-in-out infinite;
+}
+
+.upcoming-card.meeting-soon .upcoming-date {
+  background: #e6a200;
+  border-color: #e6a200;
+}
+
+.upcoming-card.meeting-soon .upcoming-date .day {
+  color: #fff;
+}
+
+.upcoming-card.meeting-soon .upcoming-date .month {
+  color: rgba(255,255,255,.85);
+}
+
+.meet-item.meeting-soon {
+  background: linear-gradient(135deg, #fff8e1 0%, #ffecb3 100%);
+  border-color: #e6a200;
+  box-shadow: 0 0 0 3px rgba(230, 162, 0, 0.12);
+  animation: soonPulse 3s ease-in-out infinite;
+}
+
+.calendar-day.meeting-soon {
+  background: #e6a200 !important;
+  color: #fff !important;
+  border-color: #e6a200 !important;
+  animation: soonPulse 3s ease-in-out infinite;
+}
+
+.calendar-day.meeting-soon .class-dot {
+  background: #fff !important;
+}
+
+.meeting-soon .btn-meet {
+  background: #e6a200;
+  border-color: #e6a200;
+  color: #fff;
+}
+
+.meeting-soon .btn-meet:hover {
+  background: #b37a00;
+}
+
+.meeting-soon .meet-link {
+  background: #e6a200;
+  border-color: #e6a200;
+}
+
+.meeting-soon .meet-link:hover {
+  background: #b37a00;
+}
+
+/* ==================== END LIVE MEETING ==================== */
 
 .next-class-info { flex:1; min-width:200px; }
 .next-class-label {
@@ -623,20 +840,20 @@ body {
 
 .meet-section { padding:18px; }
 .meet-section h3 { margin-bottom: 12px; font-size:17px; font-weight:900; }
-.meet-item { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; border:2px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; }
+.meet-item { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; border:2px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px; transition: background .4s ease, border-color .4s ease, box-shadow .4s ease; }
 .meet-item:last-child { margin-bottom:0; }
 .meet-info { flex:1; min-width:180px; }
 .meet-info .title { font-weight:800; }
 .meet-info .time { font-size:13px; color:var(--text-light); }
-.meet-link { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border:2px solid var(--border); border-radius:8px; background: var(--primary); color: var(--white); text-decoration:none; font-size:13px; font-weight:900; white-space: nowrap; }
+.meet-link { display:inline-flex; align-items:center; gap:6px; padding:8px 12px; border:2px solid var(--border); border-radius:8px; background: var(--primary); color: var(--white); text-decoration:none; font-size:13px; font-weight:900; white-space: nowrap; transition: background .3s ease; }
 .meet-link:hover { background: var(--primary-dark); }
 
 .upcoming-list { display:flex; flex-direction:column; gap:10px; }
-.upcoming-card { background: var(--white); border:2px solid var(--border); border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:16px; transition: all .2s; }
+.upcoming-card { background: var(--white); border:2px solid var(--border); border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:16px; transition: all .3s ease; }
 .upcoming-card:hover { transform: translateY(-2px); box-shadow: 4px 4px 0 var(--border); }
-.upcoming-date { text-align:center; min-width:48px; padding:6px; background: var(--primary-light); border:2px solid var(--border); border-radius:8px; }
-.upcoming-date .day { font-size:20px; font-weight:800; color: var(--primary); line-height:1; }
-.upcoming-date .month { font-size:10px; color: var(--text); text-transform:uppercase; font-weight:700; letter-spacing:.5px; margin-top:2px; }
+.upcoming-date { text-align:center; min-width:48px; padding:6px; background: var(--primary-light); border:2px solid var(--border); border-radius:8px; transition: background .3s ease, border-color .3s ease; }
+.upcoming-date .day { font-size:20px; font-weight:800; color: var(--primary); line-height:1; transition: color .3s ease; }
+.upcoming-date .month { font-size:10px; color: var(--text); text-transform:uppercase; font-weight:700; letter-spacing:.5px; margin-top:2px; transition: color .3s ease; }
 .upcoming-info { flex:1; }
 .upcoming-info .title { font-size:15px; font-weight:700; margin-bottom:2px; }
 .upcoming-info .time { font-size:13px; color:var(--text-light); }
@@ -712,7 +929,7 @@ body {
   user-select: none;
   -webkit-user-select: none;
   -ms-user-select: none;
-  touch-action: none;   /* lets us intercept touch drags */
+  touch-action: none;
 }
 .calc-header.dragging { cursor: grabbing; }
 .calc-tabs { display: flex; gap: 6px; }
@@ -910,7 +1127,7 @@ body {
 .lockdown-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(51, 65, 85, 0.98); /* Soft slate blue */
+  background: rgba(51, 65, 85, 0.98);
   z-index: 5500;
   display: none;
   align-items: center;
@@ -945,7 +1162,7 @@ body {
   .calc-toggle { bottom: 16px; right: 16px; padding: 10px 14px; }
   .calc-toggle span { display: none; }
   .calc-panel { bottom: 72px; right: 8px; left: 8px; width: auto; max-width: none; }
-  
+
   .signup-modal-box {
     max-width: 100%;
     padding: 16px;
@@ -1319,7 +1536,6 @@ body {
       <h2>Create an Account</h2>
       <button class="signup-close" onclick="closeSignupModal()">×</button>
     </div>
-    <!-- IMPORTANT: Replace YOUR_FORM_ID with your actual Google Form ID -->
     <iframe class="signup-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSf59KopwNB0lxih_7yGvTSh8OsJNntFXvUa3-7tFvUW2Yh2zg/viewform?embedded=true" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
   </div>
 </div>
@@ -1428,6 +1644,9 @@ const QUESTIONS_URL = 'https://opensheet.elk.sh/1f8VdEO7bv6hNrul0i8rHTvzpFPYo0jN
 // LocalStorage key for saved session
 const SESSION_KEY = 'lyonmathprep_session';
 
+// Eastern Time zone identifier — handles EST/EDT automatically
+const EASTERN_TZ = 'America/New_York';
+
 // =========================
 // SVG icon helpers
 // =========================
@@ -1444,6 +1663,7 @@ let questionsCache = [];
 let calendarEventMap = {};
 let quizState      = null;
 let testLockdownActive = false;
+let liveCheckInterval  = null;
 
 let activeLevels   = new Set();
 let finishedLevels = new Set();
@@ -1465,8 +1685,8 @@ const daysOfWeek = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday',
 // =========================
 // Utilities
 // =========================
-function norm(v) { 
-  return String(v ?? '').toLowerCase().replace(/\s+/g, ''); 
+function norm(v) {
+  return String(v ?? '').toLowerCase().replace(/\s+/g, '');
 }
 
 function esc(str) {
@@ -1500,6 +1720,25 @@ function extractTimeRange(text) {
   return (parts[1]||parts[0]||'').trim();
 }
 
+// =========================
+// Eastern Time Conversion
+// =========================
+// Returns a Date whose getHours/getMinutes/getDay reflect the current
+// America/New_York wall-clock time (EST in winter, EDT in summer).
+// This way "12:00 PM" in the API always matches 12:00 PM on the Eastern clock.
+function getNowInEST() {
+  const now = new Date();
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: EASTERN_TZ,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+    hour: '2-digit', minute: '2-digit', second: '2-digit',
+    hour12: false
+  }).formatToParts(now);
+  const g = type => parseInt(parts.find(p => p.type === type).value, 10);
+  return new Date(g('year'), g('month') - 1, g('day'), g('hour'), g('minute'), g('second'));
+}
+
+// Parse a single time like "12:00 PM" or "1:00 PM" into { h (0-23), min }
 function parseTimeToHM(text) {
   const m = String(text||'').match(/(\d{1,2}):(\d{2})\s*([AP]M)/i);
   if (!m) return {h:12,min:0};
@@ -1507,6 +1746,116 @@ function parseTimeToHM(text) {
   if (ap==='PM'&&h!==12) h+=12;
   if (ap==='AM'&&h===12) h=0;
   return {h,min};
+}
+
+// Parse a time range like "12:00 PM – 1:00 PM" into { startH, startMin, endH, endMin }
+function parseTimeRange(text) {
+  const str = String(text || '');
+  // Match patterns like "12:00 PM – 1:00 PM" or "12:00 PM - 1:00 PM"
+  const rangeMatch = str.match(/(\d{1,2}:\d{2}\s*[AP]M)\s*[\u2013\u2014\-–—]\s*(\d{1,2}:\d{2}\s*[AP]M)/i);
+  if (rangeMatch) {
+    const start = parseTimeToHM(rangeMatch[1]);
+    const end   = parseTimeToHM(rangeMatch[2]);
+    return { startH: start.h, startMin: start.min, endH: end.h, endMin: end.min };
+  }
+  // Fallback: just parse the first time found and assume 1 hour duration
+  const single = parseTimeToHM(str);
+  return { startH: single.h, startMin: single.min, endH: single.h + 1, endMin: single.min };
+}
+
+// Check meeting status: returns 'live', 'soon' (within 15 min), or null.
+// Meeting times are in EST (fixed UTC-5, no DST).
+// We convert the user's system clock to EST and compare.
+const SOON_MINUTES = 15; // minutes before start to show "starting soon"
+
+function getMeetingStatus(meeting) {
+  const estNow = getNowInEST();
+  const currentDayName = daysOfWeek[estNow.getDay()];
+  const currentH   = estNow.getHours();
+  const currentMin  = estNow.getMinutes();
+  const currentTotalMin = currentH * 60 + currentMin;
+
+  // Check if today matches the meeting's schedule
+  const meetingDays = meeting.weekdays || [];
+  const hasSpecific = meeting.specificDate;
+
+  let dayMatches = false;
+
+  // Check recurring weekday match
+  if (meetingDays.length > 0) {
+    dayMatches = meetingDays.some(d => d.toLowerCase() === currentDayName.toLowerCase());
+  }
+
+  // Check specific date match
+  if (hasSpecific) {
+    const specDate = meeting.specificDate;
+    if (specDate.getFullYear() === estNow.getFullYear() &&
+        specDate.getMonth() === estNow.getMonth() &&
+        specDate.getDate() === estNow.getDate()) {
+      dayMatches = true;
+    }
+  }
+
+  if (!dayMatches) return null;
+
+  // Parse the time range from the meeting's dateAndTime field
+  const timeRange = parseTimeRange(meeting.dateAndTime);
+  const startTotalMin = timeRange.startH * 60 + timeRange.startMin;
+  const endTotalMin   = timeRange.endH * 60 + timeRange.endMin;
+
+  // Currently within the meeting window
+  if (currentTotalMin >= startTotalMin && currentTotalMin < endTotalMin) {
+    return 'live';
+  }
+
+  // Within SOON_MINUTES before start
+  if (currentTotalMin >= (startTotalMin - SOON_MINUTES) && currentTotalMin < startTotalMin) {
+    return 'soon';
+  }
+
+  return null;
+}
+
+// Backwards-compatible wrapper
+function isMeetingLiveNow(meeting) {
+  return getMeetingStatus(meeting) === 'live';
+}
+
+// Check if ANY of the user's meetings is live right now
+function getAnyLiveMeeting() {
+  const meetings = getUserMeetings();
+  for (const m of meetings) {
+    if (isMeetingLiveNow(m)) return m;
+  }
+  return null;
+}
+
+// Get the best meeting to highlight (live > soon)
+function getBestActiveMeeting() {
+  const meetings = getUserMeetings();
+  let best = null;
+  let bestStatus = null;
+  for (const m of meetings) {
+    const status = getMeetingStatus(m);
+    if (status === 'live') return { meeting: m, status: 'live' };
+    if (status === 'soon' && !best) { best = m; bestStatus = 'soon'; }
+  }
+  if (best) return { meeting: best, status: bestStatus };
+  return null;
+}
+
+// Returns minutes until meeting starts (for "Starting in X min" text)
+function minutesUntilMeetingStart(meeting) {
+  const estNow = getNowInEST();
+  const currentTotalMin = estNow.getHours() * 60 + estNow.getMinutes();
+  const timeRange = parseTimeRange(meeting.dateAndTime);
+  const startTotalMin = timeRange.startH * 60 + timeRange.startMin;
+  return startTotalMin - currentTotalMin;
+}
+
+// Generate a unique key for a meeting to use as a data attribute for targeting
+function meetingUniqueKey(meeting) {
+  return norm(meeting.topic) + '|' + norm(meeting.link);
 }
 
 function extractWeekdays(text) {
@@ -1542,7 +1891,6 @@ function closeSignupModal() {
   document.getElementById('signupModal').classList.remove('active');
 }
 
-// Close modal if user clicks the dark overlay area outside the form box
 document.getElementById('signupModal').addEventListener('click', function(e) {
   if (e.target === this) {
     closeSignupModal();
@@ -1555,7 +1903,7 @@ document.getElementById('signupModal').addEventListener('click', function(e) {
 function saveSession(username, password) {
   try {
     localStorage.setItem(SESSION_KEY, JSON.stringify({ username, password }));
-  } catch(e) { /* storage unavailable */ }
+  } catch(e) {}
 }
 
 function loadSession() {
@@ -1618,7 +1966,6 @@ async function loadMeetings() {
     return;
   }
   try {
-    // Send a POST request with the logged-in user's username
     const response = await fetch(MEETINGS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1626,7 +1973,7 @@ async function loadMeetings() {
     });
 
     if (!response.ok) throw new Error('Failed to load meetings');
-    
+
     const rows = await response.json();
     meetingCache = (rows || []).map(normalizeMeeting).filter(Boolean);
   } catch (e) {
@@ -1680,16 +2027,30 @@ function meetingCardHTML(meeting, nextDate) {
   const day      = nextDate.getDate();
   const month    = new Intl.DateTimeFormat('en-US',{month:'short'}).format(nextDate);
   const timeRange = extractTimeRange(meeting.dateAndTime);
+  const status   = getMeetingStatus(meeting);
+  const statusClass = status === 'live' ? ' meeting-live' : status === 'soon' ? ' meeting-soon' : '';
+
+  let indicator = '';
+  let joinText = 'Join';
+  if (status === 'live') {
+    indicator = `<span class="live-badge"><span class="live-dot"></span> LIVE NOW</span>`;
+    joinText = 'Join Now';
+  } else if (status === 'soon') {
+    const minsLeft = minutesUntilMeetingStart(meeting);
+    indicator = `<span class="soon-badge"><span class="soon-dot"></span> IN ${minsLeft} MIN</span>`;
+    joinText = 'Join Soon';
+  }
+
   return `
-    <div class="upcoming-card">
+    <div class="upcoming-card${statusClass}" data-meeting-key="${esc(meetingUniqueKey(meeting))}">
       <div class="upcoming-date"><div class="day">${day}</div><div class="month">${month}</div></div>
       <div class="upcoming-info">
-        <div class="title">${esc(meeting.topic)}</div>
+        <div class="title">${esc(meeting.topic)} ${indicator}</div>
         <div class="time">${esc(formatShortDay(nextDate))} · ${esc(timeRange)}</div>
         ${meeting.userClass?`<div class="time">${esc(meeting.userClass)}</div>`:''}
       </div>
       <a href="${esc(meeting.link)}" target="_blank" class="meet-link">
-        ${svgUse('icon-video',14)} Join
+        ${svgUse('icon-video',14)} ${joinText}
       </a>
     </div>
   `;
@@ -1716,7 +2077,6 @@ async function handleAuth(savedPassword) {
   authSubmit.textContent = 'Logging in…';
 
   try {
-    // Send credentials securely to the Cloudflare Worker
     const response = await fetch(USERS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1730,13 +2090,11 @@ async function handleAuth(savedPassword) {
       return;
     }
 
-    // Login successful - apply the user data returned by the worker
     currentUser = {
       username: data.user.username,
       displayName: data.user.displayName
     };
 
-    // Save credentials to localStorage for auto-login on refresh
     saveSession(username, password);
 
     const approvals = await loadApprovals(currentUser.username);
@@ -1761,6 +2119,7 @@ function logout() {
   finishedLevels = new Set();
   meetingCache   = [];
   questionsCache = [];
+  stopLiveCheck();
   document.getElementById('portalScreen').classList.remove('active');
   document.getElementById('authScreen').classList.remove('hidden');
   document.getElementById('authUsername').value = '';
@@ -1783,6 +2142,41 @@ function enterPortal() {
 
   renderDashboard();
   showPage('dashboard');
+  startLiveCheck();
+}
+
+// =========================
+// Live Meeting Check Timer
+// =========================
+function startLiveCheck() {
+  stopLiveCheck();
+  // Check every 15 seconds to update live meeting status
+  liveCheckInterval = setInterval(function() {
+    updateLiveHighlights();
+  }, 15000);
+}
+
+function stopLiveCheck() {
+  if (liveCheckInterval) {
+    clearInterval(liveCheckInterval);
+    liveCheckInterval = null;
+  }
+}
+
+// Update live/soon highlights — does a full re-render of meetings UI
+// to keep badges, countdown text, and classes in sync.
+function updateLiveHighlights() {
+  if (!currentUser) return;
+
+  // Re-render the meetings UI to pick up status changes
+  const activePage = document.querySelector('.page.active');
+  if (activePage) {
+    if (activePage.id === 'page-dashboard') {
+      renderMeetingsUI();
+    } else if (activePage.id === 'page-calendar') {
+      renderMeetingsUI();
+    }
+  }
 }
 
 // =========================
@@ -1805,7 +2199,6 @@ async function refreshAllData() {
     activeLevels   = approvals.active;
     finishedLevels = approvals.finished;
 
-    // Re-render whichever page is currently active
     renderDashboard();
     const activePage = document.querySelector('.page.active');
     if (activePage?.id === 'page-calendar') renderCalendar();
@@ -1866,7 +2259,6 @@ function showPage(page) {
   if (page === 'calendar')  renderCalendar();
   if (page === 'dashboard') renderMeetingsUI();
 
-  // Update calculator visibility based on page
   updateCalcToggleVisibility();
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1979,7 +2371,6 @@ function openSubject(subjectKey) {
     list.appendChild(row);
   }
 
-  // Append Unit Test Card at the bottom
   let allLevelsFinished = true;
   for(let i=1; i<=10; i++) {
     if (getLevelStatus(subjectKey, i) !== 'finished') {
@@ -2009,7 +2400,7 @@ function openSubject(subjectKey) {
   `;
 
   if (allLevelsFinished) {
-    testRow.onclick = () => startLevelQuiz(subjectKey, 0, true); // 0 means Unit Test
+    testRow.onclick = () => startLevelQuiz(subjectKey, 0, true);
   }
 
   list.appendChild(testRow);
@@ -2025,11 +2416,11 @@ function startLevelQuiz(subjectKey, level, isTest = false) {
   if (!subject) return;
 
   const sheetKeyToMatch = isTest ? subject.sheetKey + '-test' : subject.sheetKey;
-  
+
   let pool = questionsCache.filter(q => {
     const matchSubject = norm(q['Question type']) === norm(sheetKeyToMatch);
     if (!matchSubject) return false;
-    if (isTest) return true; // Grab all test questions regardless of level
+    if (isTest) return true;
     const qLevel = parseInt(String(q.Level || '0').trim(), 10);
     return qLevel === level;
   });
@@ -2039,19 +2430,16 @@ function startLevelQuiz(subjectKey, level, isTest = false) {
     return;
   }
 
-  // Fisher-Yates shuffle for true randomization
   let shuffled = [...pool];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
     [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
-  
-  // Limit levels to 10 questions
+
   if (!isTest && shuffled.length > 10) {
     shuffled = shuffled.slice(0, 10);
   }
-  
-  // Limit tests to 30 questions
+
   if (isTest && shuffled.length > 30) {
     shuffled = shuffled.slice(0, 30);
   }
@@ -2109,8 +2497,6 @@ function disableTestLockdown() {
 
 function handleLockdown() {
   if (!testLockdownActive) return;
-  
-  // If the tab is hidden OR the user exited fullscreen
   if (document.hidden || !document.fullscreenElement) {
     document.getElementById('testLockdownOverlay').classList.add('active');
   } else {
@@ -2145,14 +2531,14 @@ function initQuizUI() {
       openSubject(quizState.subjectKey);
     }
   };
-  
+
   let titleText = `${svgUse(subjectCatalog[quizState.subjectKey].iconId,26)} ${quizState.subjectLabel} — `;
   if (quizState.isTest) {
     titleText += 'Unit Test';
   } else {
     titleText += `Level ${quizState.level}`;
   }
-  
+
   document.getElementById('quizPageTitle').innerHTML = titleText;
   document.getElementById('quizPageSubtitle').textContent = `${quizState.questions.length} question${quizState.questions.length===1?'':'s'} · Answer them all to see your results.` + (quizState.isTest ? ' · TEST MODE: Tab locked.' : '');
 
@@ -2265,16 +2651,15 @@ function nextQuizQuestion() {
 
 async function submitLevelCompletion(username, sheetKey, level) {
   const finishedString = `${sheetKey}-lvl${level}`;
-  
+
   const localKey = makeApprovalKey(sheetKey, level);
   finishedLevels.add(localKey);
   activeLevels.delete(localKey);
-  
+
   try {
     await fetch(APPROVALS_UPDATE_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      // Added action: 'submitLevel' here:
       body: JSON.stringify({ action: 'submitLevel', username, finishedLevel: finishedString })
     });
     showToast('Level mastery saved! 🎉');
@@ -2288,7 +2673,7 @@ function renderQuizResults() {
   if (quizState.isTest) {
     disableTestLockdown();
   }
-  
+
   const { correct, wrong, questions, subjectKey, subjectLabel, level, isTest } = quizState;
   const total = questions.length;
   const pct   = Math.round((correct / total) * 100);
@@ -2319,7 +2704,6 @@ function renderQuizResults() {
     </div>
   `;
 
-  // NEW: Auto-complete the level if they scored 90% or higher and it's a regular level
   if (!isTest && pct >= 90) {
     const subject = subjectCatalog[subjectKey];
     if (subject) {
@@ -2338,24 +2722,66 @@ function renderMeetingsUI() {
     .filter(m => m.next)
     .sort((a,b) => a.next - b.next);
 
+  // Check best active meeting (live takes priority over soon)
+  const bestActive = getBestActiveMeeting();
+
   const nextCard = document.getElementById('nextClassCard');
   if (nextCard) {
     if (upcoming.length) {
       const next = upcoming[0];
+      const nextStatus = getMeetingStatus(next);
+
+      // Determine what to display: active meeting (live/soon) or next upcoming
+      let displayMeeting, displayStatus;
+      if (bestActive) {
+        displayMeeting = bestActive.meeting;
+        displayStatus = bestActive.status;
+      } else {
+        displayMeeting = next;
+        displayStatus = nextStatus;
+      }
+
+      let cardClass = 'next-class-card';
+      let labelText = 'Next Meeting';
+      let badge = '';
+      let timeText = '';
+      let joinText = 'Join Meeting';
+
+      if (displayStatus === 'live') {
+        cardClass += ' meeting-live';
+        labelText = 'Meeting Is Now!';
+        badge = '<span class="live-badge"><span class="live-dot"></span> LIVE</span>';
+        timeText = `<strong>Your meeting is happening now!</strong> · ${esc(extractTimeRange(displayMeeting.dateAndTime))}`;
+        joinText = 'Join Now';
+      } else if (displayStatus === 'soon') {
+        const minsLeft = minutesUntilMeetingStart(displayMeeting);
+        cardClass += ' meeting-soon';
+        labelText = 'Starting Soon';
+        badge = `<span class="soon-badge"><span class="soon-dot"></span> ${minsLeft} MIN</span>`;
+        timeText = `<strong>Starts in ${minsLeft} minute${minsLeft===1?'':'s'}</strong> · ${esc(extractTimeRange(displayMeeting.dateAndTime))}`;
+        joinText = 'Get Ready';
+      } else {
+        timeText = `<strong>${esc(formatShortDay(next.next))}</strong> · ${esc(extractTimeRange(next.dateAndTime))}`;
+        displayMeeting = next; // fallback to next upcoming
+      }
+
+      nextCard.className = cardClass;
       nextCard.innerHTML = `
         <div class="next-class-info">
           <div class="next-class-label">
             ${svgUse('icon-calendar',14)}
-            Next Meeting
+            ${labelText}
+            ${badge}
           </div>
-          <div class="next-class-title">${esc(next.topic)}</div>
-          <div class="next-class-time"><strong>${esc(formatShortDay(next.next))}</strong> · ${esc(extractTimeRange(next.dateAndTime))}</div>
+          <div class="next-class-title">${esc(displayMeeting.topic)}</div>
+          <div class="next-class-time">${timeText}</div>
         </div>
-        <a href="${esc(next.link)}" target="_blank" class="btn btn-meet">
-          ${svgUse('icon-video',16)} Join Meeting
+        <a href="${esc(displayMeeting.link)}" target="_blank" class="btn btn-meet">
+          ${svgUse('icon-video',16)} ${joinText}
         </a>
       `;
     } else {
+      nextCard.className = 'next-class-card';
       nextCard.innerHTML = `
         <div class="next-class-info">
           <div class="next-class-label">
@@ -2387,11 +2813,27 @@ function renderMeetingsUI() {
   const calMeetings = document.getElementById('calendarMeetings');
   if (calMeetings) {
     calMeetings.innerHTML = meetings.length
-      ? `<h3>${svgUse('icon-video',16)} Your Meetings</h3>${meetings.map(m=>`
-          <div class="meet-item">
-            <div class="meet-info"><div class="title">${esc(m.topic)}</div><div class="time">${esc(m.dateAndTime)}${m.userClass?` · ${esc(m.userClass)}`:''}</div></div>
-            <a href="${esc(m.link)}" target="_blank" class="meet-link">${svgUse('icon-video',13)} Join</a>
-          </div>`).join('')}`
+      ? `<h3>${svgUse('icon-video',16)} Your Meetings</h3>${meetings.map(m=>{
+          const status = getMeetingStatus(m);
+          let statusClass = '';
+          let badge = '';
+          let joinText = 'Join';
+          if (status === 'live') {
+            statusClass = ' meeting-live';
+            badge = ' <span class="live-badge"><span class="live-dot"></span> LIVE</span>';
+            joinText = 'Join Now';
+          } else if (status === 'soon') {
+            const minsLeft = minutesUntilMeetingStart(m);
+            statusClass = ' meeting-soon';
+            badge = ` <span class="soon-badge"><span class="soon-dot"></span> IN ${minsLeft} MIN</span>`;
+            joinText = 'Join Soon';
+          }
+          return `
+          <div class="meet-item${statusClass}" data-meeting-key="${esc(meetingUniqueKey(m))}">
+            <div class="meet-info"><div class="title">${esc(m.topic)}${badge}</div><div class="time">${esc(m.dateAndTime)}${m.userClass?` · ${esc(m.userClass)}`:''}</div></div>
+            <a href="${esc(m.link)}" target="_blank" class="meet-link">${svgUse('icon-video',13)} ${joinText}</a>
+          </div>`;
+        }).join('')}`
       : `<h3>${svgUse('icon-video',16)} Your Meetings</h3><div class="empty-state"><div class="es-icon"><svg width="44" height="44"><use href="#icon-inbox"/></svg></div><h3>No meetings yet</h3><p>Staff hasn't added any meetings for your username.</p></div>`;
   }
 
@@ -2451,6 +2893,7 @@ function renderCalendar() {
   const daysInMonth = new Date(calendarYear, calendarMonth+1, 0).getDate();
   const daysInPrev  = new Date(calendarYear, calendarMonth, 0).getDate();
   const today       = new Date();
+  const estNow      = getNowInEST();
   const container   = document.getElementById('calendarDays');
   container.innerHTML = '';
 
@@ -2468,8 +2911,21 @@ function renderCalendar() {
     const dateStr = dateKey(dateObj);
     const isToday = today.getFullYear()===calendarYear&&today.getMonth()===calendarMonth&&today.getDate()===day;
     const hasCls  = !!(calendarEventMap[dateStr]?.length);
+
+    // Check if this is today and any meeting is live or starting soon
+    let todayMeetingClass = '';
+    if (isToday) {
+      const bestActive = getBestActiveMeeting();
+      if (bestActive) {
+        todayMeetingClass = bestActive.status === 'live' ? 'meeting-live' : 'meeting-soon';
+      }
+    }
+
     if (isToday) d.classList.add('today');
     if (hasCls)  { d.classList.add('has-class'); d.onclick=()=>showDayDetail(dateStr,day); }
+    if (todayMeetingClass) d.classList.add(todayMeetingClass);
+
+    d.setAttribute('data-date', dateStr);
     d.innerHTML=`${day}${hasCls?'<div class="class-dot"></div>':''}`;
     container.appendChild(d);
   }
@@ -2498,11 +2954,27 @@ function showDayDetail(dateStr, day) {
   if (!classes.length) return;
   const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
   document.getElementById('dayDetailTitle').textContent=`${months[calendarMonth]} ${day}, ${calendarYear}`;
-  document.getElementById('dayDetailContent').innerHTML=classes.map(c=>`
-    <div class="meet-item" style="margin-bottom:8px;">
-      <div class="meet-info"><div class="title">${esc(c.topic)}</div><div class="time">${esc(c.dateAndTime)}${c.userClass?` · ${esc(c.userClass)}`:''}</div></div>
-      <a href="${esc(c.link)}" target="_blank" class="meet-link">${svgUse('icon-video',13)} Join</a>
-    </div>`).join('');
+  document.getElementById('dayDetailContent').innerHTML=classes.map(c=>{
+    const status = getMeetingStatus(c);
+    let statusClass = '';
+    let badge = '';
+    let joinText = 'Join';
+    if (status === 'live') {
+      statusClass = ' meeting-live';
+      badge = ' <span class="live-badge"><span class="live-dot"></span> LIVE</span>';
+      joinText = 'Join Now';
+    } else if (status === 'soon') {
+      const minsLeft = minutesUntilMeetingStart(c);
+      statusClass = ' meeting-soon';
+      badge = ` <span class="soon-badge"><span class="soon-dot"></span> IN ${minsLeft} MIN</span>`;
+      joinText = 'Join Soon';
+    }
+    return `
+    <div class="meet-item${statusClass}" data-meeting-key="${esc(meetingUniqueKey(c))}" style="margin-bottom:8px;">
+      <div class="meet-info"><div class="title">${esc(c.topic)}${badge}</div><div class="time">${esc(c.dateAndTime)}${c.userClass?` · ${esc(c.userClass)}`:''}</div></div>
+      <a href="${esc(c.link)}" target="_blank" class="meet-link">${svgUse('icon-video',13)} ${joinText}</a>
+    </div>`;
+  }).join('');
   document.getElementById('dayDetail').classList.add('active');
 }
 
@@ -2557,7 +3029,6 @@ const CalcEngine = (function() {
         const r = parseFactor();
         l = o === '*' ? l * r : l / r;
       } else if (peek().type === 'num' || peek().type === 'name' || (peek().type === 'op' && peek().value === '(')) {
-        // implicit multiplication: 2pi, 2(3), 2sin(x)
         const r = parseFactor();
         l = l * r;
       } else {
@@ -2571,7 +3042,7 @@ const CalcEngine = (function() {
     let b = parseBase();
     if (peek() && peek().type === 'op' && peek().value === '^') {
       next();
-      const e = parseFactor(); // right-associative
+      const e = parseFactor();
       b = Math.pow(b, e);
     }
     return b;
@@ -2725,9 +3196,8 @@ function calcEquals() {
   }
 }
 
-// Keyboard support for calc input
 document.addEventListener('DOMContentLoaded', function() {
-  initCalcDrag();   // <-- add this line
+  initCalcDrag();
 
   const calcExpr = document.getElementById('calcExpr');
   if (calcExpr) {
@@ -2759,7 +3229,6 @@ function initCalcDrag() {
   const header = panel ? panel.querySelector('.calc-header') : null;
   if (!panel || !header) return;
 
-  // Start drag on mouse or touch
   header.addEventListener('mousedown', calcDragStart);
   header.addEventListener('touchstart', calcDragStart, { passive: false });
 
@@ -2769,7 +3238,6 @@ function initCalcDrag() {
   document.addEventListener('touchend',  calcDragEnd);
   document.addEventListener('touchcancel', calcDragEnd);
 
-  // Keep panel on-screen when viewport resizes
   window.addEventListener('resize', calcClampToViewport);
 }
 
@@ -2777,7 +3245,6 @@ function calcDragStart(e) {
   const panel  = document.getElementById('calcPanel');
   const header = panel.querySelector('.calc-header');
 
-  // Ignore drags that begin on the tab buttons or close button
   if (e.target.closest('.calc-tab') || e.target.closest('.calc-close')) return;
   if (!panel.classList.contains('open')) return;
 
@@ -2786,7 +3253,6 @@ function calcDragStart(e) {
   const rect  = panel.getBoundingClientRect();
   const point = e.touches ? e.touches[0] : e;
 
-  // Freeze current size and switch from CSS right/bottom to explicit left/top
   panel.style.width  = rect.width + 'px';
   panel.style.left   = rect.left + 'px';
   panel.style.top    = rect.top + 'px';
@@ -2816,7 +3282,6 @@ function calcDragMove(e) {
   const maxX = window.innerWidth  - rect.width;
   const maxY = window.innerHeight - rect.height;
 
-  // Clamp so the panel can't be dragged off-screen
   x = Math.max(0, Math.min(x, Math.max(0, maxX)));
   y = Math.max(0, Math.min(y, Math.max(0, maxY)));
 
@@ -2837,7 +3302,6 @@ function calcDragEnd() {
 function calcClampToViewport() {
   const panel = document.getElementById('calcPanel');
   if (!panel || !panel.classList.contains('open')) return;
-  // Only clamp if we've already started dragging (inline left/top set)
   if (!panel.style.left || !panel.style.top) return;
 
   const rect = panel.getBoundingClientRect();
@@ -2874,7 +3338,6 @@ function plotGraph() {
   const xToPx = x => (x - xMin) / (xMax - xMin) * w;
   const yToPx = y => h - (y - yMin) / (yMax - yMin) * h;
 
-  // Grid lines
   ctx.strokeStyle = '#eee';
   ctx.lineWidth = 1;
   const gridStep = graphZoom > 2 ? 0.5 : 1;
@@ -2893,7 +3356,6 @@ function plotGraph() {
     ctx.stroke();
   }
 
-  // Axes
   ctx.strokeStyle = '#000';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
@@ -2903,7 +3365,6 @@ function plotGraph() {
   ctx.lineTo(xToPx(0), h);
   ctx.stroke();
 
-  // Axis labels
   ctx.fillStyle = '#555';
   ctx.font = '10px sans-serif';
   const labelStep = graphZoom > 2 ? 2 : (graphZoom > 1 ? 1 : 2);
@@ -2916,7 +3377,6 @@ function plotGraph() {
     ctx.fillText(i, xToPx(0) + 4, yToPx(i) + 3);
   }
 
-  // Plot function
   ctx.strokeStyle = '#e63946';
   ctx.lineWidth = 2;
   ctx.beginPath();
@@ -2934,12 +3394,10 @@ function plotGraph() {
       }
       const py = yToPx(y);
 
-      // Detect discontinuities (large jumps)
       if (lastPy !== null && Math.abs(py - lastPy) > h * 0.6) {
         started = false;
       }
 
-      // Clamp very large values
       if (py < -1000 || py > h + 1000) {
         started = false;
         lastPy = py;
@@ -2979,13 +3437,12 @@ function updateCalcToggleVisibility() {
   const toggle = document.getElementById('calcToggle');
   const panel = document.getElementById('calcPanel');
   const activePage = document.querySelector('.page.active');
-  
-  // Only display on the quiz page
+
   if (activePage && activePage.id === 'page-quiz') {
     toggle.classList.add('visible');
   } else {
     toggle.classList.remove('visible');
-    panel.classList.remove('open'); // Close panel if leaving quiz
+    panel.classList.remove('open');
   }
 }
 
@@ -3003,7 +3460,6 @@ document.getElementById('authUsername').addEventListener('keydown', e => { if (e
   const session = loadSession();
   if (!session) return;
 
-  // Pre-fill username so user sees who's logging in
   document.getElementById('authUsername').value = session.username;
   authSubmit.disabled = true;
   authSubmit.textContent = 'Logging in…';
@@ -3011,7 +3467,6 @@ document.getElementById('authUsername').addEventListener('keydown', e => { if (e
   try {
     await handleAuth(session.password);
   } catch(e) {
-    // If auto-login fails, silently clear bad session and show login form
     clearSession();
     authSubmit.disabled = false;
     authSubmit.textContent = 'Log In';
