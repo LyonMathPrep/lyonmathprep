@@ -1,0 +1,2208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REPQUEST — Gamified Workout Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
+<style>
+:root {
+  --bg: #0a0e0d;
+  --bg-2: #0e1413;
+  --surface: #141b19;
+  --surface-2: #1b2422;
+  --surface-3: #232d2a;
+  --border: rgba(255, 255, 255, 0.06);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --text: #f4f1ea;
+  --text-muted: #8a958f;
+  --text-dim: #4d5651;
+  --accent: #c5ff3a;
+  --accent-2: #ff5e3a;
+  --accent-3: #3affe5;
+  --danger: #ff3a5e;
+  --warn: #ffb13a;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-lg: 22px;
+  --shadow: 0 24px 60px -20px rgba(0, 0, 0, 0.6);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Archivo', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 0%, rgba(197, 255, 58, 0.08), transparent 50%),
+    radial-gradient(ellipse at 85% 100%, rgba(255, 94, 58, 0.06), transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.012) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.012) 1px, transparent 1px);
+  background-size: 36px 36px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* TOPBAR */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(10, 14, 13, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.brand { display: flex; align-items: center; gap: 14px; }
+
+.logo {
+  width: 42px; height: 42px;
+  background: linear-gradient(135deg, var(--accent), #88d420);
+  color: #0a0e0d;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 16px; letter-spacing: -0.5px;
+  box-shadow: 0 6px 20px rgba(197, 255, 58, 0.25);
+}
+
+.brand-name { font-weight: 900; font-size: 18px; letter-spacing: 1px; }
+.brand-sub { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--text-muted); letter-spacing: 1.5px; }
+
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+
+.privacy-badge {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 12px;
+  background: rgba(58, 255, 229, 0.08);
+  border: 1px solid rgba(58, 255, 229, 0.2);
+  border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 1px;
+  color: var(--accent-3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.privacy-badge:hover {
+  background: rgba(58, 255, 229, 0.14);
+  border-color: rgba(58, 255, 229, 0.35);
+}
+
+.privacy-badge .dot {
+  width: 6px; height: 6px;
+  background: var(--accent-3);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-3);
+  animation: pulse-soft 2s infinite;
+}
+
+@keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.user-chip {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 6px 6px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 100px;
+}
+
+.user-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 1px;
+  color: var(--accent);
+  padding: 4px 8px;
+  background: rgba(197, 255, 58, 0.1);
+  border-radius: 100px;
+}
+
+.user-name { font-weight: 600; font-size: 14px; padding-right: 8px; }
+
+/* MAIN */
+.main {
+  flex: 1;
+  padding: 40px 28px 60px;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.screen { animation: fadeIn 0.4s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ACCOUNT */
+.account-wrap { max-width: 720px; margin: 0 auto; padding-top: 30px; }
+
+.hero-title {
+  font-size: clamp(48px, 8vw, 80px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -2px;
+  margin-bottom: 18px;
+}
+
+.hero-title .accent { color: var(--accent); font-style: italic; }
+
+.hero-sub {
+  font-size: 16px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 520px;
+  margin-bottom: 40px;
+}
+
+.account-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+
+.account-card {
+  display: flex; align-items: center; gap: 16px;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+  color: var(--text);
+  font-family: inherit;
+}
+
+.account-card:hover {
+  background: var(--surface-2);
+  border-color: var(--border-strong);
+  transform: translateX(4px);
+}
+
+.account-avatar {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--surface-3), var(--surface-2));
+  border: 1px solid var(--border-strong);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 18px;
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.account-info { flex: 1; min-width: 0; }
+.account-name { font-weight: 700; font-size: 17px; margin-bottom: 2px; }
+.account-meta {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--text-muted); letter-spacing: 0.5px;
+}
+
+.account-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--accent); letter-spacing: 1px;
+  padding: 4px 10px;
+  background: rgba(197, 255, 58, 0.08);
+  border: 1px solid rgba(197, 255, 58, 0.2);
+  border-radius: 100px;
+}
+
+.account-delete {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.account-delete:hover {
+  color: var(--danger);
+  background: rgba(255, 58, 94, 0.08);
+  border-color: rgba(255, 58, 94, 0.2);
+}
+
+.account-empty {
+  padding: 32px;
+  text-align: center;
+  background: var(--surface);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.account-create {
+  display: flex; gap: 10px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.account-create input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--text);
+  font-family: inherit; font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.account-create input:focus { border-color: var(--accent); }
+
+/* BUTTONS */
+.btn {
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.5px;
+  padding: 12px 22px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.btn-primary { background: var(--accent); color: #0a0e0d; }
+.btn-primary:hover {
+  background: #d8ff5e;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(197, 255, 58, 0.3);
+}
+
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+}
+.btn-secondary:hover { background: var(--surface-3); }
+
+.btn-pause {
+  background: var(--surface-2);
+  color: var(--warn);
+  border: 1px solid rgba(255, 177, 58, 0.3);
+  width: 100%;
+  justify-content: center;
+}
+.btn-pause:hover { background: rgba(255, 177, 58, 0.08); }
+.btn-pause.paused {
+  color: var(--accent);
+  border-color: rgba(197, 255, 58, 0.3);
+}
+
+/* SELECTION */
+.select-wrap { max-width: 1100px; margin: 0 auto; }
+
+.select-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.back-btn {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.back-btn:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.rank-display {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 16px 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.rank-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+}
+
+.rank-name {
+  font-weight: 900;
+  font-size: 22px;
+  letter-spacing: -0.5px;
+  color: var(--accent);
+}
+
+.rank-bar {
+  width: 200px;
+  height: 6px;
+  background: var(--bg);
+  border-radius: 100px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.rank-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #88d420);
+  border-radius: 100px;
+  transition: width 0.4s ease;
+  width: 0%;
+}
+
+.rank-xp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.section-title {
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 900;
+  letter-spacing: -1.5px;
+  margin-bottom: 28px;
+}
+
+.section-title .accent { color: var(--accent); font-style: italic; }
+
+.workout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.workout-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-align: left;
+  color: var(--text);
+  font-family: inherit;
+  overflow: hidden;
+}
+
+.workout-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+.workout-card:hover {
+  background: var(--surface-2);
+  border-color: rgba(197, 255, 58, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px -10px rgba(197, 255, 58, 0.2);
+}
+
+.workout-card:hover::before { opacity: 1; }
+
+.workout-icon {
+  width: 56px; height: 56px;
+  background: linear-gradient(135deg, rgba(197, 255, 58, 0.15), rgba(197, 255, 58, 0.05));
+  border: 1px solid rgba(197, 255, 58, 0.2);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 16px;
+  color: var(--accent);
+}
+
+.workout-icon svg {
+  width: 28px; height: 28px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.workout-name { font-weight: 800; font-size: 20px; letter-spacing: -0.3px; margin-bottom: 4px; }
+.workout-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 18px; }
+
+.workout-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.workout-xp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.workout-total {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ACTIVE */
+.active-wrap { max-width: 1200px; margin: 0 auto; }
+
+.active-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.active-exercise-group { text-align: center; }
+.active-exercise { font-weight: 900; font-size: 24px; letter-spacing: -0.5px; }
+
+.active-tip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+
+.cam-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: rgba(255, 58, 94, 0.1);
+  border: 1px solid rgba(255, 58, 94, 0.3);
+  border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: var(--danger);
+  transition: all 0.3s ease;
+}
+
+.cam-indicator.paused {
+  background: rgba(255, 177, 58, 0.1);
+  border-color: rgba(255, 177, 58, 0.3);
+  color: var(--warn);
+}
+
+.cam-dot {
+  width: 8px; height: 8px;
+  background: var(--danger);
+  border-radius: 50%;
+  animation: pulse-cam 1.2s infinite;
+}
+
+.cam-indicator.paused .cam-dot {
+  background: var(--warn);
+  animation: none;
+}
+
+@keyframes pulse-cam {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.active-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: 20px;
+}
+
+@media (max-width: 960px) {
+  .active-grid { grid-template-columns: 1fr; }
+}
+
+.video-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.video-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #000;
+  overflow: hidden;
+}
+
+.video-wrap video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+}
+
+.video-wrap canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+}
+
+.video-border {
+  position: absolute;
+  inset: 0;
+  border: 3px solid var(--danger);
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.7;
+  animation: border-pulse 1.6s infinite;
+  transition: border-color 0.3s ease;
+}
+
+.video-border.paused {
+  border-color: var(--warn);
+  animation: none;
+  opacity: 0.5;
+}
+
+@keyframes border-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.85; }
+}
+
+.video-overlay {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 4;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.form-feedback {
+  background: rgba(10, 14, 13, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border-strong);
+  padding: 10px 18px;
+  border-radius: 100px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--accent);
+  transition: all 0.3s ease;
+}
+
+.form-feedback.warn { color: var(--warn); border-color: rgba(255, 177, 58, 0.4); }
+.form-feedback.danger { color: var(--danger); border-color: rgba(255, 58, 94, 0.4); }
+
+.video-meta {
+  display: flex;
+  gap: 1px;
+  background: var(--border);
+}
+
+.meta-item {
+  flex: 1;
+  padding: 14px 18px;
+  background: var(--surface);
+}
+
+.meta-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
+}
+
+.meta-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.stats-panel { display: flex; flex-direction: column; gap: 16px; }
+
+.rep-counter {
+  background: 
+    radial-gradient(circle at 50% 0%, rgba(197, 255, 58, 0.08), transparent 70%),
+    var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  text-align: center;
+  position: relative;
+  overflow: visible;
+}
+
+.rep-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.rep-number {
+  font-weight: 900;
+  font-size: 96px;
+  line-height: 1;
+  letter-spacing: -4px;
+  color: var(--accent);
+  text-shadow: 0 0 40px rgba(197, 255, 58, 0.3);
+  transition: transform 0.15s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.rep-number.flash { animation: rep-flash 0.4s ease; }
+
+@keyframes rep-flash {
+  0% { transform: scale(1); color: var(--accent); }
+  50% { transform: scale(1.18); color: #ffffff; text-shadow: 0 0 60px rgba(255, 255, 255, 0.7); }
+  100% { transform: scale(1); color: var(--accent); }
+}
+
+.xp-float {
+  position: absolute;
+  top: 35%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  pointer-events: none;
+  animation: xp-float-anim 1.2s ease-out forwards;
+  text-shadow: 0 0 20px rgba(197, 255, 58, 0.6);
+  z-index: 2;
+}
+
+@keyframes xp-float-anim {
+  0% { opacity: 0; transform: translateX(-50%) translateY(0); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+}
+
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.stat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.stat-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+}
+
+.stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.rank-progress {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  transition: box-shadow 0.4s ease;
+}
+
+.rank-progress.rankup { box-shadow: 0 0 30px rgba(197, 255, 58, 0.4); }
+
+.rank-progress-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.rank-progress-label span:first-child { color: var(--accent); font-weight: 700; }
+.rank-progress-label span:last-child { color: var(--text-muted); }
+
+.rank-next {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 8px;
+  text-align: center;
+}
+
+.rank-next span { color: var(--text); }
+
+/* COMPLETE */
+.complete-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.complete-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 48px;
+  text-align: center;
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.complete-card::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, rgba(197, 255, 58, 0.06), transparent 50%);
+  pointer-events: none;
+}
+
+.complete-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.complete-reps {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.complete-num {
+  font-weight: 900;
+  font-size: 120px;
+  line-height: 1;
+  letter-spacing: -6px;
+  color: var(--accent);
+  text-shadow: 0 0 60px rgba(197, 255, 58, 0.3);
+}
+
+.complete-unit {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: 2px;
+}
+
+.complete-xp {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 16px;
+  color: var(--text);
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.complete-xp span {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.complete-rank {
+  background: linear-gradient(135deg, rgba(197, 255, 58, 0.15), rgba(197, 255, 58, 0.05));
+  border: 1px solid rgba(197, 255, 58, 0.3);
+  border-radius: var(--radius);
+  padding: 18px;
+  margin-bottom: 28px;
+  position: relative;
+  animation: rankup-glow 1.5s ease;
+}
+
+@keyframes rankup-glow {
+  0% { transform: scale(0.9); opacity: 0; }
+  60% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.rank-up-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.rank-up-name {
+  font-weight: 900;
+  font-size: 32px;
+  color: var(--accent);
+  letter-spacing: -1px;
+}
+
+.complete-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  position: relative;
+}
+
+/* MODAL */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 14, 13, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.3s ease;
+}
+
+.modal-content {
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  max-width: 520px;
+  width: 100%;
+  box-shadow: var(--shadow);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.modal-icon {
+  width: 48px; height: 48px;
+  background: rgba(197, 255, 58, 0.1);
+  border: 1px solid rgba(197, 255, 58, 0.2);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.modal-icon svg {
+  width: 22px; height: 22px;
+  stroke: var(--accent);
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.modal-header h2 {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.modal-body {
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 24px;
+  font-size: 14px;
+}
+
+.modal-body p { margin-bottom: 14px; }
+.modal-body p:last-child { margin-bottom: 0; }
+
+.privacy-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 16px 0;
+}
+
+.privacy-list li {
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.privacy-list li strong {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.modal-footnote {
+  font-size: 12px !important;
+  color: var(--text-dim);
+  margin-top: 16px !important;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: 100px;
+  padding: 12px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  z-index: 200;
+  opacity: 0;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  box-shadow: var(--shadow);
+  max-width: 90vw;
+  text-align: center;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.toast.error { border-color: rgba(255, 58, 94, 0.4); color: var(--danger); }
+.toast.success { border-color: rgba(197, 255, 58, 0.4); color: var(--accent); }
+
+/* LOADER */
+.loader {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 14, 13, 0.92);
+  backdrop-filter: blur(4px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  z-index: 10;
+}
+
+.loader-spin {
+  width: 36px; height: 36px;
+  border: 3px solid var(--border-strong);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loader-text {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+}
+
+[hidden] { display: none !important; }
+
+@media (max-width: 700px) {
+  .main { padding: 24px 16px 40px; }
+  .topbar { padding: 14px 16px; }
+  .brand-sub { display: none; }
+  .privacy-badge { padding: 6px 10px; font-size: 9px; }
+  .complete-card { padding: 32px 24px; }
+  .complete-num { font-size: 80px; }
+  .rep-number { font-size: 72px; }
+  .rank-display { width: 100%; }
+  .rank-bar { width: 100%; min-width: 160px; }
+  .active-header { justify-content: center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">RQ</div>
+      <div class="brand-text">
+        <div class="brand-name">REPQUEST</div>
+        <div class="brand-sub">LOCAL POSE TRACKER · v1.0</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="privacy-badge" id="privacyInfoBtn" title="View privacy info">
+        <span class="dot"></span>
+        ON-DEVICE ONLY
+      </button>
+      <div class="user-chip" id="userChip" hidden>
+        <span class="user-rank" id="userRank">ROOKIE</span>
+        <span class="user-name" id="userName"></span>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- ACCOUNT SCREEN -->
+    <section class="screen" id="screenAccount">
+      <div class="account-wrap">
+        <h1 class="hero-title">Choose your<br><span class="accent">athlete</span></h1>
+        <p class="hero-sub">All progress is stored locally on this device. No accounts, no servers, no video ever leaves your browser. Pick an existing profile or create a new one to begin.</p>
+        
+        <div class="account-list" id="accountList"></div>
+        
+        <div class="account-create">
+          <input type="text" id="newUsername" placeholder="New athlete name" maxlength="16" autocomplete="off">
+          <button id="createAccountBtn" class="btn btn-primary">Create</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORKOUT SELECTION -->
+    <section class="screen" id="screenSelect" hidden>
+      <div class="select-wrap">
+        <div class="select-header">
+          <button class="back-btn" id="backToAccount">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            Switch athlete
+          </button>
+          <div class="rank-display">
+            <div>
+              <div class="rank-label">CURRENT RANK</div>
+              <div class="rank-name" id="selectRankName">ROOKIE</div>
+            </div>
+            <div>
+              <div class="rank-bar"><div class="rank-bar-fill" id="rankBarFill"></div></div>
+              <div class="rank-xp" id="rankXp">0 / 100 XP</div>
+            </div>
+          </div>
+        </div>
+        
+        <h2 class="section-title">Pick today's <span class="accent">quest</span></h2>
+        
+        <div class="workout-grid" id="workoutGrid"></div>
+      </div>
+    </section>
+
+    <!-- ACTIVE WORKOUT -->
+    <section class="screen" id="screenActive" hidden>
+      <div class="active-wrap">
+        <div class="active-header">
+          <button class="back-btn" id="stopWorkout">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+            Stop session
+          </button>
+          <div class="active-exercise-group">
+            <div class="active-exercise" id="activeExerciseName">SQUATS</div>
+            <div class="active-tip" id="activeTip">Stand side-on, full body in frame</div>
+          </div>
+          <div class="cam-indicator" id="camIndicator">
+            <span class="cam-dot"></span>
+            <span id="camLabel">CAMERA ANALYZING</span>
+          </div>
+        </div>
+        
+        <div class="active-grid">
+          <div class="video-panel">
+            <div class="video-wrap" id="videoWrap">
+              <video id="video" autoplay playsinline muted></video>
+              <canvas id="canvas"></canvas>
+              <div class="video-border" id="videoBorder"></div>
+              <div class="video-overlay">
+                <div class="form-feedback" id="formFeedback">STARTING CAMERA...</div>
+              </div>
+              <div class="loader" id="loader">
+                <div class="loader-spin"></div>
+                <div class="loader-text">LOADING POSE MODEL...</div>
+              </div>
+            </div>
+            <div class="video-meta">
+              <div class="meta-item">
+                <div class="meta-label">ANGLE</div>
+                <div class="meta-value" id="angleValue">--</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">STATE</div>
+                <div class="meta-value" id="stateValue">--</div>
+              </div>
+              <div class="meta-item">
+                <div class="meta-label">FPS</div>
+                <div class="meta-value" id="fpsValue">--</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="stats-panel">
+            <div class="rep-counter">
+              <div class="rep-label">REPS COMPLETED</div>
+              <div class="rep-number" id="repCount">0</div>
+            </div>
+            <div class="stat-row">
+              <div class="stat-box">
+                <div class="stat-label">SESSION XP</div>
+                <div class="stat-value" id="sessionXp">0</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label">XP / REP</div>
+                <div class="stat-value" id="xpPerRep">10</div>
+              </div>
+            </div>
+            <div class="rank-progress" id="rankProgressBox">
+              <div class="rank-progress-label">
+                <span id="activeRankName">ROOKIE</span>
+                <span id="activeRankXp">0 / 100</span>
+              </div>
+              <div class="rank-bar"><div class="rank-bar-fill" id="activeRankBarFill"></div></div>
+              <div class="rank-next">Next: <span id="nextRankName">CADET</span></div>
+            </div>
+            <button class="btn btn-pause" id="pauseBtn">Pause session</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPLETE SCREEN -->
+    <section class="screen" id="screenComplete" hidden>
+      <div class="complete-wrap">
+        <div class="complete-card">
+          <div class="complete-label">SESSION COMPLETE</div>
+          <div class="complete-reps">
+            <div class="complete-num" id="completeReps">0</div>
+            <div class="complete-unit">REPS</div>
+          </div>
+          <div class="complete-xp"><span id="completeXp">0</span> XP EARNED</div>
+          <div class="complete-rank" id="completeRankUp" hidden>
+            <div class="rank-up-label">RANK UP</div>
+            <div class="rank-up-name" id="completeNewRank"></div>
+          </div>
+          <div class="complete-actions">
+            <button class="btn btn-secondary" id="completeBack">Back to menu</button>
+            <button class="btn btn-primary" id="completeAgain">Train again</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- PRIVACY MODAL -->
+  <div class="modal" id="privacyModal" hidden>
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-icon">
+          <svg viewBox="0 0 24 24"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+        </div>
+        <h2 id="privacyModalTitle">Camera & Privacy</h2>
+      </div>
+      <div class="modal-body" id="privacyModalBody">
+        <p>To track your workout, REPQUEST needs camera access. Here's exactly what happens:</p>
+        <ul class="privacy-list">
+          <li><strong>On-device only:</strong> Video is processed in your browser by MediaPipe Pose. Frames never leave your device.</li>
+          <li><strong>Nothing stored:</strong> Each frame is analyzed in memory and immediately discarded. No images, video, or recordings are saved anywhere.</li>
+          <li><strong>Only numbers saved:</strong> Rep counts and XP are stored locally in your browser's localStorage. Clear browser data to remove everything.</li>
+          <li><strong>You're in control:</strong> Pause or stop anytime. The camera indicator shows when analysis is active. Closing this tab ends all processing.</li>
+        </ul>
+        <p class="modal-footnote">No backend. No accounts. No telemetry. Just your browser, your camera, your workout.</p>
+      </div>
+      <div class="modal-actions" id="privacyModalActions">
+        <button class="btn btn-secondary" id="privacyCancel">Cancel</button>
+        <button class="btn btn-primary" id="privacyAccept">Allow camera & start</button>
+        <button class="btn btn-primary" id="privacyClose" hidden>Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+</div>
+
+<script>
+// ============== STATE ==============
+const state = {
+  currentUser: null,
+  currentWorkout: null,
+  repCount: 0,
+  sessionXp: 0,
+  isCameraOn: false,
+  isPaused: false,
+  startingXp: 0,
+  startingRankIndex: 0,
+  lastShownRankIndex: 0,
+  lastFrameTime: 0,
+  fps: 0,
+  firstResult: true
+};
+
+let pose = null;
+let stream = null;
+let rafId = null;
+let detector = null;
+let lastRepTime = 0;
+let audioCtx = null;
+let pendingDeleteId = null;
+let deleteTimer = null;
+
+// ============== CONSTANTS ==============
+const RANKS = [
+  { name: 'Rookie',   minXp: 0 },
+  { name: 'Cadet',    minXp: 100 },
+  { name: 'Athlete',  minXp: 300 },
+  { name: 'Warrior',  minXp: 700 },
+  { name: 'Champion', minXp: 1500 },
+  { name: 'Legend',   minXp: 3000 },
+  { name: 'Mythic',   minXp: 6000 }
+];
+
+const WORKOUTS = [
+  {
+    id: 'squats',
+    name: 'Squats',
+    description: 'Lower-body strength',
+    xpPerRep: 10,
+    tip: 'Stand side-on, full body in frame',
+    icon: `<svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M9 9h6"/><path d="M12 9v3"/><path d="M8 12h8"/><path d="M8 12l-2 6"/><path d="M16 12l2 6"/></svg>`
+  },
+  {
+    id: 'curls',
+    name: 'Bicep Curls',
+    description: 'Arm isolation',
+    xpPerRep: 8,
+    tip: 'Face camera, keep elbow still',
+    icon: `<svg viewBox="0 0 24 24"><rect x="2" y="9" width="3" height="6" rx="1"/><rect x="19" y="9" width="3" height="6" rx="1"/><path d="M5 11h14M5 13h14"/></svg>`
+  },
+  {
+    id: 'jacks',
+    name: 'Jumping Jacks',
+    description: 'Full-body cardio',
+    xpPerRep: 5,
+    tip: 'Stand back, full body in frame',
+    icon: `<svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M12 6v6"/><path d="M6 9l6 3 6-3"/><path d="M9 18l3-6 3 6"/></svg>`
+  },
+  {
+    id: 'pushups',
+    name: 'Push-ups',
+    description: 'Upper-body strength',
+    xpPerRep: 12,
+    tip: 'Side-on, body horizontal in frame',
+    icon: `<svg viewBox="0 0 24 24"><circle cx="5" cy="9" r="2"/><path d="M7 10h14"/><path d="M3 15h18"/><path d="M5 15v3M19 15v3"/></svg>`
+  }
+];
+
+// ============== STORAGE ==============
+const Storage = {
+  KEY: 'repquest_users_v1',
+  
+  getUsers() {
+    try { return JSON.parse(localStorage.getItem(this.KEY) || '[]'); }
+    catch { return []; }
+  },
+  
+  saveUsers(users) {
+    localStorage.setItem(this.KEY, JSON.stringify(users));
+  },
+  
+  createUser(name) {
+    const users = this.getUsers();
+    const user = {
+      id: 'u_' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6),
+      name: name.trim(),
+      totalXp: 0,
+      createdAt: Date.now(),
+      workoutStats: {}
+    };
+    users.push(user);
+    this.saveUsers(users);
+    return user;
+  },
+  
+  updateUser(user) {
+    const users = this.getUsers();
+    const idx = users.findIndex(u => u.id === user.id);
+    if (idx !== -1) {
+      users[idx] = user;
+      this.saveUsers(users);
+    }
+  },
+  
+  deleteUser(id) {
+    const users = this.getUsers().filter(u => u.id !== id);
+    this.saveUsers(users);
+  }
+};
+
+// ============== RANKS ==============
+function getRankIndex(xp) {
+  let idx = 0;
+  for (let i = 0; i < RANKS.length; i++) {
+    if (xp >= RANKS[i].minXp) idx = i;
+  }
+  return idx;
+}
+
+function getRankProgress(xp) {
+  const idx = getRankIndex(xp);
+  const current = RANKS[idx];
+  const next = RANKS[idx + 1];
+  
+  if (!next) {
+    return {
+      index: idx,
+      name: current.name,
+      currentXp: xp,
+      minXp: current.minXp,
+      maxXp: current.minXp,
+      progress: 1,
+      nextName: null
+    };
+  }
+  
+  const range = next.minXp - current.minXp;
+  const into = xp - current.minXp;
+  return {
+    index: idx,
+    name: current.name,
+    currentXp: xp,
+    minXp: current.minXp,
+    maxXp: next.minXp,
+    progress: Math.max(0, Math.min(1, into / range)),
+    nextName: next.name
+  };
+}
+
+// ============== UTILS ==============
+function $(id) { return document.getElementById(id); }
+
+function showScreen(name) {
+  ['Account', 'Select', 'Active', 'Complete'].forEach(s => {
+    $('screen' + s).hidden = (s.toLowerCase() !== name);
+  });
+}
+
+function showToast(msg, type = 'info') {
+  const t = $('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type === 'error' ? ' error' : type === 'success' ? ' success' : '');
+  t.hidden = false;
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => { t.hidden = true; }, 300);
+  }, 2800);
+}
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function calculateAngle(a, b, c) {
+  const r = Math.atan2(c.y - b.y, c.x - b.x) - Math.atan2(a.y - b.y, a.x - b.x);
+  let angle = Math.abs(r * 180 / Math.PI);
+  if (angle > 180) angle = 360 - angle;
+  return angle;
+}
+
+// ============== DETECTORS ==============
+function createSquatDetector() {
+  return {
+    state: 'up',
+    angle: 0,
+    lowMark: false,
+    update(lm) {
+      const angle = (calculateAngle(lm[23], lm[25], lm[27]) + calculateAngle(lm[24], lm[26], lm[28])) / 2;
+      this.angle = angle;
+      let rep = false;
+      
+      if (this.state === 'up' && angle < 100) {
+        this.state = 'down';
+      } else if (this.state === 'down' && angle > 160) {
+        this.state = 'up';
+        if (this.lowMark) rep = true;
+        this.lowMark = false;
+      }
+      if (this.state === 'down' && angle < 90) this.lowMark = true;
+      
+      let feedback;
+      if (this.state === 'up') feedback = 'SQUAT DOWN';
+      else if (angle < 90) feedback = 'STAND UP';
+      else if (angle < 120) feedback = 'GO LOWER';
+      else feedback = 'TRACKING...';
+      
+      return { rep, angle, state: this.state.toUpperCase(), feedback };
+    }
+  };
+}
+
+function createCurlDetector() {
+  return {
+    state: 'down',
+    angle: 0,
+    curlMark: false,
+    side: 'R',
+    update(lm) {
+      const lv = (lm[11].visibility || 0) + (lm[13].visibility || 0) + (lm[15].visibility || 0);
+      const rv = (lm[12].visibility || 0) + (lm[14].visibility || 0) + (lm[16].visibility || 0);
+      const useRight = rv >= lv;
+      
+      const shoulder = useRight ? lm[12] : lm[11];
+      const elbow = useRight ? lm[14] : lm[13];
+      const wrist = useRight ? lm[16] : lm[15];
+      const angle = calculateAngle(shoulder, elbow, wrist);
+      this.angle = angle;
+      this.side = useRight ? 'R' : 'L';
+      
+      let rep = false;
+      if (this.state === 'down' && angle < 50) {
+        this.state = 'up';
+        this.curlMark = true;
+      } else if (this.state === 'up' && angle > 150) {
+        this.state = 'down';
+        if (this.curlMark) rep = true;
+        this.curlMark = false;
+      }
+      
+      let feedback;
+      if (this.state === 'down') feedback = 'CURL UP';
+      else if (angle < 50) feedback = 'EXTEND DOWN';
+      else if (angle < 100) feedback = 'CURL HIGHER';
+      else feedback = 'TRACKING...';
+      
+      return { rep, angle, state: this.state.toUpperCase() + ' ' + this.side, feedback };
+    }
+  };
+}
+
+function createJackDetector() {
+  return {
+    state: 'closed',
+    update(lm) {
+      const lS = lm[11], rS = lm[12], lW = lm[15], rW = lm[16];
+      const lA = lm[27], rA = lm[28];
+      
+      const shoulderWidth = Math.max(0.05, Math.abs(lS.x - rS.x));
+      const handsUp = lW.y < lS.y && rW.y < rS.y;
+      const footDist = Math.abs(lA.x - rA.x);
+      const feetApart = footDist > shoulderWidth * 1.3;
+      
+      let rep = false;
+      if (this.state === 'closed' && handsUp && feetApart) {
+        this.state = 'open';
+      } else if (this.state === 'open' && !handsUp && !feetApart) {
+        this.state = 'closed';
+        rep = true;
+      }
+      
+      const feedback = this.state === 'closed' ? 'JUMP OUT' : 'RETURN';
+      const score = (handsUp ? 0.5 : 0) + (feetApart ? 0.5 : 0);
+      
+      return { rep, angle: score * 180, state: this.state.toUpperCase(), feedback };
+    }
+  };
+}
+
+function createPushupDetector() {
+  return {
+    state: 'up',
+    angle: 0,
+    lowMark: false,
+    update(lm) {
+      const lv = (lm[11].visibility || 0) + (lm[13].visibility || 0) + (lm[15].visibility || 0);
+      const rv = (lm[12].visibility || 0) + (lm[14].visibility || 0) + (lm[16].visibility || 0);
+      const useRight = rv >= lv;
+      
+      const shoulder = useRight ? lm[12] : lm[11];
+      const elbow = useRight ? lm[14] : lm[13];
+      const wrist = useRight ? lm[16] : lm[15];
+      const angle = calculateAngle(shoulder, elbow, wrist);
+      this.angle = angle;
+      
+      let rep = false;
+      if (this.state === 'up' && angle < 90) {
+        this.state = 'down';
+      } else if (this.state === 'down' && angle > 150) {
+        this.state = 'up';
+        if (this.lowMark) rep = true;
+        this.lowMark = false;
+      }
+      if (this.state === 'down' && angle < 80) this.lowMark = true;
+      
+      let feedback;
+      if (this.state === 'up') feedback = 'GO DOWN';
+      else if (angle < 80) feedback = 'PUSH UP';
+      else if (angle < 110) feedback = 'LOWER';
+      else feedback = 'TRACKING...';
+      
+      return { rep, angle, state: this.state.toUpperCase(), feedback };
+    }
+  };
+}
+
+const DETECTOR_FACTORIES = {
+  squats: createSquatDetector,
+  curls: createCurlDetector,
+  jacks: createJackDetector,
+  pushups: createPushupDetector
+};
+
+// ============== POSE ==============
+async function initPose() {
+  if (pose) return pose;
+  
+  if (typeof Pose === 'undefined') {
+    throw new Error('Pose library failed to load. Check your connection and refresh.');
+  }
+  
+  pose = new Pose({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/pose/${file}`
+  });
+  
+  pose.setOptions({
+    modelComplexity: 1,
+    smoothLandmarks: true,
+    enableSegmentation: false,
+    minDetectionConfidence: 0.5,
+    minTrackingConfidence: 0.5
+  });
+  
+  pose.onResults(onPoseResults);
+  return pose;
+}
+
+async function startCamera() {
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: 640, height: 480, facingMode: 'user' },
+      audio: false
+    });
+    
+    const video = $('video');
+    video.srcObject = stream;
+    await video.play();
+    
+    state.isCameraOn = true;
+    state.isPaused = false;
+    state.firstResult = true;
+    
+    await initPose();
+    
+    processFrames();
+    
+  } catch (err) {
+    console.error('Camera error:', err);
+    let msg = 'Failed to start camera.';
+    if (err.name === 'NotAllowedError') msg = 'Camera access denied. Please allow camera permission.';
+    else if (err.name === 'NotFoundError') msg = 'No camera found on this device.';
+    else if (err.message) msg = err.message;
+    showToast(msg, 'error');
+    stopCamera();
+    showScreen('select');
+    throw err;
+  }
+}
+
+async function processFrames() {
+  if (!state.isCameraOn) return;
+  
+  const video = $('video');
+  
+  if (!state.isPaused && video.readyState >= 2 && pose) {
+    try {
+      await pose.send({ image: video });
+      
+      const now = performance.now();
+      if (state.lastFrameTime) {
+        const dt = now - state.lastFrameTime;
+        if (dt > 0) {
+          const fps = 1000 / dt;
+          state.fps = state.fps > 0 ? state.fps * 0.85 + fps * 0.15 : fps;
+          $('fpsValue').textContent = Math.round(state.fps);
+        }
+      }
+      state.lastFrameTime = now;
+    } catch (e) {
+      console.error('Frame error:', e);
+    }
+  }
+  
+  rafId = requestAnimationFrame(processFrames);
+}
+
+function stopCamera() {
+  state.isCameraOn = false;
+  state.isPaused = false;
+  
+  if (rafId) {
+    cancelAnimationFrame(rafId);
+    rafId = null;
+  }
+  
+  if (stream) {
+    stream.getTracks().forEach(t => t.stop());
+    stream = null;
+  }
+  
+  const video = $('video');
+  if (video) video.srcObject = null;
+  
+  const canvas = $('canvas');
+  if (canvas) {
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+function onPoseResults(results) {
+  if (state.firstResult) {
+    state.firstResult = false;
+    $('loader').hidden = true;
+  }
+  
+  const canvas = $('canvas');
+  const ctx = canvas.getContext('2d');
+  
+  canvas.width = results.image.width;
+  canvas.height = results.image.height;
+  
+  ctx.save();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Mirror for selfie view
+  ctx.scale(-1, 1);
+  ctx.translate(-canvas.width, 0);
+  ctx.drawImage(results.image, 0, 0, canvas.width, canvas.height);
+  
+  if (results.poseLandmarks) {
+    if (typeof drawConnectors !== 'undefined' && typeof POSE_CONNECTIONS !== 'undefined') {
+      drawConnectors(ctx, results.poseLandmarks, POSE_CONNECTIONS, { color: 'rgba(197, 255, 58, 0.7)', lineWidth: 3 });
+      drawLandmarks(ctx, results.poseLandmarks, { color: '#ff5e3a', lineWidth: 1, radius: 4, fillColor: '#ff5e3a' });
+    }
+    
+    if (detector) {
+      const result = detector.update(results.poseLandmarks);
+      
+      $('angleValue').textContent = Math.round(result.angle) + '°';
+      $('stateValue').textContent = result.state;
+      
+      const ff = $('formFeedback');
+      ff.textContent = result.feedback;
+      ff.className = 'form-feedback';
+      if (result.feedback.includes('LOWER') || result.feedback.includes('HIGHER')) {
+        ff.classList.add('warn');
+      }
+      
+      if (result.rep) {
+        const now = performance.now();
+        if (now - lastRepTime > 400) {
+          lastRepTime = now;
+          state.repCount++;
+          state.sessionXp += state.currentWorkout.xpPerRep;
+          updateActiveStats();
+          flashRep();
+          showXpFloat(state.currentWorkout.xpPerRep);
+          playBlip();
+        }
+      }
+    }
+  } else {
+    const ff = $('formFeedback');
+    ff.textContent = 'NO POSE DETECTED — STEP INTO FRAME';
+    ff.className = 'form-feedback danger';
+  }
+  
+  ctx.restore();
+}
+
+function flashRep() {
+  const el = $('repCount');
+  el.classList.remove('flash');
+  void el.offsetWidth;
+  el.classList.add('flash');
+}
+
+function showXpFloat(amount) {
+  const float = document.createElement('div');
+  float.className = 'xp-float';
+  float.textContent = '+' + amount + ' XP';
+  $('repCount').parentElement.appendChild(float);
+  setTimeout(() => float.remove(), 1200);
+}
+
+function playBlip() {
+  try {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.frequency.value = 880;
+    osc.type = 'sine';
+    gain.gain.setValueAtTime(0, audioCtx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.08, audioCtx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.2);
+  } catch (e) {}
+}
+
+// ============== UI: ACCOUNT ==============
+function renderAccounts() {
+  const list = $('accountList');
+  const users = Storage.getUsers();
+  list.innerHTML = '';
+  
+  if (users.length === 0) {
+    list.innerHTML = '<div class="account-empty">No athletes yet. Create your first one below to begin.</div>';
+    return;
+  }
+  
+  users.forEach(user => {
+    const progress = getRankProgress(user.totalXp);
+    const totalReps = Object.values(user.workoutStats || {}).reduce((sum, s) => sum + (s.totalReps || 0), 0);
+    
+    const card = document.createElement('div');
+    card.className = 'account-card';
+    card.setAttribute('role', 'button');
+    card.setAttribute('tabindex', '0');
+    card.innerHTML = `
+      <div class="account-avatar">${escapeHtml(user.name.charAt(0).toUpperCase())}</div>
+      <div class="account-info">
+        <div class="account-name">${escapeHtml(user.name)}</div>
+        <div class="account-meta">${totalReps} REPS · ${user.totalXp} XP</div>
+      </div>
+      <div class="account-rank">${progress.name.toUpperCase()}</div>
+      <button class="account-delete" data-id="${user.id}" title="Delete athlete" aria-label="Delete ${escapeHtml(user.name)}">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
+    `;
+    
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.account-delete')) {
+        e.stopPropagation();
+        handleDeleteClick(user);
+        return;
+      }
+      selectUser(user);
+    });
+    
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        selectUser(user);
+      }
+    });
+    
+    list.appendChild(card);
+  });
+}
+
+function handleDeleteClick(user) {
+  if (pendingDeleteId === user.id) {
+    Storage.deleteUser(user.id);
+    renderAccounts();
+    pendingDeleteId = null;
+    clearTimeout(deleteTimer);
+    showToast(`Deleted ${user.name}.`);
+  } else {
+    pendingDeleteId = user.id;
+    showToast('Click ✕ again to confirm deletion.');
+    clearTimeout(deleteTimer);
+    deleteTimer = setTimeout(() => { pendingDeleteId = null; }, 3000);
+  }
+}
+
+function selectUser(user) {
+  state.currentUser = user;
+  $('userName').textContent = user.name;
+  const progress = getRankProgress(user.totalXp);
+  $('userRank').textContent = progress.name.toUpperCase();
+  $('userChip').hidden = false;
+  renderWorkoutSelection();
+  showScreen('select');
+}
+
+function renderWorkoutSelection() {
+  const user = state.currentUser;
+  if (!user) return;
+  
+  const progress = getRankProgress(user.totalXp);
+  $('selectRankName').textContent = progress.name.toUpperCase();
+  $('rankBarFill').style.width = (progress.progress * 100) + '%';
+  
+  if (progress.nextName) {
+    $('rankXp').textContent = `${user.totalXp} / ${progress.maxXp} XP`;
+  } else {
+    $('rankXp').textContent = `${user.totalXp} XP · MAX RANK`;
+  }
+  
+  const grid = $('workoutGrid');
+  grid.innerHTML = '';
+  
+  WORKOUTS.forEach(w => {
+    const stats = (user.workoutStats || {})[w.id] || { totalReps: 0, bestSession: 0 };
+    
+    const card = document.createElement('button');
+    card.className = 'workout-card';
+    card.innerHTML = `
+      <div class="workout-icon">${w.icon}</div>
+      <div class="workout-name">${w.name}</div>
+      <div class="workout-desc">${w.description}</div>
+      <div class="workout-stats">
+        <div class="workout-xp">+${w.xpPerRep} XP / rep</div>
+        <div class="workout-total">${stats.totalReps} all-time</div>
+      </div>
+    `;
+    card.addEventListener('click', () => {
+      requestCameraAndStart(w);
+    });
+    grid.appendChild(card);
+  });
+}
+
+// ============== UI: WORKOUT ==============
+function requestCameraAndStart(workout) {
+  state.currentWorkout = workout;
+  showPrivacyModal('request');
+}
+
+function showPrivacyModal(mode) {
+  const modal = $('privacyModal');
+  modal.hidden = false;
+  
+  if (mode === 'request') {
+    $('privacyCancel').hidden = false;
+    $('privacyAccept').hidden = false;
+    $('privacyClose').hidden = true;
+    $('privacyModalTitle').textContent = 'Camera & Privacy';
+  } else {
+    $('privacyCancel').hidden = true;
+    $('privacyAccept').hidden = true;
+    $('privacyClose').hidden = false;
+    $('privacyModalTitle').textContent = 'Privacy & Data Handling';
+  }
+}
+
+async function startWorkoutSession(workout) {
+  state.repCount = 0;
+  state.sessionXp = 0;
+  state.startingXp = state.currentUser.totalXp;
+  state.startingRankIndex = getRankIndex(state.currentUser.totalXp);
+  state.lastShownRankIndex = state.startingRankIndex;
+  state.isPaused = false;
+  state.fps = 0;
+  state.firstResult = true;
+  
+  detector = DETECTOR_FACTORIES[workout.id]();
+  
+  $('activeExerciseName').textContent = workout.name.toUpperCase();
+  $('activeTip').textContent = workout.tip;
+  $('xpPerRep').textContent = '+' + workout.xpPerRep;
+  $('pauseBtn').textContent = 'Pause session';
+  $('pauseBtn').classList.remove('paused');
+  $('loader').hidden = false;
+  $('formFeedback').textContent = 'STARTING CAMERA...';
+  $('formFeedback').className = 'form-feedback';
+  $('angleValue').textContent = '--';
+  $('stateValue').textContent = '--';
+  $('fpsValue').textContent = '--';
+  
+  // Reset camera indicator
+  $('camIndicator').classList.remove('paused');
+  $('videoBorder').classList.remove('paused');
+  $('camLabel').textContent = 'CAMERA ANALYZING';
+  
+  updateActiveStats();
+  showScreen('active');
+  
+  try {
+    await startCamera();
+  } catch (e) {
+    showScreen('select');
+  }
+}
+
+function updateActiveStats() {
+  $('repCount').textContent = state.repCount;
+  $('sessionXp').textContent = state.sessionXp;
+  
+  const totalXp = state.startingXp + state.sessionXp;
+  const progress = getRankProgress(totalXp);
+  
+  $('activeRankName').textContent = progress.name.toUpperCase();
+  $('activeRankBarFill').style.width = (progress.progress * 100) + '%';
+  
+  if (progress.nextName) {
+    $('activeRankXp').textContent = `${totalXp} / ${progress.maxXp}`;
+    $('nextRankName').textContent = progress.nextName.toUpperCase();
+  } else {
+    $('activeRankXp').textContent = `${totalXp} XP`;
+    $('nextRankName').textContent = 'MAX RANK';
+  }
+  
+  if (progress.index > state.lastShownRankIndex) {
+    state.lastShownRankIndex = progress.index;
+    showToast(`RANK UP — you're now ${progress.name}!`, 'success');
+    const box = $('rankProgressBox');
+    box.classList.remove('rankup');
+    void box.offsetWidth;
+    box.classList.add('rankup');
+    setTimeout(() => box.classList.remove('rankup'), 1500);
+  }
+}
+
+function endWorkoutSession() {
+  stopCamera();
+  
+  if (state.repCount > 0 && state.currentWorkout) {
+    const user = state.currentUser;
+    user.totalXp += state.sessionXp;
+    
+    if (!user.workoutStats) user.workoutStats = {};
+    const stats = user.workoutStats[state.currentWorkout.id] || { totalReps: 0, bestSession: 0 };
+    stats.totalReps += state.repCount;
+    if (state.repCount > stats.bestSession) stats.bestSession = state.repCount;
+    user.workoutStats[state.currentWorkout.id] = stats;
+    
+    Storage.updateUser(user);
+    
+    const endingRankIndex = getRankIndex(user.totalXp);
+    
+    $('completeReps').textContent = state.repCount;
+    $('completeXp').textContent = state.sessionXp;
+    
+    if (endingRankIndex > state.startingRankIndex) {
+      $('completeRankUp').hidden = false;
+      $('completeNewRank').textContent = RANKS[endingRankIndex].name.toUpperCase();
+    } else {
+      $('completeRankUp').hidden = true;
+    }
+    
+    const progress = getRankProgress(user.totalXp);
+    $('userRank').textContent = progress.name.toUpperCase();
+    
+    detector = null;
+    showScreen('complete');
+  } else {
+    detector = null;
+    renderWorkoutSelection();
+    showScreen('select');
+  }
+}
+
+function togglePause() {
+  state.isPaused = !state.isPaused;
+  const btn = $('pauseBtn');
+  const indicator = $('camIndicator');
+  const border = $('videoBorder');
+  
+  if (state.isPaused) {
+    btn.textContent = 'Resume session';
+    btn.classList.add('paused');
+    indicator.classList.add('paused');
+    border.classList.add('paused');
+    $('camLabel').textContent = 'CAMERA PAUSED';
+    $('formFeedback').textContent = 'PAUSED';
+    $('formFeedback').className = 'form-feedback warn';
+  } else {
+    btn.textContent = 'Pause session';
+    btn.classList.remove('paused');
+    indicator.classList.remove('paused');
+    border.classList.remove('paused');
+    $('camLabel').textContent = 'CAMERA ANALYZING';
+  }
+}
+
+// ============== INIT ==============
+function init() {
+  $('createAccountBtn').addEventListener('click', () => {
+    const input = $('newUsername');
+    const name = input.value.trim();
+    if (!name) {
+      showToast('Enter a name first.', 'error');
+      input.focus();
+      return;
+    }
+    if (name.length > 16) {
+      showToast('Name too long (max 16 chars).', 'error');
+      return;
+    }
+    const existing = Storage.getUsers();
+    if (existing.some(u => u.name.toLowerCase() === name.toLowerCase())) {
+      showToast('That name is already taken.', 'error');
+      return;
+    }
+    const user = Storage.createUser(name);
+    input.value = '';
+    renderAccounts();
+    selectUser(user);
+    showToast(`Welcome, ${user.name}!`, 'success');
+  });
+  
+  $('newUsername').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') $('createAccountBtn').click();
+  });
+  
+  $('backToAccount').addEventListener('click', () => {
+    showScreen('account');
+    renderAccounts();
+  });
+  
+  $('stopWorkout').addEventListener('click', endWorkoutSession);
+  $('pauseBtn').addEventListener('click', togglePause);
+  
+  $('completeBack').addEventListener('click', () => {
+    renderWorkoutSelection();
+    showScreen('select');
+  });
+  
+  $('completeAgain').addEventListener('click', async () => {
+    if (state.currentWorkout) {
+      await startWorkoutSession(state.currentWorkout);
+    } else {
+      renderWorkoutSelection();
+      showScreen('select');
+    }
+  });
+  
+  // Privacy modal buttons
+  $('privacyAccept').addEventListener('click', async () => {
+    $('privacyModal').hidden = true;
+    await startWorkoutSession(state.currentWorkout);
+  });
+  
+  $('privacyCancel').addEventListener('click', () => {
+    $('privacyModal').hidden = true;
+    state.currentWorkout = null;
+  });
+  
+  $('privacyClose').addEventListener('click', () => {
+    $('privacyModal').hidden = true;
+  });
+  
+  $('privacyInfoBtn').addEventListener('click', () => {
+    showPrivacyModal('info');
+  });
+  
+  // Click outside modal to dismiss
+  $('privacyModal').addEventListener('click', (e) => {
+    if (e.target === $('privacyModal')) {
+      $('privacyModal').hidden = true;
+      state.currentWorkout = null;
+    }
+  });
+  
+  // Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (!$('privacyModal').hidden) {
+        $('privacyModal').hidden = true;
+        state.currentWorkout = null;
+      } else if (!$('screenActive').hidden && !state.isPaused) {
+        togglePause();
+      }
+    }
+  });
+  
+  // Cleanup on page hide
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && state.isCameraOn && !state.isPaused) {
+      togglePause();
+    }
+  });
+  
+  window.addEventListener('beforeunload', stopCamera);
+  
+  renderAccounts();
+}
+
+init();
+</script>
+</body>
+</html>
