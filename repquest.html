@@ -112,14 +112,20 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 .warmup-mobile{display:none}
 .wm-top-row{display:flex;gap:8px;margin-bottom:8px;align-items:stretch}
 .wm-cam{flex:1;min-width:0}.wm-cam .video-card{height:100%}.wm-cam .video-wrap{aspect-ratio:1/1}
-.wm-timer-box{width:100px;flex-shrink:0;background:var(--white);border:1px solid var(--gray-200);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 8px;text-align:center}
-.wmt-time{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:32px;line-height:1;margin-bottom:6px}
-.wmt-bar{width:100%;height:5px;background:var(--gray-200);border-radius:3px;overflow:hidden;margin-bottom:4px}
-.wmt-bar-fill{height:100%;border-radius:3px;transition:width .3s}
-.wmt-status{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:600;padding:3px 8px;border-radius:4px;display:inline-block}
-.wmt-status.active{color:var(--green-600);background:var(--green-50)}
-.wmt-status.paused{color:var(--orange-500);background:#fff7ed}
+/* Timer box as a fill-bar */
+.wm-timer-box{width:100px;flex-shrink:0;border-radius:12px;position:relative;overflow:hidden;border:1px solid var(--gray-200)}
+.wm-timer-bg{position:absolute;bottom:0;left:0;right:0;height:0%;background:var(--green-500);transition:height .4s ease;opacity:.18}
+.wm-timer-fg{position:absolute;bottom:0;left:0;right:0;height:0%;background:var(--green-500);transition:height .4s ease;opacity:.35;border-radius:0 0 11px 11px}
+.wm-timer-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:10px 6px;text-align:center}
+.wmt-time{font-family:'JetBrains Mono',monospace;font-weight:800;font-size:30px;line-height:1;color:var(--gray-900)}
+.wmt-status{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:700;margin-top:6px;padding:3px 8px;border-radius:4px;display:inline-block}
+.wmt-status.active{color:var(--green-600);background:rgba(34,197,94,.15)}
+.wmt-status.paused{color:var(--orange-500);background:rgba(249,115,22,.12)}
 .wmt-status.waiting{color:var(--gray-500);background:var(--gray-100)}
+/* Paused state: orange fill */
+.wm-timer-box.timer-paused .wm-timer-bg{background:var(--orange-500)}
+.wm-timer-box.timer-paused .wm-timer-fg{background:var(--orange-500)}
+
 .wm-info-section{background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:10px 14px;margin-bottom:8px}
 .wm-phase-name{font-weight:700;font-size:14px;margin-bottom:1px}
 .wm-phase-detail{font-size:11px;color:var(--gray-400)}
@@ -157,13 +163,10 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 .rc-bar{height:5px;background:var(--gray-200);border-radius:3px;overflow:hidden}.rc-bar-fill{height:100%;border-radius:3px;transition:width .3s}
 .rc-next{font-size:10px;color:var(--gray-400);margin-top:5px;text-align:center}.rc-next span{color:var(--gray-700);font-weight:600}
 .active-controls{display:flex;gap:8px;margin-top:2px}.active-controls .btn{flex:1}
-
-/* MOBILE STATS BAR */
 .mobile-stats-bar{display:none}
 .msb-inner{display:flex;align-items:stretch;background:var(--white);border:1px solid var(--gray-200);border-radius:12px;overflow:hidden;margin-top:8px}
 .msb-left{display:flex}
-.msb-cell{padding:10px 12px;text-align:center;border-right:1px solid var(--gray-200)}
-.msb-cell:last-child{border-right:none}
+.msb-cell{padding:10px 12px;text-align:center;border-right:1px solid var(--gray-200)}.msb-cell:last-child{border-right:none}
 .msb-cell.rep-cell{background:var(--gray-50);min-width:70px}
 .msb-cell.xp-cell{min-width:56px}
 .msb-label{font-family:'JetBrains Mono',monospace;font-size:7px;letter-spacing:.8px;color:var(--gray-400);margin-bottom:1px;text-transform:uppercase}
@@ -175,8 +178,6 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 .msb-rank-bar{width:100%;height:4px;background:var(--gray-200);border-radius:2px;overflow:hidden}
 .msb-rank-bar-fill{height:100%;border-radius:2px;transition:width .3s}
 .msb-rank-xp{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--gray-400);margin-top:2px}
-
-/* COMPLETE */
 .complete-center{display:flex;align-items:center;justify-content:center;min-height:50vh}
 .complete-card{background:var(--white);border:1px solid var(--gray-200);border-radius:16px;padding:40px;text-align:center;max-width:380px;width:100%}
 .cc-label{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gray-400);letter-spacing:1.5px;margin-bottom:14px}
@@ -194,7 +195,6 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 .modal-actions{display:flex;gap:8px;justify-content:flex-end}
 .toast{position:fixed;bottom:calc(20px + var(--safe-bottom));left:16px;right:16px;max-width:360px;margin:0 auto;background:var(--gray-800);border-radius:10px;padding:12px 18px;font-size:13px;font-weight:500;color:#fff;z-index:200;opacity:0;transform:translateY(12px);transition:all .25s ease;pointer-events:none;box-shadow:0 8px 24px rgba(0,0,0,.2);text-align:center}.toast.show{opacity:1;transform:translateY(0)}.toast.error{background:var(--red-500)}.toast.success{background:var(--green-600)}
 [hidden]{display:none!important}
-
 @media(min-width:601px){.topbar-context.active{display:flex}.topbar-rank-area{display:none!important}.modal-handle{display:none!important}.mobile-stats-bar{display:none!important}.warmup-mobile{display:none!important}.warmup-desktop{display:grid}}
 @media(max-width:800px){.active-body{grid-template-columns:1fr}.warmup-desktop{grid-template-columns:1fr}}
 @media(max-width:600px){
@@ -224,7 +224,7 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 .modal-handle{display:block!important}.modal-actions{flex-direction:column}.modal-actions .btn{width:100%;min-height:52px;font-size:15px;border-radius:14px}
 }
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
-@media(max-width:380px){.main{padding:10px 8px 20px}.page-title{font-size:20px}.cc-num{font-size:48px}.wmt-time{font-size:26px}.wm-timer-box{width:85px}.msb-val.rep-val{font-size:28px}.msb-val.xp-val{font-size:18px}}
+@media(max-width:380px){.main{padding:10px 8px 20px}.page-title{font-size:20px}.cc-num{font-size:48px}.wmt-time{font-size:24px}.wm-timer-box{width:80px}.msb-val.rep-val{font-size:28px}.msb-val.xp-val{font-size:18px}}
 </style>
 </head>
 <body>
@@ -243,8 +243,17 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 <div class="warmup-controls"><button class="btn btn-secondary btn-lg" id="skipWarmup">Skip warm-up</button><button class="btn btn-danger-ghost btn-lg" id="cancelWarmup" style="flex:0 0 auto;min-width:56px"><svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="6" width="12" height="12" rx="2"/></svg></button></div></div>
 </div>
 <div class="warmup-mobile">
-<div class="wm-top-row"><div class="wm-cam"><div class="video-card"><div class="video-wrap"><video id="wuVideoM" autoplay playsinline muted></video><canvas id="wuCanvasM"></canvas><div class="video-border warmup-active" id="wuBorderM"></div><div class="video-feedback"><div class="feedback-pill" id="wuFeedbackM">STARTING...</div></div><div class="loader" id="wuLoaderM"><div class="loader-spin"></div><div class="loader-text">LOADING</div></div></div></div></div>
-<div class="wm-timer-box"><div class="wmt-time" id="wmtTime">0:30</div><div class="wmt-bar"><div class="wmt-bar-fill" id="wmtBarFill" style="width:0%;background:var(--green-500)"></div></div><div class="wmt-status waiting" id="wmtStatus">WAITING</div></div></div>
+<div class="wm-top-row">
+<div class="wm-cam"><div class="video-card"><div class="video-wrap"><video id="wuVideoM" autoplay playsinline muted></video><canvas id="wuCanvasM"></canvas><div class="video-border warmup-active" id="wuBorderM"></div><div class="video-feedback"><div class="feedback-pill" id="wuFeedbackM">STARTING...</div></div><div class="loader" id="wuLoaderM"><div class="loader-spin"></div><div class="loader-text">LOADING</div></div></div></div></div>
+<div class="wm-timer-box" id="wmTimerBox">
+<div class="wm-timer-bg" id="wmTimerBg"></div>
+<div class="wm-timer-fg" id="wmTimerFg"></div>
+<div class="wm-timer-content">
+<div class="wmt-time" id="wmtTime">0:30</div>
+<div class="wmt-status waiting" id="wmtStatus">WAITING</div>
+</div>
+</div>
+</div>
 <div class="wm-info-section"><div class="wm-phase-name" id="wmPhaseName">Arm Circles (Forward)</div><div class="wm-phase-detail" id="wmPhaseDetail">Rotate arms forward</div></div>
 <div class="wm-bottom">
 <div class="warmup-steps"><div class="ws-title">PLAN</div><div class="ws-list" id="wsListM"></div></div>
@@ -307,8 +316,22 @@ async function loop(){if(!S.cameraOn)return;const v=gV();if(!S.paused&&v.readySt
 function camStop(){S.cameraOn=false;S.paused=false;if(raf){cancelAnimationFrame(raf);raf=null}if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}['video','wuVideo','wuVideoM'].forEach(id=>{const v=$(id);if(v)v.srcObject=null});['canvas','wuCanvas','wuCanvasM'].forEach(id=>{const c=$(id);if(c)c.getContext('2d').clearRect(0,0,c.width,c.height)})}
 function onR(res){const isW=S.mode==='warmup';const cv=gC();const ctx=cv.getContext('2d');if(S.firstResult){S.firstResult=false;gL().hidden=true}cv.width=res.image.width;cv.height=res.image.height;ctx.save();ctx.clearRect(0,0,cv.width,cv.height);ctx.scale(-1,1);ctx.translate(-cv.width,0);ctx.drawImage(res.image,0,0,cv.width,cv.height);if(res.poseLandmarks){if(typeof drawConnectors!=='undefined'&&typeof POSE_CONNECTIONS!=='undefined'){drawConnectors(ctx,res.poseLandmarks,POSE_CONNECTIONS,{color:isW?'rgba(34,197,94,.6)':'rgba(59,130,246,.6)',lineWidth:2});drawLandmarks(ctx,res.poseLandmarks,{color:'#ef4444',lineWidth:1,radius:3,fillColor:'#ef4444'})}if(isW)pWU(res.poseLandmarks);else if(det)pAct(res.poseLandmarks)}else{gF().textContent='STEP INTO FRAME';gF().className='feedback-pill danger';if(isW){WU.noForm++;WU.goodForm=0;if(WU.noForm>15)sWuP(true)}}ctx.restore()}
 function pWU(lm){if(WU.done)return;const ph=WU.phases[WU.idx];if(!ph)return;const d=WD[ph.type],r=d(lm),fp=gF();if(r.ok){fp.textContent=r.msg;fp.className='feedback-pill good';WU.goodForm++;WU.noForm=0;if(WU.goodForm>4)sWuP(false)}else{fp.textContent=r.msg;fp.className='feedback-pill warn';WU.noForm++;WU.goodForm=0;if(WU.noForm>25)sWuP(true)}tWU()}
-function sWuP(p){if(WU.pausedByForm===p)return;WU.pausedByForm=p;if(p){$('wpStatus').textContent='PAUSED - FIX FORM';$('wpStatus').className='wp-status paused';const ms=$('wmtStatus');if(ms){ms.textContent='PAUSED';ms.className='wmt-status paused'}$('wuCamGroup').classList.add('paused');gB().classList.add('paused');$('wuCamLabel').textContent='PAUSED';WU.lastTick=0}else{$('wpStatus').textContent='GOOD FORM';$('wpStatus').className='wp-status active';const ms=$('wmtStatus');if(ms){ms.textContent='GOOD';ms.className='wmt-status active'}$('wuCamGroup').classList.remove('paused');gB().classList.remove('paused');$('wuCamLabel').textContent='ANALYZING';WU.lastTick=performance.now()}}
-function tWU(){if(WU.pausedByForm||WU.done)return;const now=performance.now();if(WU.lastTick>0)WU.elapsed+=(now-WU.lastTick)/1000;WU.lastTick=now;const ph=WU.phases[WU.idx],rem=Math.max(0,ph.duration-WU.elapsed);const ts=fmtTime(rem),pct=((WU.elapsed/ph.duration)*100)+'%';$('wpTimer').textContent=ts;$('wpBar').style.width=pct;$('wmtTime').textContent=ts;$('wmtBarFill').style.width=pct;
+function sWuP(p){if(WU.pausedByForm===p)return;WU.pausedByForm=p;const tb=$('wmTimerBox');
+if(p){$('wpStatus').textContent='PAUSED - FIX FORM';$('wpStatus').className='wp-status paused';const ms=$('wmtStatus');if(ms){ms.textContent='PAUSED';ms.className='wmt-status paused'}if(tb)tb.classList.add('timer-paused');$('wuCamGroup').classList.add('paused');gB().classList.add('paused');$('wuCamLabel').textContent='PAUSED';WU.lastTick=0}
+else{$('wpStatus').textContent='GOOD FORM';$('wpStatus').className='wp-status active';const ms=$('wmtStatus');if(ms){ms.textContent='GOOD';ms.className='wmt-status active'}if(tb)tb.classList.remove('timer-paused');$('wuCamGroup').classList.remove('paused');gB().classList.remove('paused');$('wuCamLabel').textContent='ANALYZING';WU.lastTick=performance.now()}}
+
+function updateTimerFill(pct){
+// Desktop bar
+$('wpBar').style.width=pct+'%';
+// Mobile: fill from bottom
+$('wmTimerBg').style.height=pct+'%';
+$('wmTimerFg').style.height=pct+'%';
+}
+
+function tWU(){if(WU.pausedByForm||WU.done)return;const now=performance.now();if(WU.lastTick>0)WU.elapsed+=(now-WU.lastTick)/1000;WU.lastTick=now;const ph=WU.phases[WU.idx],rem=Math.max(0,ph.duration-WU.elapsed);const ts=fmtTime(rem);const pct=(WU.elapsed/ph.duration)*100;
+$('wpTimer').textContent=ts;
+$('wmtTime').textContent=ts;
+updateTimerFill(pct);
 if(rem<=0){WU.idx++;WU.elapsed=0;WU.lastTick=performance.now();WU.noForm=0;WU.goodForm=0;WU.prevKneeY={l:null,r:null};WU.movement=0;resetAC();if(WU.idx>=WU.phases.length){WU.done=true;wuDone();return}rWuPh();playTone(660)}}
 function pAct(lm){const d=det.update(lm);$('vAngle').textContent=Math.round(d.a)+'°';$('vState').textContent=d.st;const fp=$('feedbackPill');fp.textContent=d.f;fp.className='feedback-pill';if(d.f.includes('LOWER')||d.f.includes('HIGHER'))fp.classList.add('warn');if(d.r){const now=performance.now();if(now-lastRep>400){lastRep=now;S.reps++;S.xp+=S.currentWorkout.xp;uAct();flashRep();xpFloat(S.currentWorkout.xp);playTone(880)}}}
 function flashRep(){const e=$('repCount');e.classList.remove('flash');void e.offsetWidth;e.classList.add('flash')}
@@ -321,11 +344,8 @@ function pickU(u){S.currentUser=u;rTopRank(u.xp);rSelect();show('select')}
 function rSelect(){const u=S.currentUser;if(!u)return;const p=rp(u.xp),r=RANKS[p.i];$('selectRankIcon').textContent=p.name[0].toUpperCase();$('selectRankIcon').style.cssText=`background:${r.bg};color:${r.color}`;$('selectRankName').textContent=p.name.toUpperCase();$('selectRankName').style.color=r.color;$('selectRankBarFill').style.cssText=`width:${p.pct*100}%;background:${r.color}`;$('selectRankXp').textContent=p.next?`${u.xp} / ${p.max} XP`:`${u.xp} XP · MAX`;setCtx(null);const g=$('workoutGrid');g.innerHTML='';const isMb=mb();WK.forEach(w=>{const st=(u.stats||{})[w.id]||{reps:0};const c=document.createElement('button');c.className='workout-card';if(isMb){c.innerHTML=`<div class="wc-top"><div class="wc-icon">${w.icon}</div></div><div class="wc-body"><div class="wc-name">${w.name}</div><div class="wc-desc">${w.desc}</div><div class="wc-footer"><div class="wc-xp">+${w.xp} XP/rep</div><div class="wc-total">${st.reps} total</div></div></div><div class="wc-chevron"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>`}else{c.innerHTML=`<div class="wc-top"><div class="wc-icon">${w.icon}</div><div><div class="wc-name">${w.name}</div><div class="wc-desc">${w.desc}</div></div></div><div class="wc-footer"><div class="wc-xp">+${w.xp} XP/rep</div><div class="wc-total">${st.reps} total</div></div>`}c.addEventListener('click',()=>{S.currentWorkout=w;showP('ask')});g.appendChild(c)})}
 function setCtx(data){const el=$('topbarCtx');if(!data){el.classList.remove('active','mobile-active');return}$('topbarCtxName').textContent=data.name;$('topbarCtxSub').textContent=data.sub;el.classList.add('active');if(mb())el.classList.add('mobile-active');else el.classList.remove('mobile-active')}
 function showP(mode){$('privModal').hidden=false;if(mode==='ask'){$('privCancel').hidden=false;$('privAccept').hidden=false;$('privClose').hidden=true;$('privTitle').textContent='Camera & Privacy'}else{$('privCancel').hidden=true;$('privAccept').hidden=true;$('privClose').hidden=false;$('privTitle').textContent='Privacy Info'}}
-async function startWU(w){S.mode='warmup';S.paused=false;S.fps=0;S.firstResult=true;WU.phases=WARMUP_PLANS[w.id].map(p=>({...p}));WU.idx=0;WU.elapsed=0;WU.lastTick=0;WU.pausedByForm=false;WU.noForm=0;WU.goodForm=0;WU.done=false;WU.prevKneeY={l:null,r:null};WU.movement=0;resetAC();$('wuName').textContent=w.name+' Warm-up';$('wuTip').textContent='Get ready for '+w.name.toLowerCase();['wuLoader','wuLoaderM'].forEach(id=>{const e=$(id);if(e)e.hidden=false});['wuFeedback','wuFeedbackM'].forEach(id=>{const e=$(id);if(e){e.textContent='STARTING...';e.className='feedback-pill'}});$('wuCamGroup').classList.remove('paused');$('wuCamGroup').classList.add('warmup-cam');['wuBorder','wuBorderM'].forEach(id=>{const e=$(id);if(e)e.classList.remove('paused')});$('wuCamLabel').textContent='ANALYZING';setCtx({name:w.name+' Warm-up',sub:'Get ready'});updateMobileWuRank();rWuPh();rWuSt();show('warmup');try{await camStart()}catch(e){show('select');setCtx(null)}}
-function rWuPh(){const p=WU.phases[WU.idx];const lbl=`PHASE ${WU.idx+1} OF ${WU.phases.length}`;const t=fmtTime(p.duration);$('wpLabel').textContent=lbl;$('wpName').textContent=p.name;$('wpDetail').textContent=p.detail;$('wpTimer').textContent=t;$('wpBar').style.width='0%';$('wpStatus').textContent='WAITING...';$('wpStatus').className='wp-status waiting';
-// Mobile: no phase label, just name+detail
-$('wmPhaseName').textContent=p.name;$('wmPhaseDetail').textContent=p.detail;
-$('wmtTime').textContent=t;$('wmtBarFill').style.width='0%';$('wmtStatus').textContent='WAITING';$('wmtStatus').className='wmt-status waiting';rWuSt()}
+async function startWU(w){S.mode='warmup';S.paused=false;S.fps=0;S.firstResult=true;WU.phases=WARMUP_PLANS[w.id].map(p=>({...p}));WU.idx=0;WU.elapsed=0;WU.lastTick=0;WU.pausedByForm=false;WU.noForm=0;WU.goodForm=0;WU.done=false;WU.prevKneeY={l:null,r:null};WU.movement=0;resetAC();$('wuName').textContent=w.name+' Warm-up';$('wuTip').textContent='Get ready for '+w.name.toLowerCase();['wuLoader','wuLoaderM'].forEach(id=>{const e=$(id);if(e)e.hidden=false});['wuFeedback','wuFeedbackM'].forEach(id=>{const e=$(id);if(e){e.textContent='STARTING...';e.className='feedback-pill'}});$('wuCamGroup').classList.remove('paused');$('wuCamGroup').classList.add('warmup-cam');['wuBorder','wuBorderM'].forEach(id=>{const e=$(id);if(e)e.classList.remove('paused')});$('wuCamLabel').textContent='ANALYZING';$('wmTimerBox').classList.remove('timer-paused');setCtx({name:w.name+' Warm-up',sub:'Get ready'});updateMobileWuRank();rWuPh();rWuSt();show('warmup');try{await camStart()}catch(e){show('select');setCtx(null)}}
+function rWuPh(){const p=WU.phases[WU.idx];const lbl=`PHASE ${WU.idx+1} OF ${WU.phases.length}`;const t=fmtTime(p.duration);$('wpLabel').textContent=lbl;$('wpName').textContent=p.name;$('wpDetail').textContent=p.detail;$('wpTimer').textContent=t;$('wpBar').style.width='0%';$('wpStatus').textContent='WAITING...';$('wpStatus').className='wp-status waiting';$('wmPhaseName').textContent=p.name;$('wmPhaseDetail').textContent=p.detail;$('wmtTime').textContent=t;updateTimerFill(0);$('wmtStatus').textContent='WAITING';$('wmtStatus').className='wmt-status waiting';rWuSt()}
 function rWuSt(){['wsList','wsListM'].forEach(listId=>{const list=$(listId);if(!list)return;list.innerHTML='';WU.phases.forEach((p,i)=>{const cls=i<WU.idx?'ws-item done':i===WU.idx?'ws-item current':'ws-item';const el=document.createElement('div');el.className=cls;el.innerHTML=`<div class="ws-check"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><div class="ws-name">${p.name}</div><div class="ws-dur">${p.duration}s</div></div>`;list.appendChild(el)})})}
 function wuDone(){camStop();toast('Warm-up done! Starting workout...','success');setTimeout(()=>startMain(S.currentWorkout),800)}
 async function startMain(w){S.mode='active';S.reps=0;S.xp=0;S.startXp=S.currentUser.xp;S.startRank=ri(S.currentUser.xp);S.shownRank=S.startRank;S.paused=false;S.fps=0;S.firstResult=true;det=DETS[w.id]();$('activeName').textContent=w.name.toUpperCase();$('activeTip').textContent=w.tip;$('xpPerRep').textContent='+'+w.xp;$('vPerRep').textContent='+'+w.xp;if(mb())$('vsPerRep').style.display='';else $('vsPerRep').style.display='none';$('pauseIco').innerHTML='<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>';$('pauseTxt').textContent='Pause';$('pauseBtn').classList.remove('paused');$('loader').hidden=false;$('feedbackPill').textContent='STARTING...';$('feedbackPill').className='feedback-pill';$('vAngle').textContent='--';$('vState').textContent='--';$('vFps').textContent='--';$('camGroup').classList.remove('paused','warmup-cam');$('videoBorder').classList.remove('paused','warmup-active');$('camLabel').textContent='ANALYZING';setCtx({name:w.name.toUpperCase(),sub:w.tip});uAct();show('active');try{await camStart()}catch(e){show('select');setCtx(null)}}
