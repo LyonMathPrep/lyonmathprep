@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FocusPet - Privacy-First Posture Tracker</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --text-color: #f0f0f0;
+            --accent-color: #4caf50;
+            --danger-color: #f44336;
+            --border-color: #444;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        h1 { margin-bottom: 5px; }
+        .subtitle { color: #888; margin-top: 0; margin-bottom: 20px; font-size: 1.1rem; }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .camera-section { flex: 1; min-width: 400px; }
+        .game-section { flex: 1; min-width: 300px; display: flex; flex-direction: column; align-items: center; }
+
+        .video-wrapper {
+            position: relative;
+            width: 100%;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: #000;
+            aspect-ratio: 4/3;
+            border: 4px solid var(--border-color);
+            transition: border-color 0.3s;
+        }
+        .video-wrapper.active { border-color: var(--accent-color); }
+        .video-wrapper.distracted { border-color: var(--danger-color); }
+
+        #videoEl, #canvasEl {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror view */
+        }
+        #videoEl { visibility: hidden; }
+
+        .status-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            display: none;
+        }
+
+        .controls { margin-top: 15px; display: flex; gap: 10px; }
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+        button:hover { opacity: 0.9; }
+        button:disabled { background-color: #555; cursor: not-allowed; }
+        button.stop { background-color: var(--danger-color); }
+
+        .pet-display {
+            font-size: 8rem;
+            line-height: 1;
+            margin: 20px 0;
+            transition: transform 0.5s ease;
+        }
+        .stats { text-align: center; margin-bottom: 20px; }
+        .stat-label { color: #888; font-size: 0.9rem; text-transform: uppercase; }
+        .stat-value { font-size: 1.8rem; font-weight: bold; }
+
+        .privacy-notice {
+            margin-top: 30px;
+            max-width: 800px;
+            background: #222;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent-color);
+        }
+        .privacy-notice h3 { margin-top: 0; }
+        .privacy-notice ul { padding-left: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>🐢 FocusPet</h1>
+    <p class="subtitle">Maintain your posture and focus to help your pet grow!</p>
+
+    <div class="container">
+        <!-- Camera & Detection Section -->
+        <div class="card camera-section">
+            <div class="video-wrapper" id="videoWrapper">
+                <video id="videoEl" autoplay playsinline></video>
+                <canvas id="canvasEl"></canvas>
+                <div class="status-overlay" id="statusOverlay">Camera Analyzing...</div>
+            </div>
+            <div class="controls">
+                <button id="startBtn">Start Session</button>
+                <button id="stopBtn" class="stop" disabled>Stop Session</button>
+            </div>
+            <div id="debugStats" style="margin-top: 10px; font-size: 0.8rem; color: #888;">
+                Posture: <span id="postureStat">N/A</span> | 
+                Attention: <span id="attentionStat">N/A</span>
+            </div>
+        </div>
+
+        <!-- Gamification Section -->
+        <div class="card game-section">
+            <h2>Your Pet</h2>
+            <div class="pet-display" id="petDisplay">🥚</div>
+            <div class="stats">
+                <div class="stat-label">Focus XP</div>
+                <div class="stat-value" id="xpValue">0</div>
+            </div>
+            <div class="stats">
+                <div class="stat-label">Current State</div>
+                <div class="stat-value" id="stateValue" style="font-size: 1.2rem;">Idle</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="privacy-notice">
+        <h3>Privacy & Data Handling</h3>
+        <ul>
+            <li><strong>100% On-Device Processing:</strong> All pose and face detection runs locally in your browser via MediaPipe. No video frames are ever sent to a server.</li>
+            <li><strong>Zero Data Storage:</strong> We do not save, cache, or log video frames. Image data exists only in temporary memory and is overwritten instantly frame-by-frame.</li>
+            <li><strong>Explicit Consent:</strong> The camera only activates when you click "Start Session" and requests your browser's explicit permission.</li>
+            <li><strong>User Control:</strong> You can pause or stop the session at any time. Stopping the session immediately kills the camera stream.</li>
+        </ul>
+    </div>
+
+    <!-- Import MediaPipe Tasks Vision -->
+    <script type="module">
+        import { PoseLandmarker, FilesetResolver } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
+
+        // DOM Elements
+        const videoEl = document.getElementById('videoEl');
+        const canvasEl = document.getElementById('canvasEl');
+        const ctx = canvasEl.getContext('2d');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const videoWrapper = document.getElementById('videoWrapper');
+        const statusOverlay = document.getElementById('statusOverlay');
+        
+        const petDisplay = document.getElementById('petDisplay');
+        const xpValue = document.getElementById('xpValue');
+        const stateValue = document.getElementById('stateValue');
+        const postureStat = document.getElementById('postureStat');
+        const attentionStat = document.getElementById('attentionStat');
+
+        // State Variables
+        let poseLandmarker = null;
+        let stream = null;
+        let animationId = null;
+        let focusXP = 0;
+        let lastVideoTime = -1;
+        let distractionTimer = 0; 
+        let slouchTimer = 0; // NEW: Timer to debounce slouching so it's not too strict
+
+        // Initialize MediaPipe
+        async function initMediaPipe() {
+            const vision = await FilesetResolver.forVisionTasks(
+                "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
+            );
+            poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
+                baseOptions: {
+                    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+                    delegate: "GPU"
+                },
+                runningMode: "VIDEO",
+                numPoses: 1
+            });
+            console.log("MediaPipe PoseLandmarker loaded.");
+        }
+
+        // Start Camera
+        startBtn.addEventListener('click', async () => {
+            if (!poseLandmarker) {
+                stateValue.innerText = "Loading AI...";
+                await initMediaPipe();
+            }
+            
+            try {
+                // Explicit permission request via getUserMedia
+                stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                videoEl.srcObject = stream;
+                
+                await videoEl.play();
+                canvasEl.width = videoEl.videoWidth;
+                canvasEl.height = videoEl.videoHeight;
+
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                statusOverlay.style.display = 'block';
+                videoWrapper.classList.add('active');
+                
+                stateValue.innerText = "Focusing";
+                predictWebcam();
+            } catch (err) {
+                console.error("Camera access denied or error:", err);
+                alert("Camera access is required for this app to function. Please allow camera access and try again.");
+            }
+        });
+
+        // Stop Camera
+        stopBtn.addEventListener('click', stopSession);
+
+        function stopSession() {
+            if (animationId) cancelAnimationFrame(animationId);
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            videoEl.srcObject = null;
+            ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+            
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+            statusOverlay.style.display = 'none';
+            videoWrapper.classList.remove('active', 'distracted');
+            stateValue.innerText = "Idle";
+        }
+
+        // Main Processing Loop
+        function predictWebcam() {
+            if (!videoEl.videoWidth) {
+                animationId = requestAnimationFrame(predictWebcam);
+                return;
+            }
+
+            // Process frame in memory
+            if (videoEl.currentTime !== lastVideoTime) {
+                lastVideoTime = videoEl.currentTime;
+                const results = poseLandmarker.detectForVideo(videoEl, performance.now());
+                
+                // Clear canvas and draw video frame (in memory, not saved)
+                ctx.save();
+                ctx.clearRect(0, 0, canvasEl.width, canvasEl.height);
+                
+                // Draw the video frame manually to canvas
+                ctx.translate(canvasEl.width, 0);
+                ctx.scale(-1, 1);
+                ctx.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+
+                let isSlouching = false;
+                let isDistracted = false;
+
+                if (results.landmarks && results.landmarks.length > 0) {
+                    const landmarks = results.landmarks[0];
+                    
+                    // Draw skeleton overlay
+                    drawSkeleton(landmarks);
+
+                    // Indices: 0=Nose, 7/8=Left/Right Ear, 11/12=Left/Right Shoulder, 23/24=Left/Right Hip
+                    const nose = landmarks[0];
+                    const leftShoulder = landmarks[11];
+                    const rightShoulder = landmarks[12];
+                    const leftHip = landmarks[23];
+                    const rightHip = landmarks[24];
+
+                    // 1. Slouching Detection (Ear-Shoulder-Hip angle)
+                    if (rightShoulder && rightHip) {
+                        const shoulder = { x: rightShoulder.x * canvasEl.width, y: rightShoulder.y * canvasEl.height };
+                        const hip = { x: rightHip.x * canvasEl.width, y: rightHip.y * canvasEl.height };
+                        const ear = landmarks[8] ? { x: landmarks[8].x * canvasEl.width, y: landmarks[8].y * canvasEl.height } : null;
+
+                        if (ear) {
+                            const angle = calculateAngle(ear, shoulder, hip);
+                            postureStat.innerText = `${angle.toFixed(0)}°`;
+                            
+                            // UPDATED: Added a debounce timer. 
+                            // Only trigger slouching if angle is < 140 for more than 45 frames (~0.75 seconds)
+                            if (angle < 140) {
+                                slouchTimer++;
+                                if (slouchTimer > 45) {
+                                    isSlouching = true;
+                                }
+                            } else {
+                                slouchTimer = 0; // Reset if they sit back up
+                            }
+                        }
+                    }
+
+                    // 2. Distraction Detection (Head turned / looking away)
+                    if (nose && leftShoulder && rightShoulder) {
+                        const shoulderMidX = (leftShoulder.x + rightShoulder.x) / 2;
+                        const offset = Math.abs(nose.x - shoulderMidX);
+                        const shoulderWidth = Math.abs(leftShoulder.x - rightShoulder.x);
+                        
+                        if (offset > (shoulderWidth * 0.35)) {
+                            distractionTimer++;
+                            if (distractionTimer > 15) isDistracted = true; // ~0.5 seconds of looking away
+                        } else {
+                            distractionTimer = 0;
+                        }
+                        
+                        attentionStat.innerText = isDistracted ? "Distracted" : "Focused";
+                    }
+                }
+
+                ctx.restore();
+
+                // Gamification Logic
+                updateGameState(isSlouching, isDistracted);
+            }
+            
+            animationId = requestAnimationFrame(predictWebcam);
+        }
+
+        function calculateAngle(p1, p2, p3) {
+            const angleRad = Math.atan2(p3.y - p2.y, p3.x - p2.x) - Math.atan2(p1.y - p2.y, p1.x - p2.x);
+            let angleDeg = Math.abs(angleRad * 180 / Math.PI);
+            if (angleDeg > 180) angleDeg = 360 - angleDeg;
+            return angleDeg;
+        }
+
+        function drawSkeleton(landmarks) {
+            ctx.strokeStyle = '#4caf50';
+            ctx.lineWidth = 3;
+            const connections = [
+                [11, 12], [11, 23], [12, 24], [23, 24], // Torso
+                [11, 13], [13, 15], [12, 14], [14, 16], // Arms
+                [23, 25], [25, 27], [24, 26], [26, 28], // Legs
+                [0, 11], [0, 12] // Neck to head
+            ];
+
+            connections.forEach(([i, j]) => {
+                if (landmarks[i] && landmarks[j]) {
+                    ctx.beginPath();
+                    ctx.moveTo(landmarks[i].x * canvasEl.width, landmarks[i].y * canvasEl.height);
+                    ctx.lineTo(landmarks[j].x * canvasEl.width, landmarks[j].y * canvasEl.height);
+                    ctx.stroke();
+                }
+            });
+
+            // Draw joints
+            ctx.fillStyle = '#f44336';
+            landmarks.forEach(lm => {
+                ctx.beginPath();
+                ctx.arc(lm.x * canvasEl.width, lm.y * canvasEl.height, 4, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function updateGameState(isSlouching, isDistracted) {
+            if (isSlouching || isDistracted) {
+                focusXP = Math.max(0, focusXP - 0.5); // Penalty
+                videoWrapper.classList.add('distracted');
+                stateValue.innerText = isSlouching ? "Slouching!" : "Distracted!";
+                stateValue.style.color = '#f44336';
+            } else {
+                focusXP += 0.2; // Reward
+                videoWrapper.classList.remove('distracted');
+                stateValue.innerText = "Focusing";
+                stateValue.style.color = '#4caf50';
+            }
+
+            // Update UI
+            xpValue.innerText = Math.floor(focusXP);
+            
+            // Pet Evolution Logic
+            const scale = 1 + (focusXP / 200); // Grows up to 2x size
+            petDisplay.style.transform = `scale(${Math.min(scale, 2)})`;
+
+            if (focusXP < 20) petDisplay.innerText = "🥚";
+            else if (focusXP < 50) petDisplay.innerText = "🐣";
+            else if (focusXP < 100) petDisplay.innerText = "🐤";
+            else if (focusXP < 150) petDisplay.innerText = "🐦";
+            else petDisplay.innerText = "🦅";
+        }
+
+        // Initialize MediaPipe on load so it's ready when user clicks start
+        initMediaPipe();
+    </script>
+</body>
+</html>
