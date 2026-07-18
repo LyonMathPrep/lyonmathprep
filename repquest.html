@@ -283,8 +283,27 @@ let pose=null,stream=null,raf=null,det=null,lastRep=0,audioCtx=null,pendingDel=n
 const AC={history:[],maxHist:15,yDirChangesL:0,yDirChangesR:0,prevDirL:0,prevDirR:0,prevLY:null,prevRY:null,smoothMovement:0};
 const WU={phases:[],idx:0,elapsed:0,lastTick:0,pausedByForm:false,noForm:0,goodForm:0,done:false,prevKneeY:{l:null,r:null},movement:0};
 const RANKS=[{name:'Rookie',min:0,color:'#6b7280',bg:'#f3f4f6'},{name:'Cadet',min:100,color:'#3b82f6',bg:'#eff6ff'},{name:'Athlete',min:300,color:'#22c55e',bg:'#f0fdf4'},{name:'Warrior',min:700,color:'#f97316',bg:'#fff7ed'},{name:'Champion',min:1500,color:'#ef4444',bg:'#fef2f2'},{name:'Legend',min:3000,color:'#a855f7',bg:'#faf5ff'},{name:'Mythic',min:6000,color:'#eab308',bg:'#fefce8'}];
-const WK=[{id:'squats',name:'Squats',desc:'Lower-body strength',xp:10,tip:'Stand side-on, full body visible',icon:`<svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M9 9h6"/><path d="M12 9v3"/><path d="M8 12h8"/><path d="M8 12l-2 6"/><path d="M16 12l2 6"/></svg>`},{id:'curls',name:'Bicep Curls',desc:'Arm isolation',xp:8,tip:'Face camera, keep elbows still',icon:`<svg viewBox="0 0 24 24"><rect x="2" y="9" width="3" height="6" rx="1"/><rect x="19" y="9" width="3" height="6" rx="1"/><path d="M5 11h14M5 13h14"/></svg>`},{id:'jacks',name:'Jumping Jacks',desc:'Full-body cardio',xp:5,tip:'Step back, full body in frame',icon:`<svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M12 6v6"/><path d="M6 9l6 3 6-3"/><path d="M9 18l3-6 3 6"/></svg>`},{id:'pushups',name:'Push-ups',desc:'Upper-body strength',xp:12,tip:'Side-on, body horizontal',icon:`<svg viewBox="0 0 24 24"><circle cx="5" cy="9" r="2"/><path d="M7 10h14"/><path d="M3 15h18"/><path d="M5 15v3M19 15v3"/></svg>`}];
-const WARMUP_PLANS={curls:[{name:'Arm Circles (Forward)',detail:'Rotate arms forward in wide circles',duration:15,type:'arm_circles'},{name:'Arm Circles (Backward)',detail:'Reverse direction',duration:15,type:'arm_circles'},{name:'High Knees',detail:'Run in place, drive knees up',duration:30,type:'high_knees'}],squats:[{name:'High Knees',detail:'Run in place, open hips and knees',duration:50,type:'high_knees'},{name:'Arm Circles (Forward)',detail:'Loosen shoulders',duration:15,type:'arm_circles'},{name:'Arm Circles (Backward)',detail:'Reverse direction',duration:15,type:'arm_circles'}],pushups:[{name:'Arm Circles (Forward)',detail:'Mobilize shoulder girdle',duration:22,type:'arm_circles'},{name:'Arm Circles (Backward)',detail:'Full range of motion',duration:23,type:'arm_circles'},{name:'High Knees',detail:'Run in place, engage core',duration:45,type:'high_knees'}],jacks:[{name:'Arm Circles (Forward)',detail:'Loosen up shoulders',duration:15,type:'arm_circles'},{name:'Arm Circles (Backward)',detail:'Reverse direction',duration:15,type:'arm_circles'},{name:'High Knees',detail:'Run in place, build intensity',duration:55,type:'high_knees'}]};
+
+const WK=[
+    {id:'squats',name:'Squats',desc:'Lower-body strength',xp:10,tip:'Stand side-on, full body visible',icon:`<svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M9 9h6"/><path d="M12 9v3"/><path d="M8 12h8"/><path d="M8 12l-2 6"/><path d="M16 12l2 6"/></svg>`},
+    {id:'curls',name:'Bicep Curls',desc:'Arm isolation',xp:8,tip:'Face camera, keep elbows still',icon:`<svg viewBox="0 0 24 24"><rect x="2" y="9" width="3" height="6" rx="1"/><rect x="19" y="9" width="3" height="6" rx="1"/><path d="M5 11h14M5 13h14"/></svg>`},
+    {id:'jacks',name:'Jumping Jacks',desc:'Full-body cardio',xp:5,tip:'Step back, full body in frame',icon:`<svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M12 6v6"/><path d="M6 9l6 3 6-3"/><path d="M9 18l3-6 3 6"/></svg>`},
+    {id:'pushups',name:'Push-ups',desc:'Upper-body strength',xp:12,tip:'Side-on, body horizontal',icon:`<svg viewBox="0 0 24 24"><circle cx="5" cy="9" r="2"/><path d="M7 10h14"/><path d="M3 15h18"/><path d="M5 15v3M19 15v3"/></svg>`},
+    {id:'lunges',name:'Lunges',desc:'Legs & Glutes',xp:11,tip:'Stand side-on, step forward',icon:`<svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M9 9h6"/><path d="M12 9l-4 5"/><path d="M8 14h6"/><path d="M8 14v4"/><path d="M16 14v4"/></svg>`},
+    {id:'press',name:'Shoulder Press',desc:'Shoulders & Arms',xp:9,tip:'Face camera, press overhead',icon:`<svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M12 6v4"/><path d="M7 10l5 2 5-2"/><path d="M12 12v4"/><path d="M8 18h8"/></svg>`},
+    {id:'legraises',name:'Side Leg Raises',desc:'Outer Thighs',xp:7,tip:'Stand side-on, lift leg out',icon:`<svg viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M12 6v8"/><path d="M8 14h8"/><path d="M12 14l5 3"/></svg>`}
+];
+
+const WARMUP_PLANS={
+    curls:[{name:'Arm Circles (Forward)',detail:'Rotate arms forward in wide circles',duration:15,type:'arm_circles'},{name:'Arm Circles (Backward)',detail:'Reverse direction',duration:15,type:'arm_circles'},{name:'High Knees',detail:'Run in place, drive knees up',duration:30,type:'high_knees'}],
+    squats:[{name:'High Knees',detail:'Run in place, open hips and knees',duration:50,type:'high_knees'},{name:'Arm Circles (Forward)',detail:'Loosen shoulders',duration:15,type:'arm_circles'},{name:'Arm Circles (Backward)',detail:'Reverse direction',duration:15,type:'arm_circles'}],
+    pushups:[{name:'Arm Circles (Forward)',detail:'Mobilize shoulder girdle',duration:22,type:'arm_circles'},{name:'Arm Circles (Backward)',detail:'Full range of motion',duration:23,type:'arm_circles'},{name:'High Knees',detail:'Run in place, engage core',duration:45,type:'high_knees'}],
+    jacks:[{name:'Arm Circles (Forward)',detail:'Loosen up shoulders',duration:15,type:'arm_circles'},{name:'Arm Circles (Backward)',detail:'Reverse direction',duration:15,type:'arm_circles'},{name:'High Knees',detail:'Run in place, build intensity',duration:55,type:'high_knees'}],
+    lunges:[{name:'High Knees',detail:'Run in place, open hips and knees',duration:40,type:'high_knees'},{name:'Arm Circles (Forward)',detail:'Loosen shoulders',duration:15,type:'arm_circles'},{name:'Arm Circles (Backward)',detail:'Reverse direction',duration:15,type:'arm_circles'}],
+    press:[{name:'Arm Circles (Forward)',detail:'Mobilize shoulder girdle',duration:20,type:'arm_circles'},{name:'Arm Circles (Backward)',detail:'Full range of motion',duration:20,type:'arm_circles'},{name:'High Knees',detail:'Run in place, engage core',duration:30,type:'high_knees'}],
+    legraises:[{name:'High Knees',detail:'Run in place, open hips',duration:45,type:'high_knees'},{name:'Arm Circles (Forward)',detail:'Loosen up',duration:15,type:'arm_circles'},{name:'Arm Circles (Backward)',detail:'Reverse direction',duration:15,type:'arm_circles'}]
+};
+
 const DB={K:'repquest_v1',get(){try{return JSON.parse(localStorage.getItem(this.K)||'[]')}catch{return[]}},save(u){localStorage.setItem(this.K,JSON.stringify(u))},add(n){const u=this.get(),o={id:'u_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:n.trim(),xp:0,created:Date.now(),stats:{}};u.push(o);this.save(u);return o},upd(o){const u=this.get(),i=u.findIndex(x=>x.id===o.id);if(i>=0){u[i]=o;this.save(u)}},del(id){this.save(this.get().filter(x=>x.id!==id))}};
 function mb(){return window.innerWidth<=600}
 function ri(x){let i=0;RANKS.forEach((r,j)=>{if(x>=r.min)i=j});return i}
@@ -304,7 +323,12 @@ function mkSquat(){return{s:'up',lm:false,update(l){const a=(ang(l[23],l[25],l[2
 function mkCurl(){return{s:'down',cm:false,update(l){const lv=(l[11].visibility||0)+(l[13].visibility||0)+(l[15].visibility||0),rv=(l[12].visibility||0)+(l[14].visibility||0)+(l[16].visibility||0),u=rv>=lv;const sh=u?l[12]:l[11],el=u?l[14]:l[13],wr=u?l[16]:l[15];const a=ang(sh,el,wr);let r=false;if(this.s==='down'&&a<50){this.s='up';this.cm=true}else if(this.s==='up'&&a>150){this.s='down';if(this.cm)r=true;this.cm=false}let f;if(this.s==='down')f='CURL UP';else if(a<50)f='EXTEND DOWN';else if(a<100)f='CURL HIGHER';else f='TRACKING...';return{r,a,st:this.s.toUpperCase()+(u?' R':' L'),f}}}}
 function mkJack(){return{s:'closed',update(l){const sw=Math.max(.05,Math.abs(l[11].x-l[12].x)),hu=l[15].y<l[11].y&&l[16].y<l[12].y,fa=Math.abs(l[27].x-l[28].x)>sw*1.3;let r=false;if(this.s==='closed'&&hu&&fa)this.s='open';else if(this.s==='open'&&!hu&&!fa){this.s='closed';r=true}return{r,a:((hu?.5:0)+(fa?.5:0))*180,st:this.s.toUpperCase(),f:this.s==='closed'?'JUMP OUT':'RETURN'}}}}
 function mkPushup(){return{s:'up',lm:false,update(l){const lv=(l[11].visibility||0)+(l[13].visibility||0)+(l[15].visibility||0),rv=(l[12].visibility||0)+(l[14].visibility||0)+(l[16].visibility||0),u=rv>=lv;const sh=u?l[12]:l[11],el=u?l[14]:l[13],wr=u?l[16]:l[15];const a=ang(sh,el,wr);let r=false;if(this.s==='up'&&a<90)this.s='down';else if(this.s==='down'&&a>150){this.s='up';if(this.lm)r=true;this.lm=false}if(this.s==='down'&&a<80)this.lm=true;let f;if(this.s==='up')f='GO DOWN';else if(a<80)f='PUSH UP';else if(a<110)f='LOWER';else f='TRACKING...';return{r,a,st:this.s.toUpperCase(),f}}}}
-const DETS={squats:mkSquat,curls:mkCurl,jacks:mkJack,pushups:mkPushup};
+
+function mkLunge(){return{s:'up',lm:false,update(l){const la=ang(l[23],l[25],l[27]),ra=ang(l[24],l[26],l[28]);const a=Math.min(la,ra);let r=false;if(this.s==='up'&&a<110)this.s='down';else if(this.s==='down'&&a>160){this.s='up';if(this.lm)r=true;this.lm=false}if(this.s==='down'&&a<90)this.lm=true;let f;if(this.s==='up')f='LUNGE DOWN';else if(a<90)f='STAND UP';else if(a<120)f='GO LOWER';else f='TRACKING...';return{r,a,st:this.s.toUpperCase(),f}}}}
+function mkPress(){return{s:'down',lm:false,update(l){const lv=(l[11].visibility||0)+(l[13].visibility||0)+(l[15].visibility||0),rv=(l[12].visibility||0)+(l[14].visibility||0)+(l[16].visibility||0),u=rv>=lv;const sh=u?l[12]:l[11],el=u?l[14]:l[13],wr=u?l[16]:l[15];const a=ang(sh,el,wr);let r=false;if(this.s==='down'&&a>150){this.s='up';if(this.lm)r=true;this.lm=false}else if(this.s==='up'&&a<90){this.s='down';this.lm=true}let f;if(this.s==='down')f='PRESS UP';else if(a>160)f='LOWER DOWN';else if(a<120)f='PRESS HIGHER';else f='TRACKING...';return{r,a,st:this.s.toUpperCase()+(u?' R':' L'),f}}}}
+function mkLegRaise(){return{s:'down',lm:false,update(l){const la=ang(l[11],l[23],l[25]),ra=ang(l[12],l[24],l[26]);const a=Math.min(la,ra);let r=false;if(this.s==='down'&&a<130)this.s='up';else if(this.s==='up'&&a>160){this.s='down';if(this.lm)r=true;this.lm=false}if(this.s==='up'&&a<110)this.lm=true;let f;if(this.s==='down')f='RAISE LEG';else if(a>160)f='LOWER LEG';else if(a<110)f='HOLD';else f='TRACKING...';return{r,a,st:this.s.toUpperCase(),f}}}}
+
+const DETS={squats:mkSquat,curls:mkCurl,jacks:mkJack,pushups:mkPushup,lunges:mkLunge,press:mkPress,legraises:mkLegRaise};
 async function initPose(){if(pose)return;if(typeof Pose==='undefined')throw new Error('missing');pose=new Pose({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/pose/${f}`});pose.setOptions({modelComplexity:1,smoothLandmarks:true,enableSegmentation:false,minDetectionConfidence:.5,minTrackingConfidence:.5});pose.onResults(onR)}
 function gV(){if(S.mode==='warmup')return mb()?$('wuVideoM'):$('wuVideo');return $('video')}
 function gC(){if(S.mode==='warmup')return mb()?$('wuCanvasM'):$('wuCanvas');return $('canvas')}
@@ -322,15 +346,15 @@ else{$('wpStatus').textContent='GOOD FORM';$('wpStatus').className='wp-status ac
 
 function updateTimerFill(pct){
 // Desktop bar
-$('wpBar').style.width=pct+'%';
+ $('wpBar').style.width=pct+'%';
 // Mobile: fill from bottom
-$('wmTimerBg').style.height=pct+'%';
-$('wmTimerFg').style.height=pct+'%';
+ $('wmTimerBg').style.height=pct+'%';
+ $('wmTimerFg').style.height=pct+'%';
 }
 
 function tWU(){if(WU.pausedByForm||WU.done)return;const now=performance.now();if(WU.lastTick>0)WU.elapsed+=(now-WU.lastTick)/1000;WU.lastTick=now;const ph=WU.phases[WU.idx],rem=Math.max(0,ph.duration-WU.elapsed);const ts=fmtTime(rem);const pct=(WU.elapsed/ph.duration)*100;
-$('wpTimer').textContent=ts;
-$('wmtTime').textContent=ts;
+ $('wpTimer').textContent=ts;
+ $('wmtTime').textContent=ts;
 updateTimerFill(pct);
 if(rem<=0){WU.idx++;WU.elapsed=0;WU.lastTick=performance.now();WU.noForm=0;WU.goodForm=0;WU.prevKneeY={l:null,r:null};WU.movement=0;resetAC();if(WU.idx>=WU.phases.length){WU.done=true;wuDone();return}rWuPh();playTone(660)}}
 function pAct(lm){const d=det.update(lm);$('vAngle').textContent=Math.round(d.a)+'°';$('vState').textContent=d.st;const fp=$('feedbackPill');fp.textContent=d.f;fp.className='feedback-pill';if(d.f.includes('LOWER')||d.f.includes('HIGHER'))fp.classList.add('warn');if(d.r){const now=performance.now();if(now-lastRep>400){lastRep=now;S.reps++;S.xp+=S.currentWorkout.xp;uAct();flashRep();xpFloat(S.currentWorkout.xp);playTone(880)}}}
@@ -354,20 +378,20 @@ function endSession(){camStop();setCtx(null);S.mode=null;if(S.reps>0&&S.currentW
 function togglePause(){S.paused=!S.paused;if(S.paused){$('pauseIco').innerHTML='<polygon points="5 3 19 12 5 21 5 3"/>';$('pauseTxt').textContent='Resume';$('pauseBtn').classList.add('paused');$('camGroup').classList.add('paused');$('videoBorder').classList.add('paused');$('camLabel').textContent='PAUSED';$('feedbackPill').textContent='PAUSED';$('feedbackPill').className='feedback-pill warn'}else{$('pauseIco').innerHTML='<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>';$('pauseTxt').textContent='Pause';$('pauseBtn').classList.remove('paused');$('camGroup').classList.remove('paused');$('videoBorder').classList.remove('paused');$('camLabel').textContent='ANALYZING'}}
 function cancelWU(){camStop();S.mode=null;setCtx(null);rSelect();show('select')}
 function skipWU(){camStop();S.mode=null;WU.done=true;startMain(S.currentWorkout)}
-$('createBtn').addEventListener('click',()=>{const inp=$('newName'),n=inp.value.trim();if(!n){toast('Enter a name.','error');inp.focus();return}if(n.length>16){toast('Too long.','error');return}if(DB.get().some(u=>u.name.toLowerCase()===n.toLowerCase())){toast('Name taken.','error');return}const u=DB.add(n);inp.value='';rAccounts();pickU(u);toast(`Welcome, ${u.name}!`,'success')});
-$('newName').addEventListener('keydown',e=>{if(e.key==='Enter')$('createBtn').click()});
-$('switchUser').addEventListener('click',()=>{setCtx(null);show('account');rAccounts()});
-$('stopBtn').addEventListener('click',endSession);$('pauseBtn').addEventListener('click',togglePause);
-$('ccBack').addEventListener('click',()=>{rSelect();show('select')});
-$('ccAgain').addEventListener('click',async()=>{if(S.currentWorkout)await startWU(S.currentWorkout);else{rSelect();show('select')}});
-$('privAccept').addEventListener('click',async()=>{$('privModal').hidden=true;await startWU(S.currentWorkout)});
-$('privCancel').addEventListener('click',()=>{$('privModal').hidden=true;S.currentWorkout=null});
-$('privClose').addEventListener('click',()=>{$('privModal').hidden=true});
-$('privacyBtn').addEventListener('click',()=>showP('info'));
-$('topbarRankArea').addEventListener('click',()=>showP('info'));
-$('privModal').addEventListener('click',e=>{if(e.target===$('privModal')){$('privModal').hidden=true;S.currentWorkout=null}});
-$('cancelWarmup').addEventListener('click',cancelWU);$('skipWarmup').addEventListener('click',skipWU);
-$('cancelWarmupM').addEventListener('click',cancelWU);$('skipWarmupM').addEventListener('click',skipWU);
+ $('createBtn').addEventListener('click',()=>{const inp=$('newName'),n=inp.value.trim();if(!n){toast('Enter a name.','error');inp.focus();return}if(n.length>16){toast('Too long.','error');return}if(DB.get().some(u=>u.name.toLowerCase()===n.toLowerCase())){toast('Name taken.','error');return}const u=DB.add(n);inp.value='';rAccounts();pickU(u);toast(`Welcome, ${u.name}!`,'success')});
+ $('newName').addEventListener('keydown',e=>{if(e.key==='Enter')$('createBtn').click()});
+ $('switchUser').addEventListener('click',()=>{setCtx(null);show('account');rAccounts()});
+ $('stopBtn').addEventListener('click',endSession);$('pauseBtn').addEventListener('click',togglePause);
+ $('ccBack').addEventListener('click',()=>{rSelect();show('select')});
+ $('ccAgain').addEventListener('click',async()=>{if(S.currentWorkout)await startWU(S.currentWorkout);else{rSelect();show('select')}});
+ $('privAccept').addEventListener('click',async()=>{$('privModal').hidden=true;await startWU(S.currentWorkout)});
+ $('privCancel').addEventListener('click',()=>{$('privModal').hidden=true;S.currentWorkout=null});
+ $('privClose').addEventListener('click',()=>{$('privModal').hidden=true});
+ $('privacyBtn').addEventListener('click',()=>showP('info'));
+ $('topbarRankArea').addEventListener('click',()=>showP('info'));
+ $('privModal').addEventListener('click',e=>{if(e.target===$('privModal')){$('privModal').hidden=true;S.currentWorkout=null}});
+ $('cancelWarmup').addEventListener('click',cancelWU);$('skipWarmup').addEventListener('click',skipWU);
+ $('cancelWarmupM').addEventListener('click',cancelWU);$('skipWarmupM').addEventListener('click',skipWU);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('privModal').hidden){$('privModal').hidden=true;S.currentWorkout=null}else if(!$('scrActive').hidden&&!S.paused)togglePause()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&S.cameraOn){if(S.mode==='active'&&!S.paused)togglePause();if(S.mode==='warmup')sWuP(true)}});
 window.addEventListener('beforeunload',camStop);
