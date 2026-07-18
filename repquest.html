@@ -338,7 +338,223 @@ function gB(){if(S.mode==='warmup')return mb()?$('wuBorderM'):$('wuBorder');retu
 async function camStart(){try{stream=await navigator.mediaDevices.getUserMedia({video:{width:640,height:480,facingMode:'user'},audio:false});const v=gV();v.srcObject=stream;await v.play();S.cameraOn=true;S.paused=false;S.firstResult=true;await initPose();loop()}catch(e){let m='Camera failed.';if(e.name==='NotAllowedError')m='Camera denied.';else if(e.name==='NotFoundError')m='No camera.';toast(m,'error');camStop();show('select');throw e}}
 async function loop(){if(!S.cameraOn)return;const v=gV();if(!S.paused&&v.readyState>=2&&pose){try{await pose.send({image:v});const now=performance.now();if(S.lastFrame){const d=now-S.lastFrame;if(d>0){const f=1000/d;S.fps=S.fps>0?S.fps*.85+f*.15:f;if(S.mode==='active')$('vFps').textContent=Math.round(S.fps)}}S.lastFrame=now}catch(e){}}raf=requestAnimationFrame(loop)}
 function camStop(){S.cameraOn=false;S.paused=false;if(raf){cancelAnimationFrame(raf);raf=null}if(stream){stream.getTracks().forEach(t=>t.stop());stream=null}['video','wuVideo','wuVideoM'].forEach(id=>{const v=$(id);if(v)v.srcObject=null});['canvas','wuCanvas','wuCanvasM'].forEach(id=>{const c=$(id);if(c)c.getContext('2d').clearRect(0,0,c.width,c.height)})}
-function onR(res){const isW=S.mode==='warmup';const cv=gC();const ctx=cv.getContext('2d');if(S.firstResult){S.firstResult=false;gL().hidden=true}cv.width=res.image.width;cv.height=res.image.height;ctx.save();ctx.clearRect(0,0,cv.width,cv.height);ctx.scale(-1,1);ctx.translate(-cv.width,0);ctx.drawImage(res.image,0,0,cv.width,cv.height);if(res.poseLandmarks){if(typeof drawConnectors!=='undefined'&&typeof POSE_CONNECTIONS!=='undefined'){drawConnectors(ctx,res.poseLandmarks,POSE_CONNECTIONS,{color:isW?'rgba(34,197,94,.6)':'rgba(59,130,246,.6)',lineWidth:2});drawLandmarks(ctx,res.poseLandmarks,{color:'#ef4444',lineWidth:1,radius:3,fillColor:'#ef4444'})}if(isW)pWU(res.poseLandmarks);else if(det)pAct(res.poseLandmarks)}else{gF().textContent='STEP INTO FRAME';gF().className='feedback-pill danger';if(isW){WU.noForm++;WU.goodForm=0;if(WU.noForm>15)sWuP(true)}}ctx.restore()}
+
+function drawKnight(ctx,lm,w,h){
+    if(!lm)return;
+    const P=i=>lm[i]?{x:lm[i].x*w,y:lm[i].y*h,v:lm[i].visibility}:null;
+    const n=P(0),l=P(7),h2=P(8),s=P(11),o=P(12),c=P(13),u=P(14),d=P(15),p=P(16),g=P(23),m=P(24),f=P(25),b=P(26),x2=P(27),y2=P(28);
+    
+    // Slight dim overlay to make the character pop
+    ctx.fillStyle='rgba(0,0,0,0.45)';ctx.fillRect(0,0,w,h);
+    
+    // Chainmail base layer (torso)
+    if(s&&o&&g&&m&&s.v>.3&&o.v>.3&&g.v>.3&&m.v>.3){
+        ctx.fillStyle='rgba(40,40,50,0.85)';
+        ctx.beginPath();
+        ctx.moveTo(s.x,s.y);
+        for(let pt of [o,m,g]) ctx.lineTo(pt.x,pt.y);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    // Helper for segmented limbs (Rerebraces, Vambraces, Cuisses, Greaves)
+    const drawSegment = (p1, p2, w1, w2) => {
+        if(!p1 || !p2 || p1.v < 0.3 || p2.v < 0.3) return;
+        const dx = p2.x - p1.x;
+        const dy = p2.y - p1.y;
+        const len = Math.max(1, Math.hypot(dx, dy));
+        const nx = -dy / len, ny = dx / len;
+        
+        // Dark steel base
+        ctx.fillStyle = '#374151'; 
+        ctx.strokeStyle = '#9ca3af'; 
+        ctx.lineWidth = 2;
+        ctx.lineJoin = 'round';
+        
+        ctx.beginPath();
+        ctx.moveTo(p1.x + nx * w1, p1.y + ny * w1);
+        ctx.lineTo(p2.x + nx * w2, p2.y + ny * w2);
+        ctx.lineTo(p2.x - nx * w2, p2.y - ny * w2);
+        ctx.lineTo(p1.x - nx * w1, p1.y - ny * w1);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+        
+        // Metallic highlight stripe
+        ctx.strokeStyle = '#d1d5db';
+        ctx.lineWidth = Math.min(w1, w2) * 0.4;
+        ctx.beginPath();
+        ctx.moveTo(p1.x + nx * w1*0.3, p1.y + ny * w1*0.3);
+        ctx.lineTo(p2.x + nx * w2*0.3, p2.y + ny * w2*0.3);
+        ctx.stroke();
+    };
+
+    // Helper for joints (Pauldrons, Couters, Poleyns)
+    const J=(t,r)=>{if(t&&t.v>.3){
+        ctx.fillStyle='#1f2937';ctx.strokeStyle='#9ca3af';ctx.lineWidth=3;
+        ctx.beginPath();ctx.arc(t.x,t.y,r,0,Math.PI*2);ctx.fill();ctx.stroke();
+        ctx.fillStyle='#d1d5db';ctx.beginPath();ctx.arc(t.x,t.y,r*0.4,0,Math.PI*2);ctx.fill();
+    }};
+
+    // Draw Legs (Plate Armor) - Draw before torso so torso overlaps slightly
+    drawSegment(g, f, 18, 14); // Left Cuisse
+    drawSegment(m, b, 18, 14); // Right Cuisse
+    drawSegment(f, x2, 14, 10); // Left Greave
+    drawSegment(b, y2, 14, 10); // Right Greave
+    
+    // Sollerets (Feet)
+    const drawFoot = (t, p1, p2) => {
+        if(!t || !p1 || !p2 || t.v < .3 || p1.v < .3 || p2.v < .3) return;
+        const dx = p2.x - p1.x, dy = p2.y - p1.y;
+        const len = Math.max(1, Math.hypot(dx, dy));
+        const ex = t.x + (dx/len) * 25, ey = t.y + (dy/len) * 25;
+        ctx.fillStyle='#1f2937';ctx.strokeStyle='#9ca3af';ctx.lineWidth=2;ctx.lineJoin='round';
+        ctx.beginPath();
+        ctx.moveTo(t.x + (-dy/len)*8, t.y + (dx/len)*8);
+        ctx.lineTo(ex, ey);
+        ctx.lineTo(t.x - (-dy/len)*8, t.y - (dx/len)*8);
+        ctx.closePath();
+        ctx.fill(); ctx.stroke();
+    };
+    drawFoot(x2, f, x2);
+    drawFoot(y2, b, y2);
+
+    // Draw Arms (Plate Armor)
+    drawSegment(s, c, 14, 10); // Left Rerebrace
+    drawSegment(o, u, 14, 10); // Right Rerebrace
+    drawSegment(c, d, 10, 8);  // Left Vambrace
+    drawSegment(u, p, 10, 8);  // Right Vambrace
+        
+    // Torso Cuirass & Tabard (No Crosses)
+    if(s&&o&&g&&m&&s.v>.3&&o.v>.3&&g.v>.3&&m.v>.3){
+        // Cuirass (Steel)
+        ctx.fillStyle='#374151';ctx.strokeStyle='#d1d5db';ctx.lineWidth=3;ctx.lineJoin='round';
+        ctx.beginPath();
+        ctx.moveTo(s.x,s.y);
+        ctx.lineTo(o.x,o.y);
+        ctx.lineTo(m.x,m.y);
+        ctx.lineTo(g.x,g.y);
+        ctx.closePath();
+        ctx.fill();ctx.stroke();
+        
+        // Tabard (Red Cloth) with Gold Trim
+        const cx=(s.x+o.x)/2;
+        const topY=Math.min(s.y,o.y);
+        const botY=(g.y+m.y)/2 + Math.abs(g.y-m.y)*0.6;
+        const halfW=Math.abs(s.x-o.x)*0.35;
+        ctx.fillStyle='#991b1b';ctx.strokeStyle='#fbbf24';ctx.lineWidth=3;ctx.lineJoin='round';
+        ctx.beginPath();
+        ctx.moveTo(cx-halfW, topY);
+        ctx.lineTo(cx+halfW, topY);
+        ctx.lineTo(cx+halfW*0.7, botY);
+        ctx.lineTo(cx-halfW*0.7, botY);
+        ctx.closePath();
+        ctx.fill();ctx.stroke();
+    }
+    
+    // Joints (Pauldrons, Couters, Poleyns)
+    J(s,16);J(o,16); // Pauldrons
+    J(c,12);J(u,12); // Couters
+    J(g,16);J(m,16); // Tassets
+    J(f,14);J(b,14); // Poleyns
+    
+    // Shield on Left Arm (No Crosses, added Steel Boss)
+    if(c&&d&&c.v>.3&&d.v>.3){
+        const mx=(c.x+d.x)/2, my=(c.y+d.y)/2;
+        const armAngle = Math.atan2(d.y-c.y, d.x-c.x);
+        ctx.save();
+        ctx.translate(mx, my);
+        ctx.rotate(armAngle - Math.PI/2); 
+        // Kite Shield
+        ctx.fillStyle='#7c2d12';ctx.strokeStyle='#e5e7eb';ctx.lineWidth=4;ctx.lineJoin='round';
+        ctx.beginPath();
+        ctx.moveTo(-30, -45);
+        ctx.lineTo(30, -45);
+        ctx.quadraticCurveTo(30, 20, 0, 60);
+        ctx.quadraticCurveTo(-30, 20, -30, -45);
+        ctx.closePath();
+        ctx.fill();ctx.stroke();
+        
+        // Steel Boss (Center dome)
+        ctx.fillStyle='#d1d5db';ctx.strokeStyle='#374151';ctx.lineWidth=3;
+        ctx.beginPath();ctx.arc(0, -10, 12, 0, Math.PI*2);ctx.fill();ctx.stroke();
+        ctx.restore();
+    }
+    
+    // Sword in Right Hand
+    if(u&&p&&u.v>.3&&p.v>.3){
+        const dx = p.x - u.x;
+        const dy = p.y - u.y;
+        const len = Math.max(1, Math.hypot(dx, dy));
+        const ex = p.x + (dx/len) * 100;
+        const ey = p.y + (dy/len) * 100;
+        
+        // Crossguard
+        const gx = -dy/len, gy = dx/len;
+        ctx.strokeStyle='#fbbf24';ctx.lineWidth=6;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(p.x+gx*25, p.y+gy*25);ctx.lineTo(p.x-gx*25, p.y-gy*25);ctx.stroke();
+        
+        // Blade
+        ctx.strokeStyle='#e5e7eb';ctx.lineWidth=10;ctx.lineCap='round';
+        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(ex,ey);ctx.stroke();
+        // Blade shine
+        ctx.strokeStyle='#ffffff';ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(ex,ey);ctx.stroke();
+        
+        // Pommel
+        ctx.fillStyle='#fbbf24';
+        ctx.beginPath();ctx.arc(p.x - (dx/len)*10, p.y - (dy/len)*10, 5, 0, Math.PI*2);ctx.fill();
+    }
+    
+    // Gauntlets
+    J(d,10);J(p,10);
+    
+    // Helmet (Armet/Kettle Hat)
+    if(n&&l&&h2&&l.v>.3&&h2.v>.3){
+        const cx=n.x,cy=n.y;
+        const hw=Math.max(60,Math.abs(l.x-h2.x)*1.6);
+        const hh=hw*1.1;
+        
+        // Plume (Red crest)
+        ctx.fillStyle='#dc2626';ctx.strokeStyle='#991b1b';ctx.lineWidth=2;ctx.lineJoin='round';
+        ctx.beginPath();
+        ctx.moveTo(cx, cy-hh*0.5);
+        ctx.quadraticCurveTo(cx+hw*0.5, cy-hh*1.3, cx, cy-hh*1.6);
+        ctx.quadraticCurveTo(cx-hw*0.5, cy-hh*1.3, cx, cy-hh*0.5);
+        ctx.fill();ctx.stroke();
+        
+        // Skull of helmet
+        ctx.fillStyle='#4b5563';ctx.strokeStyle='#1f2937';ctx.lineWidth=4;ctx.lineJoin='round';
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, hw/2, hh/2, 0, Math.PI, 0);
+        ctx.lineTo(cx+hw/2, cy+hh*0.2);
+        ctx.lineTo(cx-hw/2, cy+hh*0.2);
+        ctx.closePath();
+        ctx.fill();ctx.stroke();
+        
+        // Visor Plate
+        ctx.fillStyle='#374151';
+        ctx.fillRect(cx-hw/2, cy-hh*0.1, hw, hh*0.4);
+        ctx.strokeRect(cx-hw/2, cy-hh*0.1, hw, hh*0.4);
+        
+        // Eye Slit (Glowing Yellow)
+        ctx.shadowColor='#fbbf24';ctx.shadowBlur=15;ctx.fillStyle='#fbbf24';
+        ctx.fillRect(cx-hw*0.35, cy, hw*0.7, 5);
+        ctx.shadowBlur=0;
+        
+        // Breath Holes
+        ctx.fillStyle='#000';
+        for(let i=-1;i<=1;i++){
+            ctx.fillRect(cx + i*10 - 2, cy+15, 4, 8);
+        }
+        
+        // Helmet Highlight
+        ctx.strokeStyle='#d1d5db';ctx.lineWidth=2;
+        ctx.beginPath();ctx.ellipse(cx-5, cy-5, hw*0.3, hh*0.2, -0.5, 0, Math.PI*2);ctx.stroke();
+    }
+}
+
+function onR(res){const isW=S.mode==='warmup';const cv=gC();const ctx=cv.getContext('2d');if(S.firstResult){S.firstResult=false;gL().hidden=true}cv.width=res.image.width;cv.height=res.image.height;ctx.save();ctx.clearRect(0,0,cv.width,cv.height);ctx.scale(-1,1);ctx.translate(-cv.width,0);ctx.drawImage(res.image,0,0,cv.width,cv.height);if(res.poseLandmarks){drawKnight(ctx,res.poseLandmarks,cv.width,cv.height);if(isW)pWU(res.poseLandmarks);else if(det)pAct(res.poseLandmarks)}else{gF().textContent='STEP INTO FRAME';gF().className='feedback-pill danger';if(isW){WU.noForm++;WU.goodForm=0;if(WU.noForm>15)sWuP(true)}}ctx.restore()}
 function pWU(lm){if(WU.done)return;const ph=WU.phases[WU.idx];if(!ph)return;const d=WD[ph.type],r=d(lm),fp=gF();if(r.ok){fp.textContent=r.msg;fp.className='feedback-pill good';WU.goodForm++;WU.noForm=0;if(WU.goodForm>4)sWuP(false)}else{fp.textContent=r.msg;fp.className='feedback-pill warn';WU.noForm++;WU.goodForm=0;if(WU.noForm>25)sWuP(true)}tWU()}
 function sWuP(p){if(WU.pausedByForm===p)return;WU.pausedByForm=p;const tb=$('wmTimerBox');
 if(p){$('wpStatus').textContent='PAUSED - FIX FORM';$('wpStatus').className='wp-status paused';const ms=$('wmtStatus');if(ms){ms.textContent='PAUSED';ms.className='wmt-status paused'}if(tb)tb.classList.add('timer-paused');$('wuCamGroup').classList.add('paused');gB().classList.add('paused');$('wuCamLabel').textContent='PAUSED';WU.lastTick=0}
