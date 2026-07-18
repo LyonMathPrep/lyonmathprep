@@ -270,6 +270,10 @@
           <p class="text-[10px] font-black uppercase tracking-[.16em] text-[#5f716b]">dew drops</p>
         </div>
       </div>
+      
+      <div id="gardenCamera" class="hidden absolute inset-0 z-0 opacity-20">
+        <video id="gardenVideo" autoplay muted playsinline disablepictureinpicture class="w-full h-full object-cover transform scale-x-[-1]"></video>
+      </div>
 
       <div class="sun" aria-hidden="true"></div>
       <div class="cloud cloud-one" aria-hidden="true"></div>
@@ -433,7 +437,7 @@
         </button>
       </div>
 
-      <p class="mt-5 text-[15px] leading-6 text-[#5f716b]">Focus Sprout needs temporary camera access to estimate posture and whether your head is centered. Access will not be requested until you continue below.</p>
+      <p class="mt-5 text-[15px] leading-6 text-[#5f716b]">Focus Sprout needs temporary camera access to estimate posture and whether your head is centered. <strong>The browser will now prompt you for permission; please select 'Allow' to start your session.</strong></p>
 
       <div class="mt-6 border-y fine-rule divide-y divide-[#17332d]/15">
         <div class="py-4 flex gap-3">
@@ -499,14 +503,14 @@
     </div>
   </dialog>
 
-  <script type="module">
+    <script type="module">
     const MP_ROOT = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
     const POSE_MODEL = "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task";
     const FACE_MODEL = "https://storage.googleapis.com/mediapipe-models/face_landmarker/face_landmarker/float16/1/face_landmarker.task";
 
     const $ = (id) => document.getElementById(id);
     const ui = {
-      garden: $("garden"), petStageLabel: $("petStageLabel"), dewCount: $("dewCount"),
+      garden: $("garden"), gardenCamera: $("gardenCamera"), gardenVideo: $("gardenVideo"), petStageLabel: $("petStageLabel"), dewCount: $("dewCount"),
       growthMessage: $("growthMessage"), growthPercent: $("growthPercent"), growthBar: $("growthBar"),
       welcomePanel: $("welcomePanel"), sessionPanel: $("sessionPanel"), summaryPanel: $("summaryPanel"), errorPanel: $("errorPanel"),
       startButton: $("startButton"), newSessionButton: $("newSessionButton"), retryButton: $("retryButton"), backButton: $("backButton"),
@@ -702,8 +706,11 @@
         }
       });
       ui.cameraVideo.srcObject = stream;
+      ui.gardenVideo.srcObject = stream;
       await ui.cameraVideo.play();
+      await ui.gardenVideo.play();
       ui.cameraPlaceholder.classList.add("hidden");
+      ui.gardenCamera.classList.remove("hidden");
     }
 
     function stopCamera() {
@@ -711,7 +718,10 @@
       stream = null;
       ui.cameraVideo.pause();
       ui.cameraVideo.srcObject = null;
+      ui.gardenVideo.pause();
+      ui.gardenVideo.srcObject = null;
       ui.cameraPlaceholder.classList.remove("hidden");
+      ui.gardenCamera.classList.add("hidden");
     }
 
     function closeModels() {
@@ -1008,9 +1018,10 @@
     ui.pauseButton.addEventListener("click", () => paused ? resumeSession() : pauseSession());
     ui.endButton.addEventListener("click", endSession);
 
-    document.addEventListener("visibilitychange", () => {
-      if (document.hidden && running) pauseSession(true);
-    });
+    // Removed auto-pause on visibility change to allow background running
+    // document.addEventListener("visibilitychange", () => {
+    //   if (document.hidden && running) pauseSession(true);
+    // });
     window.addEventListener("pagehide", () => {
       running = false;
       stopCamera();
