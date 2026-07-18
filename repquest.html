@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>RepQuest — Workout Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/@mediapipe/pose/pose.js" crossorigin="anonymous"></script>
 <style>
@@ -22,6 +22,8 @@
   --gray-700: #374151;
   --gray-800: #1f2937;
   --gray-900: #111827;
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
   --blue-500: #3b82f6;
   --blue-600: #2563eb;
   --blue-700: #1d4ed8;
@@ -30,6 +32,8 @@
   --red-500: #ef4444;
   --orange-500: #f97316;
   --yellow-500: #eab308;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
 }
 
 html, body {
@@ -37,10 +41,14 @@ html, body {
   color: var(--gray-900);
   font-family: 'Inter', -apple-system, sans-serif;
   min-height: 100vh;
+  min-height: 100dvh;
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: none;
+  touch-action: manipulation;
 }
 
-.app { min-height: 100vh; display: flex; flex-direction: column; }
+.app { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
 
 /* TOPBAR */
 .topbar {
@@ -54,30 +62,34 @@ html, body {
   position: sticky;
   top: 0;
   z-index: 50;
+  padding-top: var(--safe-top);
 }
 
 .brand { display: flex; align-items: center; gap: 10px; }
 
 .logo {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 18px;
   color: var(--gray-900);
 }
 
 .logo span { color: var(--blue-600); }
 
-.topbar-right { display: flex; align-items: center; gap: 12px; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
 
 .privacy-badge {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--gray-500);
   background: var(--gray-100);
   border: 1px solid var(--gray-200);
-  padding: 4px 10px;
-  border-radius: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
   cursor: pointer;
   font-family: 'JetBrains Mono', monospace;
   transition: background 0.15s;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
 }
 
 .privacy-badge:hover { background: var(--gray-200); }
@@ -96,9 +108,9 @@ html, body {
   font-size: 11px;
   font-weight: 600;
   color: var(--blue-600);
-  background: #eff6ff;
-  padding: 2px 8px;
-  border-radius: 3px;
+  background: var(--blue-50);
+  padding: 3px 8px;
+  border-radius: 4px;
 }
 
 /* MAIN */
@@ -112,8 +124,8 @@ html, body {
 
 .screen { animation: fadeIn 0.25s ease; }
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ACCOUNT */
@@ -121,7 +133,7 @@ html, body {
 
 .page-title {
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 800;
   margin-bottom: 6px;
   color: var(--gray-900);
 }
@@ -133,22 +145,23 @@ html, body {
   line-height: 1.5;
 }
 
-.account-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 20px; }
+.account-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 24px; }
 
 .account-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: 14px;
+  padding: 16px 18px;
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
   text-align: left;
   color: var(--gray-900);
   font-family: inherit;
   width: 100%;
+  min-height: 64px;
 }
 
 .account-card:hover {
@@ -156,28 +169,32 @@ html, body {
   box-shadow: 0 0 0 1px var(--blue-500);
 }
 
+.account-card:active {
+  transform: scale(0.98);
+}
+
 .account-avatar {
-  width: 36px; height: 36px;
+  width: 42px; height: 42px;
   border-radius: 50%;
-  background: var(--gray-100);
+  background: var(--blue-50);
   display: flex; align-items: center; justify-content: center;
-  font-weight: 700; font-size: 14px;
-  color: var(--gray-600);
+  font-weight: 700; font-size: 16px;
+  color: var(--blue-600);
   flex-shrink: 0;
 }
 
 .account-info { flex: 1; min-width: 0; }
-.account-name { font-weight: 600; font-size: 14px; }
-.account-meta { font-size: 12px; color: var(--gray-400); margin-top: 1px; }
+.account-name { font-weight: 600; font-size: 15px; }
+.account-meta { font-size: 13px; color: var(--gray-400); margin-top: 2px; }
 
 .account-rank-badge {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
   font-weight: 600;
   color: var(--blue-600);
-  background: #eff6ff;
-  padding: 3px 8px;
-  border-radius: 3px;
+  background: var(--blue-50);
+  padding: 4px 10px;
+  border-radius: 4px;
 }
 
 .account-delete {
@@ -185,60 +202,71 @@ html, body {
   border: none;
   color: var(--gray-300);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
-  transition: color 0.15s;
+  padding: 10px;
+  border-radius: 8px;
+  transition: color 0.15s, background 0.15s;
   line-height: 0;
+  min-width: 40px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.account-delete:hover { color: var(--red-500); }
+.account-delete:hover { color: var(--red-500); background: #fef2f2; }
 
 .account-empty {
-  padding: 24px;
+  padding: 32px 24px;
   text-align: center;
   background: var(--white);
-  border: 1px dashed var(--gray-300);
-  border-radius: 8px;
+  border: 2px dashed var(--gray-200);
+  border-radius: 12px;
   color: var(--gray-400);
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .account-create {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .account-create input {
   flex: 1;
   background: var(--white);
   border: 1px solid var(--gray-300);
-  border-radius: 6px;
-  padding: 10px 12px;
+  border-radius: 10px;
+  padding: 14px 16px;
   color: var(--gray-900);
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
   outline: none;
   transition: border-color 0.15s;
+  min-height: 50px;
 }
 
-.account-create input:focus { border-color: var(--blue-500); box-shadow: 0 0 0 1px var(--blue-500); }
+.account-create input:focus { border-color: var(--blue-500); box-shadow: 0 0 0 2px rgba(59,130,246,0.15); }
 .account-create input::placeholder { color: var(--gray-400); }
 
 /* BUTTONS */
 .btn {
   font-family: inherit;
   font-weight: 600;
-  font-size: 13px;
-  padding: 10px 16px;
-  border-radius: 6px;
+  font-size: 14px;
+  padding: 14px 20px;
+  border-radius: 10px;
   border: none;
   cursor: pointer;
   transition: all 0.15s;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
   white-space: nowrap;
+  min-height: 50px;
+  min-width: 50px;
 }
+
+.btn:active { transform: scale(0.97); }
 
 .btn-primary { background: var(--blue-600); color: white; }
 .btn-primary:hover { background: var(--blue-700); }
@@ -250,15 +278,23 @@ html, body {
 }
 .btn-secondary:hover { background: var(--gray-50); border-color: var(--gray-400); }
 
+.btn-danger {
+  background: var(--red-500);
+  color: white;
+}
+
 .btn-pause {
   background: var(--white);
   color: var(--gray-700);
   border: 1px solid var(--gray-300);
   width: 100%;
   justify-content: center;
+  font-size: 16px;
+  min-height: 56px;
+  border-radius: 12px;
 }
 .btn-pause:hover { background: var(--gray-50); }
-.btn-pause.paused { color: var(--blue-600); border-color: var(--blue-500); }
+.btn-pause.paused { color: var(--blue-600); border-color: var(--blue-500); background: var(--blue-50); }
 
 /* SELECTION */
 .select-header {
@@ -276,13 +312,14 @@ html, body {
   color: var(--gray-500);
   cursor: pointer;
   font-family: inherit;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 0;
+  gap: 6px;
+  padding: 10px 0;
   transition: color 0.15s;
+  min-height: 44px;
 }
 
 .back-btn:hover { color: var(--gray-900); }
@@ -303,16 +340,16 @@ html, body {
 
 .rank-bar {
   width: 120px;
-  height: 4px;
+  height: 6px;
   background: var(--gray-200);
-  border-radius: 2px;
+  border-radius: 3px;
   overflow: hidden;
 }
 
 .rank-bar-fill {
   height: 100%;
   background: var(--blue-500);
-  border-radius: 2px;
+  border-radius: 3px;
   transition: width 0.3s;
   width: 0%;
 }
@@ -324,7 +361,7 @@ html, body {
 }
 
 .section-title {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
   margin-bottom: 16px;
 }
@@ -338,10 +375,10 @@ html, body {
 .workout-card {
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 20px;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
+  transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
   text-align: left;
   color: var(--gray-900);
   font-family: inherit;
@@ -352,17 +389,21 @@ html, body {
   box-shadow: 0 0 0 1px var(--blue-500);
 }
 
+.workout-card:active {
+  transform: scale(0.98);
+}
+
 .workout-icon {
-  width: 40px; height: 40px;
-  background: var(--gray-100);
-  border-radius: 8px;
+  width: 44px; height: 44px;
+  background: var(--blue-50);
+  border-radius: 10px;
   display: flex; align-items: center; justify-content: center;
-  margin-bottom: 12px;
-  color: var(--gray-600);
+  margin-bottom: 14px;
+  color: var(--blue-600);
 }
 
 .workout-icon svg {
-  width: 20px; height: 20px;
+  width: 22px; height: 22px;
   stroke: currentColor;
   fill: none;
   stroke-width: 2;
@@ -370,17 +411,17 @@ html, body {
   stroke-linejoin: round;
 }
 
-.workout-name { font-weight: 600; font-size: 15px; margin-bottom: 2px; }
-.workout-desc { font-size: 12px; color: var(--gray-400); margin-bottom: 14px; }
+.workout-name { font-weight: 600; font-size: 16px; margin-bottom: 3px; }
+.workout-desc { font-size: 13px; color: var(--gray-400); margin-bottom: 16px; }
 
 .workout-stats {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 12px;
+  padding-top: 14px;
   border-top: 1px solid var(--gray-100);
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .workout-xp { color: var(--blue-600); font-weight: 600; }
@@ -391,7 +432,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   flex-wrap: wrap;
   gap: 12px;
 }
@@ -439,14 +480,10 @@ html, body {
   gap: 16px;
 }
 
-@media (max-width: 800px) {
-  .active-grid { grid-template-columns: 1fr; }
-}
-
 .video-panel {
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
 }
 
@@ -477,6 +514,7 @@ html, body {
   z-index: 3;
   pointer-events: none;
   opacity: 0.5;
+  border-radius: 12px 12px 0 0;
 }
 
 .video-border.paused { border-color: var(--orange-500); opacity: 0.3; }
@@ -491,11 +529,11 @@ html, body {
 }
 
 .form-feedback {
-  background: rgba(0,0,0,0.7);
-  padding: 6px 14px;
-  border-radius: 4px;
+  background: rgba(0,0,0,0.75);
+  padding: 8px 16px;
+  border-radius: 8px;
   font-family: 'JetBrains Mono', monospace;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.5px;
   color: white;
@@ -536,7 +574,7 @@ html, body {
 .rep-counter {
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 24px;
   text-align: center;
   position: relative;
@@ -552,7 +590,7 @@ html, body {
 }
 
 .rep-number {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 64px;
   line-height: 1;
   color: var(--gray-900);
@@ -591,7 +629,7 @@ html, body {
 .stat-box {
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 14px;
 }
 
@@ -612,7 +650,7 @@ html, body {
 .rank-progress {
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 14px;
   transition: box-shadow 0.3s;
 }
@@ -650,7 +688,7 @@ html, body {
 .complete-card {
   background: var(--white);
   border: 1px solid var(--gray-200);
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 40px;
   text-align: center;
   max-width: 400px;
@@ -674,7 +712,7 @@ html, body {
 }
 
 .complete-num {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 72px;
   line-height: 1;
   color: var(--gray-900);
@@ -700,10 +738,10 @@ html, body {
 }
 
 .complete-rank {
-  background: #eff6ff;
-  border: 1px solid #bfdbfe;
-  border-radius: 8px;
-  padding: 16px;
+  background: var(--blue-50);
+  border: 1px solid var(--blue-100);
+  border-radius: 12px;
+  padding: 20px;
   margin-bottom: 24px;
   animation: rankup-glow 0.5s ease;
 }
@@ -722,39 +760,53 @@ html, body {
 }
 
 .rank-up-name {
-  font-weight: 700;
+  font-weight: 800;
   font-size: 24px;
   color: var(--blue-700);
 }
 
 .complete-actions {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   justify-content: center;
 }
 
 /* MODAL */
 .modal {
   position: fixed; inset: 0;
-  background: rgba(0,0,0,0.3);
+  background: rgba(0,0,0,0.4);
   z-index: 100;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  padding: 20px;
+  padding: 0;
   animation: fadeIn 0.2s ease;
 }
 
 .modal-content {
   background: var(--white);
-  border: 1px solid var(--gray-200);
-  border-radius: 12px;
-  padding: 28px;
-  max-width: 480px;
+  border-radius: 20px 20px 0 0;
+  padding: 28px 24px;
+  padding-bottom: calc(28px + var(--safe-bottom));
+  max-width: 560px;
   width: 100%;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
-  max-height: 90vh;
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.12);
+  max-height: 85vh;
   overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.modal-handle {
+  width: 36px;
+  height: 4px;
+  background: var(--gray-300);
+  border-radius: 2px;
+  margin: 0 auto 16px;
 }
 
 .modal-header {
@@ -769,11 +821,11 @@ html, body {
 .modal-body {
   color: var(--gray-500);
   line-height: 1.6;
-  margin-bottom: 20px;
-  font-size: 13px;
+  margin-bottom: 24px;
+  font-size: 14px;
 }
 
-.modal-body p { margin-bottom: 10px; }
+.modal-body p { margin-bottom: 12px; }
 .modal-body p:last-child { margin-bottom: 0; }
 
 .privacy-list {
@@ -785,42 +837,51 @@ html, body {
 }
 
 .privacy-list li {
-  padding: 10px 12px;
+  padding: 12px 14px;
   background: var(--gray-50);
   border: 1px solid var(--gray-200);
-  border-radius: 6px;
-  font-size: 12px;
+  border-radius: 10px;
+  font-size: 13px;
   color: var(--gray-600);
   line-height: 1.5;
 }
 
 .privacy-list li strong { color: var(--gray-800); }
 
-.modal-footnote { font-size: 11px !important; color: var(--gray-400); margin-top: 12px !important; }
+.modal-footnote { font-size: 12px !important; color: var(--gray-400); margin-top: 12px !important; }
 
-.modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  flex-direction: column;
+}
+
+.modal-actions .btn { width: 100%; }
 
 /* TOAST */
 .toast {
   position: fixed;
-  bottom: 24px; left: 50%;
-  transform: translateX(-50%) translateY(16px);
+  bottom: calc(24px + var(--safe-bottom));
+  left: 16px;
+  right: 16px;
+  max-width: 400px;
+  margin: 0 auto;
   background: var(--gray-800);
-  border-radius: 6px;
-  padding: 10px 18px;
-  font-size: 13px;
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 14px;
   font-weight: 500;
   color: white;
   z-index: 200;
   opacity: 0;
+  transform: translateY(16px);
   transition: all 0.25s ease;
   pointer-events: none;
   box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  max-width: 90vw;
   text-align: center;
 }
 
-.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.show { opacity: 1; transform: translateY(0); }
 .toast.error { background: var(--red-500); }
 .toast.success { background: var(--green-600); }
 
@@ -855,12 +916,302 @@ html, body {
 
 [hidden] { display: none !important; }
 
+/* ======================== */
+/* MOBILE RESPONSIVE STYLES */
+/* ======================== */
+
+@media (max-width: 800px) {
+  .active-grid { grid-template-columns: 1fr; }
+}
+
 @media (max-width: 600px) {
-  .main { padding: 20px 16px 40px; }
-  .topbar { padding: 0 16px; }
-  .complete-num { font-size: 56px; }
-  .rep-number { font-size: 48px; }
+  .topbar {
+    padding: 0 16px;
+    height: 52px;
+  }
+
+  .topbar .logo { font-size: 16px; }
+
+  .user-chip span:not(.rank-tag) { display: none; }
+
+  .main { padding: 16px 16px 32px; }
+
+  /* ACCOUNT SCREEN MOBILE */
+  .account-wrap { padding-top: 24px; }
+
+  .page-title { font-size: 24px; }
+
+  .page-desc { font-size: 13px; margin-bottom: 24px; }
+
+  .account-card {
+    padding: 14px 16px;
+    border-radius: 14px;
+    min-height: 68px;
+  }
+
+  .account-avatar {
+    width: 44px; height: 44px;
+    font-size: 17px;
+  }
+
+  .account-name { font-size: 16px; }
+  .account-meta { font-size: 13px; }
+
+  .account-delete {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 12px;
+  }
+
+  .account-create {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .account-create input {
+    font-size: 16px;
+    padding: 16px 18px;
+    min-height: 54px;
+    border-radius: 14px;
+  }
+
+  .account-create .btn {
+    min-height: 54px;
+    font-size: 16px;
+    border-radius: 14px;
+  }
+
+  .account-empty {
+    padding: 28px 20px;
+    border-radius: 14px;
+    font-size: 14px;
+  }
+
+  /* SELECT SCREEN MOBILE */
+  .select-header { margin-bottom: 20px; }
+
   .rank-display { display: none; }
+
+  .section-title { font-size: 20px; margin-bottom: 12px; }
+
+  /* Mobile rank bar (shown below back button) */
+  .mobile-rank-bar {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    width: 100%;
+  }
+
+  .mobile-rank-bar .rank-name {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--blue-600);
+    flex-shrink: 0;
+  }
+
+  .mobile-rank-bar .rank-bar { flex: 1; height: 6px; }
+
+  .mobile-rank-bar .rank-xp {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--gray-400);
+    flex-shrink: 0;
+  }
+
+  .workout-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .workout-card {
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .workout-card .workout-icon { margin-bottom: 0; flex-shrink: 0; }
+
+  .workout-card .workout-content { flex: 1; min-width: 0; }
+
+  .workout-card .workout-stats {
+    border-top: none;
+    padding-top: 4px;
+    gap: 12px;
+    justify-content: flex-start;
+  }
+
+  .workout-card .workout-desc { margin-bottom: 6px; }
+
+  .workout-card .workout-chevron {
+    flex-shrink: 0;
+    color: var(--gray-300);
+  }
+
+  /* ACTIVE SCREEN MOBILE */
+  .active-header {
+    flex-wrap: nowrap;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .active-exercise { font-size: 16px; }
+
+  .back-btn { font-size: 13px; padding: 8px 0; }
+
+  .video-panel { border-radius: 14px; overflow: hidden; }
+  .video-border { border-radius: 14px 14px 0 0; }
+
+  .video-wrap { aspect-ratio: 3 / 4; }
+
+  .meta-item { padding: 8px 10px; }
+
+  .meta-label { font-size: 8px; }
+  .meta-value { font-size: 13px; }
+
+  /* Mobile active bottom section */
+  .stats-panel { gap: 10px; }
+
+  .mobile-active-main-stats {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .mobile-active-main-stats .rep-counter {
+    padding: 20px 16px;
+    border-radius: 14px;
+  }
+
+  .rep-number { font-size: 52px; }
+
+  .mobile-active-main-stats .mobile-session-xp {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: 14px;
+    padding: 20px 16px;
+  }
+
+  .stat-row { gap: 10px; }
+
+  .stat-box { border-radius: 14px; padding: 12px; }
+  .stat-value { font-size: 16px; }
+
+  .rank-progress { border-radius: 14px; padding: 12px 14px; }
+
+  .btn-pause {
+    min-height: 60px;
+    font-size: 17px;
+    font-weight: 700;
+    border-radius: 14px;
+    position: sticky;
+    bottom: calc(12px + var(--safe-bottom));
+    z-index: 10;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.08);
+  }
+
+  /* COMPLETE MOBILE */
+  .complete-wrap { min-height: 40vh; align-items: flex-start; padding-top: 24px; }
+
+  .complete-card {
+    border-radius: 16px;
+    padding: 32px 24px;
+  }
+
+  .complete-num { font-size: 60px; }
+
+  .complete-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .complete-actions .btn {
+    width: 100%;
+    min-height: 54px;
+    font-size: 16px;
+    border-radius: 14px;
+  }
+
+  .complete-rank { border-radius: 14px; padding: 18px; }
+
+  /* MODAL MOBILE */
+  .modal-content {
+    border-radius: 20px 20px 0 0;
+    padding: 24px 20px;
+    padding-bottom: calc(24px + var(--safe-bottom));
+    max-height: 90vh;
+  }
+
+  .modal-header h2 { font-size: 17px; }
+
+  .modal-body { font-size: 14px; }
+
+  .modal-actions .btn {
+    min-height: 54px;
+    font-size: 16px;
+    border-radius: 14px;
+  }
+
+  /* STOP button mobile */
+  .stop-btn-mobile {
+    color: var(--red-500) !important;
+  }
+}
+
+/* Desktop only: modal centered */
+@media (min-width: 601px) {
+  .modal {
+    align-items: center;
+    padding: 20px;
+  }
+
+  .modal-content {
+    border-radius: 16px;
+    max-height: 90vh;
+  }
+
+  .modal-handle { display: none; }
+
+  .modal-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
+
+  .modal-actions .btn { width: auto; }
+
+  .mobile-rank-bar { display: none !important; }
+
+  .mobile-active-main-stats { display: contents !important; }
+  .mobile-active-main-stats .mobile-session-xp { display: none !important; }
+}
+
+/* Extra small phones */
+@media (max-width: 380px) {
+  .main { padding: 12px 12px 28px; }
+
+  .page-title { font-size: 22px; }
+
+  .rep-number { font-size: 44px; }
+
+  .complete-num { font-size: 52px; }
+
+  .workout-card { padding: 16px; }
+
+  .active-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 }
 </style>
 </head>
@@ -871,7 +1222,7 @@ html, body {
       <div class="logo">Rep<span>Quest</span></div>
     </div>
     <div class="topbar-right">
-      <button class="privacy-badge" id="privacyInfoBtn">ON-DEVICE ONLY</button>
+      <button class="privacy-badge" id="privacyInfoBtn">ON-DEVICE</button>
       <div class="user-chip" id="userChip" hidden>
         <span class="rank-tag" id="userRank">ROOKIE</span>
         <span id="userName"></span>
@@ -903,6 +1254,11 @@ html, body {
             <span class="rank-xp" id="rankXp">0 / 100 XP</span>
           </div>
         </div>
+        <div class="mobile-rank-bar" id="mobileRankBar" style="display:none;">
+          <span class="rank-name" id="mobileRankName">ROOKIE</span>
+          <div class="rank-bar"><div class="rank-bar-fill" id="mobileRankBarFill"></div></div>
+          <span class="rank-xp" id="mobileRankXp">0 / 100 XP</span>
+        </div>
         <h2 class="section-title">Pick a workout</h2>
         <div class="workout-grid" id="workoutGrid"></div>
       </div>
@@ -911,7 +1267,7 @@ html, body {
     <section class="screen" id="screenActive" hidden>
       <div>
         <div class="active-header">
-          <button class="back-btn" id="stopWorkout">■ Stop session</button>
+          <button class="back-btn stop-btn-mobile" id="stopWorkout">■ Stop</button>
           <div class="active-exercise-group">
             <div class="active-exercise" id="activeExerciseName">SQUATS</div>
             <div class="active-tip" id="activeTip">Stand side-on, full body in frame</div>
@@ -951,9 +1307,15 @@ html, body {
             </div>
           </div>
           <div class="stats-panel">
-            <div class="rep-counter">
-              <div class="rep-label">REPS</div>
-              <div class="rep-number" id="repCount">0</div>
+            <div class="mobile-active-main-stats" style="display:contents;">
+              <div class="rep-counter">
+                <div class="rep-label">REPS</div>
+                <div class="rep-number" id="repCount">0</div>
+              </div>
+              <div class="mobile-session-xp" style="display:none;">
+                <div class="rep-label">SESSION XP</div>
+                <div class="rep-number" id="mobileSessionXp" style="font-size:40px; color: var(--blue-600);">0</div>
+              </div>
             </div>
             <div class="stat-row">
               <div class="stat-box">
@@ -973,7 +1335,7 @@ html, body {
               <div class="rank-bar"><div class="rank-bar-fill" id="activeRankBarFill"></div></div>
               <div class="rank-next">Next: <span id="nextRankName">CADET</span></div>
             </div>
-            <button class="btn btn-pause" id="pauseBtn">Pause</button>
+            <button class="btn btn-pause" id="pauseBtn">⏸ Pause</button>
           </div>
         </div>
       </div>
@@ -993,8 +1355,8 @@ html, body {
             <div class="rank-up-name" id="completeNewRank"></div>
           </div>
           <div class="complete-actions">
-            <button class="btn btn-secondary" id="completeBack">Back to menu</button>
-            <button class="btn btn-primary" id="completeAgain">Train again</button>
+            <button class="btn btn-primary" id="completeAgain">🔄 Train again</button>
+            <button class="btn btn-secondary" id="completeBack">← Back to menu</button>
           </div>
         </div>
       </div>
@@ -1003,6 +1365,7 @@ html, body {
 
   <div class="modal" id="privacyModal" hidden>
     <div class="modal-content">
+      <div class="modal-handle"></div>
       <div class="modal-header">
         <h2 id="privacyModalTitle">Camera & Privacy</h2>
       </div>
@@ -1017,8 +1380,8 @@ html, body {
         <p class="modal-footnote">No backend. No accounts. No telemetry.</p>
       </div>
       <div class="modal-actions" id="privacyModalActions">
-        <button class="btn btn-secondary" id="privacyCancel">Cancel</button>
         <button class="btn btn-primary" id="privacyAccept">Allow camera & start</button>
+        <button class="btn btn-secondary" id="privacyCancel">Cancel</button>
         <button class="btn btn-primary" id="privacyClose" hidden>Got it</button>
       </div>
     </div>
@@ -1271,7 +1634,7 @@ function renderAccounts() {
       <div class="account-avatar">${escapeHtml(user.name.charAt(0).toUpperCase())}</div>
       <div class="account-info"><div class="account-name">${escapeHtml(user.name)}</div><div class="account-meta">${totalReps} reps · ${user.totalXp} XP</div></div>
       <div class="account-rank-badge">${progress.name.toUpperCase()}</div>
-      <button class="account-delete" data-id="${user.id}" title="Delete"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`;
+      <button class="account-delete" data-id="${user.id}" title="Delete"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`;
     card.addEventListener('click', (e) => { if (e.target.closest('.account-delete')) { e.stopPropagation(); handleDeleteClick(user); return; } selectUser(user); });
     card.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectUser(user); } });
     list.appendChild(card);
@@ -1280,7 +1643,7 @@ function renderAccounts() {
 
 function handleDeleteClick(user) {
   if (pendingDeleteId === user.id) { Storage.deleteUser(user.id); renderAccounts(); pendingDeleteId = null; clearTimeout(deleteTimer); showToast(`Deleted ${user.name}.`); }
-  else { pendingDeleteId = user.id; showToast('Click ✕ again to confirm.'); clearTimeout(deleteTimer); deleteTimer = setTimeout(() => { pendingDeleteId = null; }, 3000); }
+  else { pendingDeleteId = user.id; showToast('Tap ✕ again to confirm delete.'); clearTimeout(deleteTimer); deleteTimer = setTimeout(() => { pendingDeleteId = null; }, 3000); }
 }
 
 function selectUser(user) {
@@ -1292,14 +1655,35 @@ function selectUser(user) {
 function renderWorkoutSelection() {
   const user = state.currentUser; if (!user) return;
   const progress = getRankProgress(user.totalXp);
+  // Desktop rank display
   $('selectRankName').textContent = progress.name.toUpperCase();
   $('rankBarFill').style.width = (progress.progress * 100) + '%';
   $('rankXp').textContent = progress.nextName ? `${user.totalXp} / ${progress.maxXp} XP` : `${user.totalXp} XP · MAX`;
+  // Mobile rank display
+  $('mobileRankName').textContent = progress.name.toUpperCase();
+  $('mobileRankBarFill').style.width = (progress.progress * 100) + '%';
+  $('mobileRankXp').textContent = progress.nextName ? `${user.totalXp} / ${progress.maxXp} XP` : `${user.totalXp} XP · MAX`;
+
   const grid = $('workoutGrid'); grid.innerHTML = '';
+  const isMobile = window.innerWidth <= 600;
   WORKOUTS.forEach(w => {
     const stats = (user.workoutStats || {})[w.id] || { totalReps: 0 };
     const card = document.createElement('button'); card.className = 'workout-card';
-    card.innerHTML = `<div class="workout-icon">${w.icon}</div><div class="workout-name">${w.name}</div><div class="workout-desc">${w.description}</div><div class="workout-stats"><div class="workout-xp">+${w.xpPerRep} XP/rep</div><div class="workout-total">${stats.totalReps} total</div></div>`;
+    if (isMobile) {
+      card.innerHTML = `
+        <div class="workout-icon">${w.icon}</div>
+        <div class="workout-content">
+          <div class="workout-name">${w.name}</div>
+          <div class="workout-desc">${w.description}</div>
+          <div class="workout-stats">
+            <div class="workout-xp">+${w.xpPerRep} XP/rep</div>
+            <div class="workout-total">${stats.totalReps} total</div>
+          </div>
+        </div>
+        <div class="workout-chevron"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>`;
+    } else {
+      card.innerHTML = `<div class="workout-icon">${w.icon}</div><div class="workout-name">${w.name}</div><div class="workout-desc">${w.description}</div><div class="workout-stats"><div class="workout-xp">+${w.xpPerRep} XP/rep</div><div class="workout-total">${stats.totalReps} total</div></div>`;
+    }
     card.addEventListener('click', () => { state.currentWorkout = w; showPrivacyModal('request'); });
     grid.appendChild(card);
   });
@@ -1317,7 +1701,7 @@ async function startWorkoutSession(workout) {
   state.isPaused = false; state.fps = 0; state.firstResult = true;
   detector = DETECTOR_FACTORIES[workout.id]();
   $('activeExerciseName').textContent = workout.name.toUpperCase(); $('activeTip').textContent = workout.tip;
-  $('xpPerRep').textContent = '+' + workout.xpPerRep; $('pauseBtn').textContent = 'Pause'; $('pauseBtn').classList.remove('paused');
+  $('xpPerRep').textContent = '+' + workout.xpPerRep; $('pauseBtn').textContent = '⏸ Pause'; $('pauseBtn').classList.remove('paused');
   $('loader').hidden = false; $('formFeedback').textContent = 'STARTING CAMERA...'; $('formFeedback').className = 'form-feedback';
   $('angleValue').textContent = '--'; $('stateValue').textContent = '--'; $('fpsValue').textContent = '--';
   $('camIndicator').classList.remove('paused'); $('videoBorder').classList.remove('paused'); $('camLabel').textContent = 'ANALYZING';
@@ -1327,6 +1711,7 @@ async function startWorkoutSession(workout) {
 
 function updateActiveStats() {
   $('repCount').textContent = state.repCount; $('sessionXp').textContent = state.sessionXp;
+  if ($('mobileSessionXp')) $('mobileSessionXp').textContent = state.sessionXp;
   const totalXp = state.startingXp + state.sessionXp; const progress = getRankProgress(totalXp);
   $('activeRankName').textContent = progress.name.toUpperCase();
   $('activeRankBarFill').style.width = (progress.progress * 100) + '%';
@@ -1358,8 +1743,8 @@ function endWorkoutSession() {
 
 function togglePause() {
   state.isPaused = !state.isPaused;
-  if (state.isPaused) { $('pauseBtn').textContent = 'Resume'; $('pauseBtn').classList.add('paused'); $('camIndicator').classList.add('paused'); $('videoBorder').classList.add('paused'); $('camLabel').textContent = 'PAUSED'; $('formFeedback').textContent = 'PAUSED'; $('formFeedback').className = 'form-feedback warn'; }
-  else { $('pauseBtn').textContent = 'Pause'; $('pauseBtn').classList.remove('paused'); $('camIndicator').classList.remove('paused'); $('videoBorder').classList.remove('paused'); $('camLabel').textContent = 'ANALYZING'; }
+  if (state.isPaused) { $('pauseBtn').textContent = '▶ Resume'; $('pauseBtn').classList.add('paused'); $('camIndicator').classList.add('paused'); $('videoBorder').classList.add('paused'); $('camLabel').textContent = 'PAUSED'; $('formFeedback').textContent = 'PAUSED'; $('formFeedback').className = 'form-feedback warn'; }
+  else { $('pauseBtn').textContent = '⏸ Pause'; $('pauseBtn').classList.remove('paused'); $('camIndicator').classList.remove('paused'); $('videoBorder').classList.remove('paused'); $('camLabel').textContent = 'ANALYZING'; }
 }
 
 function init() {
@@ -1384,6 +1769,14 @@ function init() {
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (!$('privacyModal').hidden) { $('privacyModal').hidden = true; state.currentWorkout = null; } else if (!$('screenActive').hidden && !state.isPaused) togglePause(); } });
   document.addEventListener('visibilitychange', () => { if (document.hidden && state.isCameraOn && !state.isPaused) togglePause(); });
   window.addEventListener('beforeunload', stopCamera);
+  // Re-render workout grid on resize to switch between mobile/desktop layout
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (!$('screenSelect').hidden && state.currentUser) renderWorkoutSelection();
+    }, 200);
+  });
   renderAccounts();
 }
 
