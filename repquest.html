@@ -40,9 +40,14 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 .btn-ghost{background:none;border:none;color:var(--gray-500);padding:8px 12px;min-height:40px;border-radius:8px}.btn-ghost:hover{background:var(--gray-100);color:var(--gray-700)}
 .btn-danger-ghost{background:none;border:none;color:var(--red-500);padding:8px 12px;min-height:40px;border-radius:8px}.btn-danger-ghost:hover{background:#fef2f2}
 .btn-block{width:100%}.btn-lg{min-height:56px;font-size:16px;border-radius:12px}
-.account-wrap{max-width:440px;margin:0 auto;padding-top:40px}
+.account-wrap{max-width:440px;margin:0 auto;padding-top:20px}
 .page-title{font-size:26px;font-weight:800;margin-bottom:4px}
-.page-sub{font-size:13px;color:var(--gray-400);margin-bottom:28px;line-height:1.5}
+.page-sub{font-size:13px;color:var(--gray-400);margin-bottom:20px;line-height:1.5}
+.divider{display:flex;align-items:center;gap:12px;margin:24px 0;color:var(--gray-400);font-size:11px;font-weight:700;font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--gray-200)}
+.embed-form-wrap{margin-bottom:20px;border:1px solid var(--gray-200);border-radius:12px;overflow:hidden;background:var(--white)}
+.embed-form-wrap iframe{width:100%;height:550px;border:0;display:block}
+.post-form-text{font-size:12px;color:var(--gray-500);margin-bottom:8px;text-align:center}
 .account-list{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
 .account-card{display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--white);border:1px solid var(--gray-200);border-radius:12px;cursor:pointer;transition:all .15s;width:100%;text-align:left;font-family:inherit;color:var(--gray-900);min-height:64px}.account-card:hover{border-color:var(--blue-500);box-shadow:0 0 0 1px var(--blue-500)}.account-card:active{transform:scale(.98)}
 .account-avatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0}
@@ -112,7 +117,6 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 .warmup-mobile{display:none}
 .wm-top-row{display:flex;gap:8px;margin-bottom:8px;align-items:stretch}
 .wm-cam{flex:1;min-width:0}.wm-cam .video-card{height:100%}.wm-cam .video-wrap{aspect-ratio:1/1}
-/* Timer box as a fill-bar */
 .wm-timer-box{width:100px;flex-shrink:0;border-radius:12px;position:relative;overflow:hidden;border:1px solid var(--gray-200)}
 .wm-timer-bg{position:absolute;bottom:0;left:0;right:0;height:0%;background:var(--green-500);transition:height .4s ease;opacity:.18}
 .wm-timer-fg{position:absolute;bottom:0;left:0;right:0;height:0%;background:var(--green-500);transition:height .4s ease;opacity:.35;border-radius:0 0 11px 11px}
@@ -122,7 +126,6 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 .wmt-status.active{color:var(--green-600);background:rgba(34,197,94,.15)}
 .wmt-status.paused{color:var(--orange-500);background:rgba(249,115,22,.12)}
 .wmt-status.waiting{color:var(--gray-500);background:var(--gray-100)}
-/* Paused state: orange fill */
 .wm-timer-box.timer-paused .wm-timer-bg{background:var(--orange-500)}
 .wm-timer-box.timer-paused .wm-timer-fg{background:var(--orange-500)}
 
@@ -233,7 +236,33 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 <div class="app">
 <header class="topbar"><div class="topbar-left"><div class="logo"><img src="repquestlogo.png" alt="RepQuest Logo"></div><div class="topbar-context" id="topbarCtx"><span class="topbar-context-name" id="topbarCtxName"></span><span class="topbar-context-sub" id="topbarCtxSub"></span></div></div><div class="topbar-right"><button class="privacy-btn" id="privacyBtn">ON-DEVICE ONLY</button><div class="topbar-rank-area" id="topbarRankArea" hidden></div></div></header>
 <main class="main">
-<section class="screen" id="scrAccount"><div class="account-wrap"><h1 class="page-title">Choose your athlete</h1><p class="page-sub">Progress stored in your browser. No servers, no sign-ups, no video leaves your device.</p><div class="account-list" id="accountList"></div><div class="create-row"><input class="create-input" id="newName" placeholder="New athlete name" maxlength="16" autocomplete="off"><button class="btn btn-primary" id="createBtn">Create</button></div></div></section>
+
+<section class="screen" id="scrAccount">
+    <div class="account-wrap">
+        <h1 class="page-title">Welcome to RepQuest</h1>
+        <p class="page-sub">You can play as a guest, or create an account to save your progress, compete on the leaderboard, and do daily challenges!</p>
+        
+        <button class="btn btn-secondary btn-block" id="guestBtn" style="margin-bottom: 24px;">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Continue as Guest
+        </button>
+
+        <div class="divider">OR CREATE / SYNC AN ACCOUNT</div>
+
+        <div class="embed-form-wrap">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScFVIx3FbZOxKH8uEgHocaWP5PEa8uhrVaCPsnD4eiVLyP2eQ/viewform?embedded=true" loading="lazy">Loading…</iframe>
+        </div>
+
+        <p class="post-form-text">After submitting the form above (or if you already have one), enter your exact username below to sync your cloud data:</p>
+        <div class="create-row">
+            <input class="create-input" id="newName" placeholder="Enter your username" maxlength="16" autocomplete="off">
+            <button class="btn btn-primary" id="createBtn">Sync</button>
+        </div>
+        
+        <div class="account-list" id="accountList" style="margin-top: 30px;"></div>
+    </div>
+</section>
+
 <section class="screen" id="scrSelect" hidden><div class="select-top"><button class="btn-ghost" id="switchUser"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg> Switch</button></div><div class="select-rank-card"><div class="select-rank-icon" id="selectRankIcon">R</div><div class="select-rank-info"><div class="select-rank-name" id="selectRankName">ROOKIE</div><div class="select-rank-bar-row"><div class="select-rank-bar"><div class="select-rank-bar-fill" id="selectRankBarFill"></div></div><span class="select-rank-xp" id="selectRankXp">0 / 100</span></div></div></div><div class="section-label">WORKOUTS</div><div class="workout-grid" id="workoutGrid"></div></section>
 
 <section class="screen" id="scrWarmup" hidden>
@@ -346,10 +375,8 @@ function drawKnight(ctx,lm,w,h){
     const P=i=>lm[i]?{x:lm[i].x*w,y:lm[i].y*h,v:lm[i].visibility}:null;
     const n=P(0),l=P(7),h2=P(8),s=P(11),o=P(12),c=P(13),u=P(14),d=P(15),p=P(16),g=P(23),m=P(24),f=P(25),b=P(26),x2=P(27),y2=P(28);
     
-    // Slight dim overlay to make the character pop
     ctx.fillStyle='rgba(0,0,0,0.45)';ctx.fillRect(0,0,w,h);
     
-    // Chainmail base layer (torso)
     if(s&&o&&g&&m&&s.v>.3&&o.v>.3&&g.v>.3&&m.v>.3){
         ctx.fillStyle='rgba(40,40,50,0.85)';
         ctx.beginPath();
@@ -359,7 +386,6 @@ function drawKnight(ctx,lm,w,h){
         ctx.fill();
     }
 
-    // Helper for segmented limbs (Rerebraces, Vambraces, Cuisses, Greaves)
     const drawSegment = (p1, p2, w1, w2) => {
         if(!p1 || !p2 || p1.v < 0.3 || p2.v < 0.3) return;
         const dx = p2.x - p1.x;
@@ -367,7 +393,6 @@ function drawKnight(ctx,lm,w,h){
         const len = Math.max(1, Math.hypot(dx, dy));
         const nx = -dy / len, ny = dx / len;
         
-        // Dark steel base
         ctx.fillStyle = '#374151'; 
         ctx.strokeStyle = '#9ca3af'; 
         ctx.lineWidth = 2;
@@ -382,7 +407,6 @@ function drawKnight(ctx,lm,w,h){
         ctx.fill();
         ctx.stroke();
         
-        // Metallic highlight stripe
         ctx.strokeStyle = '#d1d5db';
         ctx.lineWidth = Math.min(w1, w2) * 0.4;
         ctx.beginPath();
@@ -391,20 +415,17 @@ function drawKnight(ctx,lm,w,h){
         ctx.stroke();
     };
 
-    // Helper for joints (Pauldrons, Couters, Poleyns)
     const J=(t,r)=>{if(t&&t.v>.3){
         ctx.fillStyle='#1f2937';ctx.strokeStyle='#9ca3af';ctx.lineWidth=3;
         ctx.beginPath();ctx.arc(t.x,t.y,r,0,Math.PI*2);ctx.fill();ctx.stroke();
         ctx.fillStyle='#d1d5db';ctx.beginPath();ctx.arc(t.x,t.y,r*0.4,0,Math.PI*2);ctx.fill();
     }};
 
-    // Draw Legs (Plate Armor) - Draw before torso so torso overlaps slightly
-    drawSegment(g, f, 18, 14); // Left Cuisse
-    drawSegment(m, b, 18, 14); // Right Cuisse
-    drawSegment(f, x2, 14, 10); // Left Greave
-    drawSegment(b, y2, 14, 10); // Right Greave
+    drawSegment(g, f, 18, 14);
+    drawSegment(m, b, 18, 14);
+    drawSegment(f, x2, 14, 10);
+    drawSegment(b, y2, 14, 10);
     
-    // Sollerets (Feet)
     const drawFoot = (t, p1, p2) => {
         if(!t || !p1 || !p2 || t.v < .3 || p1.v < .3 || p2.v < .3) return;
         const dx = p2.x - p1.x, dy = p2.y - p1.y;
@@ -421,15 +442,12 @@ function drawKnight(ctx,lm,w,h){
     drawFoot(x2, f, x2);
     drawFoot(y2, b, y2);
 
-    // Draw Arms (Plate Armor)
-    drawSegment(s, c, 14, 10); // Left Rerebrace
-    drawSegment(o, u, 14, 10); // Right Rerebrace
-    drawSegment(c, d, 10, 8);  // Left Vambrace
-    drawSegment(u, p, 10, 8);  // Right Vambrace
+    drawSegment(s, c, 14, 10);
+    drawSegment(o, u, 14, 10);
+    drawSegment(c, d, 10, 8);
+    drawSegment(u, p, 10, 8);
         
-    // Torso Cuirass & Tabard (No Crosses)
     if(s&&o&&g&&m&&s.v>.3&&o.v>.3&&g.v>.3&&m.v>.3){
-        // Cuirass (Steel)
         ctx.fillStyle='#374151';ctx.strokeStyle='#d1d5db';ctx.lineWidth=3;ctx.lineJoin='round';
         ctx.beginPath();
         ctx.moveTo(s.x,s.y);
@@ -439,7 +457,6 @@ function drawKnight(ctx,lm,w,h){
         ctx.closePath();
         ctx.fill();ctx.stroke();
         
-        // Tabard (Red Cloth) with Gold Trim
         const cx=(s.x+o.x)/2;
         const topY=Math.min(s.y,o.y);
         const botY=(g.y+m.y)/2 + Math.abs(g.y-m.y)*0.6;
@@ -454,20 +471,14 @@ function drawKnight(ctx,lm,w,h){
         ctx.fill();ctx.stroke();
     }
     
-    // Joints (Pauldrons, Couters, Poleyns)
-    J(s,16);J(o,16); // Pauldrons
-    J(c,12);J(u,12); // Couters
-    J(g,16);J(m,16); // Tassets
-    J(f,14);J(b,14); // Poleyns
+    J(s,16);J(o,16);J(c,12);J(u,12);J(g,16);J(m,16);J(f,14);J(b,14);
     
-    // Shield on Left Arm (No Crosses, added Steel Boss)
     if(c&&d&&c.v>.3&&d.v>.3){
         const mx=(c.x+d.x)/2, my=(c.y+d.y)/2;
         const armAngle = Math.atan2(d.y-c.y, d.x-c.x);
         ctx.save();
         ctx.translate(mx, my);
         ctx.rotate(armAngle - Math.PI/2); 
-        // Kite Shield
         ctx.fillStyle='#7c2d12';ctx.strokeStyle='#e5e7eb';ctx.lineWidth=4;ctx.lineJoin='round';
         ctx.beginPath();
         ctx.moveTo(-30, -45);
@@ -477,13 +488,11 @@ function drawKnight(ctx,lm,w,h){
         ctx.closePath();
         ctx.fill();ctx.stroke();
         
-        // Steel Boss (Center dome)
         ctx.fillStyle='#d1d5db';ctx.strokeStyle='#374151';ctx.lineWidth=3;
         ctx.beginPath();ctx.arc(0, -10, 12, 0, Math.PI*2);ctx.fill();ctx.stroke();
         ctx.restore();
     }
     
-    // Sword in Right Hand
     if(u&&p&&u.v>.3&&p.v>.3){
         const dx = p.x - u.x;
         const dy = p.y - u.y;
@@ -491,33 +500,26 @@ function drawKnight(ctx,lm,w,h){
         const ex = p.x + (dx/len) * 100;
         const ey = p.y + (dy/len) * 100;
         
-        // Crossguard
         const gx = -dy/len, gy = dx/len;
         ctx.strokeStyle='#fbbf24';ctx.lineWidth=6;ctx.lineCap='round';
         ctx.beginPath();ctx.moveTo(p.x+gx*25, p.y+gy*25);ctx.lineTo(p.x-gx*25, p.y-gy*25);ctx.stroke();
         
-        // Blade
         ctx.strokeStyle='#e5e7eb';ctx.lineWidth=10;ctx.lineCap='round';
         ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(ex,ey);ctx.stroke();
-        // Blade shine
         ctx.strokeStyle='#ffffff';ctx.lineWidth=3;
         ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(ex,ey);ctx.stroke();
         
-        // Pommel
         ctx.fillStyle='#fbbf24';
         ctx.beginPath();ctx.arc(p.x - (dx/len)*10, p.y - (dy/len)*10, 5, 0, Math.PI*2);ctx.fill();
     }
     
-    // Gauntlets
     J(d,10);J(p,10);
     
-    // Helmet (Armet/Kettle Hat)
     if(n&&l&&h2&&l.v>.3&&h2.v>.3){
         const cx=n.x,cy=n.y;
         const hw=Math.max(60,Math.abs(l.x-h2.x)*1.6);
         const hh=hw*1.1;
         
-        // Plume (Red crest)
         ctx.fillStyle='#dc2626';ctx.strokeStyle='#991b1b';ctx.lineWidth=2;ctx.lineJoin='round';
         ctx.beginPath();
         ctx.moveTo(cx, cy-hh*0.5);
@@ -525,7 +527,6 @@ function drawKnight(ctx,lm,w,h){
         ctx.quadraticCurveTo(cx-hw*0.5, cy-hh*1.3, cx, cy-hh*0.5);
         ctx.fill();ctx.stroke();
         
-        // Skull of helmet
         ctx.fillStyle='#4b5563';ctx.strokeStyle='#1f2937';ctx.lineWidth=4;ctx.lineJoin='round';
         ctx.beginPath();
         ctx.ellipse(cx, cy, hw/2, hh/2, 0, Math.PI, 0);
@@ -534,23 +535,19 @@ function drawKnight(ctx,lm,w,h){
         ctx.closePath();
         ctx.fill();ctx.stroke();
         
-        // Visor Plate
         ctx.fillStyle='#374151';
         ctx.fillRect(cx-hw/2, cy-hh*0.1, hw, hh*0.4);
         ctx.strokeRect(cx-hw/2, cy-hh*0.1, hw, hh*0.4);
         
-        // Eye Slit (Glowing Yellow)
         ctx.shadowColor='#fbbf24';ctx.shadowBlur=15;ctx.fillStyle='#fbbf24';
         ctx.fillRect(cx-hw*0.35, cy, hw*0.7, 5);
         ctx.shadowBlur=0;
         
-        // Breath Holes
         ctx.fillStyle='#000';
         for(let i=-1;i<=1;i++){
             ctx.fillRect(cx + i*10 - 2, cy+15, 4, 8);
         }
         
-        // Helmet Highlight
         ctx.strokeStyle='#d1d5db';ctx.lineWidth=2;
         ctx.beginPath();ctx.ellipse(cx-5, cy-5, hw*0.3, hh*0.2, -0.5, 0, Math.PI*2);ctx.stroke();
     }
@@ -563,9 +560,7 @@ if(p){$('wpStatus').textContent='PAUSED - FIX FORM';$('wpStatus').className='wp-
 else{$('wpStatus').textContent='GOOD FORM';$('wpStatus').className='wp-status active';const ms=$('wmtStatus');if(ms){ms.textContent='GOOD';ms.className='wmt-status active'}if(tb)tb.classList.remove('timer-paused');$('wuCamGroup').classList.remove('paused');gB().classList.remove('paused');$('wuCamLabel').textContent='ANALYZING';WU.lastTick=performance.now()}}
 
 function updateTimerFill(pct){
-// Desktop bar
  $('wpBar').style.width=pct+'%';
-// Mobile: fill from bottom
  $('wmTimerBg').style.height=pct+'%';
  $('wmTimerFg').style.height=pct+'%';
 }
@@ -580,10 +575,10 @@ function flashRep(){const e=$('repCount');e.classList.remove('flash');void e.off
 function xpFloat(n){const f=document.createElement('div');f.className='xp-float';f.textContent='+'+n+' XP';$('repCount').parentElement.appendChild(f);setTimeout(()=>f.remove(),1000)}
 function rTopRank(xp){const p=rp(xp),r=RANKS[p.i],el=$('topbarRankArea');el.innerHTML=`<div class="rank-pill" style="color:${r.color};background:${r.bg}">${p.name.toUpperCase()}<div class="rank-pill-bar"><div class="rank-pill-bar-fill" style="width:${p.pct*100}%;background:${r.color}"></div></div><span class="rank-pill-xp">${p.next?p.xp+'/'+p.max:'MAX'}</span></div>`;el.hidden=false}
 function updateMobileWuRank(){if(!S.currentUser)return;const p=rp(S.currentUser.xp),r=RANKS[p.i];$('wmRankName').textContent=p.name.toUpperCase();$('wmRankName').style.color=r.color;$('wmRankBarFill').style.cssText=`width:${p.pct*100}%;background:${r.color}`;$('wmRankXp').textContent=p.next?`${S.currentUser.xp}/${p.max}`:'MAX'}
-function rAccounts(){const el=$('accountList'),users=DB.get();el.innerHTML='';if(!users.length){el.innerHTML='<div class="account-empty">No athletes yet. Create one below.</div>';return}users.forEach(u=>{const p=rp(u.xp),r=RANKS[p.i],tr=Object.values(u.stats||{}).reduce((s,v)=>s+(v.reps||0),0);const d=document.createElement('div');d.className='account-card';d.setAttribute('role','button');d.tabIndex=0;d.innerHTML=`<div class="account-avatar" style="background:${r.bg};color:${r.color}">${esc(u.name[0].toUpperCase())}</div><div class="account-info"><div class="account-name">${esc(u.name)}</div><div class="account-meta">${tr} reps · ${u.xp} XP · ${p.name}</div></div><div class="rank-pill" style="color:${r.color};background:${r.bg};font-size:10px;padding:3px 8px">${p.name.toUpperCase()}</div><button class="account-x" data-id="${u.id}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`;d.addEventListener('click',e=>{if(e.target.closest('.account-x')){e.stopPropagation();delU(u);return}pickU(u)});d.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pickU(u)}});el.appendChild(d)})}
+function rAccounts(){const el=$('accountList'),users=DB.get();el.innerHTML='';if(!users.length){el.innerHTML='<div class="account-empty">No local accounts yet. Create one above!</div>';return}users.forEach(u=>{const p=rp(u.xp),r=RANKS[p.i],tr=Object.values(u.stats||{}).reduce((s,v)=>s+(v.reps||0),0);const d=document.createElement('div');d.className='account-card';d.setAttribute('role','button');d.tabIndex=0;d.innerHTML=`<div class="account-avatar" style="background:${r.bg};color:${r.color}">${esc(u.name[0].toUpperCase())}</div><div class="account-info"><div class="account-name">${esc(u.name)}</div><div class="account-meta">${tr} reps · ${u.xp} XP · ${p.name}</div></div><div class="rank-pill" style="color:${r.color};background:${r.bg};font-size:10px;padding:3px 8px">${p.name.toUpperCase()}</div><button class="account-x" data-id="${u.id}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`;d.addEventListener('click',e=>{if(e.target.closest('.account-x')){e.stopPropagation();delU(u);return}pickU(u)});d.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pickU(u)}});el.appendChild(d)})}
 function delU(u){if(pendingDel===u.id){DB.del(u.id);rAccounts();pendingDel=null;clearTimeout(delTimer);toast(`Deleted ${u.name}.`);if(S.currentUser&&S.currentUser.id===u.id){S.currentUser=null;$('topbarRankArea').hidden=true}}else{pendingDel=u.id;toast('Tap X again to confirm.');clearTimeout(delTimer);delTimer=setTimeout(()=>{pendingDel=null},3000)}}
 function pickU(u){S.currentUser=u;rTopRank(u.xp);rSelect();show('select')}
-function rSelect(){const u=S.currentUser;if(!u)return;const p=rp(u.xp),r=RANKS[p.i];$('selectRankIcon').textContent=p.name[0].toUpperCase();$('selectRankIcon').style.cssText=`background:${r.bg};color:${r.color}`;$('selectRankName').textContent=p.name.toUpperCase();$('selectRankName').style.color=r.color;$('selectRankBarFill').style.cssText=`width:${p.pct*100}%;background:${r.color}`;$('selectRankXp').textContent=p.next?`${u.xp} / ${p.max} XP`:`${u.xp} XP · MAX`;setCtx(null);const g=$('workoutGrid');g.innerHTML='';const isMb=mb();WK.forEach(w=>{const st=(u.stats||{})[w.id]||{reps:0};const c=document.createElement('button');c.className='workout-card';if(isMb){c.innerHTML=`<div class="wc-top"><div class="wc-icon">${w.icon}</div></div><div class="wc-body"><div class="wc-name">${w.name}</div><div class="wc-desc">${w.desc}</div><div class="wc-footer"><div class="wc-xp">+${w.xp} XP/rep</div><div class="wc-total">${st.reps} total</div></div></div><div class="wc-chevron"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></div>`}else{c.innerHTML=`<div class="wc-top"><div class="wc-icon">${w.icon}</div><div><div class="wc-name">${w.name}</div><div class="wc-desc">${w.desc}</div></div></div><div class="wc-footer"><div class="wc-xp">+${w.xp} XP/rep</div><div class="wc-total">${st.reps} total</div></div>`}c.addEventListener('click',()=>{S.currentWorkout=w;showP('ask')});g.appendChild(c)})}
+function rSelect(){const u=S.currentUser;if(!u)return;const p=rp(u.xp),r=RANKS[p.i];$('selectRankIcon').textContent=p.name[0].toUpperCase();$('selectRankIcon').style.cssText=`background:${r.bg};color:${r.color}`;$('selectRankName').textContent=p.name.toUpperCase();$('selectRankName').style.color=r.color;$('selectRankBarFill').style.cssText=`width:${p.pct*100}%;background:${r.color}`;$('selectRankXp').textContent=p.next?`${u.xp} / ${p.max} XP`:`${u.xp} XP · MAX`;setCtx(null);const g=$('workoutGrid');g.innerHTML='';const isMb=mb();WK.forEach(w=>{const st=(u.stats||{})[w.id]||{reps:0};const c=document.createElement('button');c.className='workout-card';if(isMb){c.innerHTML=`<div class="wc-top"><div class="wc-icon">${w.icon}</div></div><div class="wc-body"><div class="wc-name">${w.name}</div><div class="wc-desc">${w.desc}</div><div class="wc-footer"><div class="wc-xp">+${w.xp} XP/rep</div><div class="wc-total">${st.reps} total</div></div></div><div class="wc-chevron"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap:round><path d="M9 18l6-6-6-6"/></svg></div>`}else{c.innerHTML=`<div class="wc-top"><div class="wc-icon">${w.icon}</div><div><div class="wc-name">${w.name}</div><div class="wc-desc">${w.desc}</div></div></div><div class="wc-footer"><div class="wc-xp">+${w.xp} XP/rep</div><div class="wc-total">${st.reps} total</div></div>`}c.addEventListener('click',()=>{S.currentWorkout=w;showP('ask')});g.appendChild(c)})}
 function setCtx(data){const el=$('topbarCtx');if(!data){el.classList.remove('active','mobile-active');return}$('topbarCtxName').textContent=data.name;$('topbarCtxSub').textContent=data.sub;el.classList.add('active');if(mb())el.classList.add('mobile-active');else el.classList.remove('mobile-active')}
 function showP(mode){$('privModal').hidden=false;if(mode==='ask'){$('privCancel').hidden=false;$('privAccept').hidden=false;$('privClose').hidden=true;$('privTitle').textContent='Camera & Privacy'}else{$('privCancel').hidden=true;$('privAccept').hidden=true;$('privClose').hidden=false;$('privTitle').textContent='Privacy Info'}}
 async function startWU(w){S.mode='warmup';S.paused=false;S.fps=0;S.firstResult=true;WU.phases=WARMUP_PLANS[w.id].map(p=>({...p}));WU.idx=0;WU.elapsed=0;WU.lastTick=0;WU.pausedByForm=false;WU.noForm=0;WU.goodForm=0;WU.done=false;WU.prevKneeY={l:null,r:null};WU.movement=0;resetAC();$('wuName').textContent=w.name+' Warm-up';$('wuTip').textContent='Get ready for '+w.name.toLowerCase();['wuLoader','wuLoaderM'].forEach(id=>{const e=$(id);if(e)e.hidden=false});['wuFeedback','wuFeedbackM'].forEach(id=>{const e=$(id);if(e){e.textContent='STARTING...';e.className='feedback-pill'}});$('wuCamGroup').classList.remove('paused');$('wuCamGroup').classList.add('warmup-cam');['wuBorder','wuBorderM'].forEach(id=>{const e=$(id);if(e)e.classList.remove('paused')});$('wuCamLabel').textContent='ANALYZING';$('wmTimerBox').classList.remove('timer-paused');setCtx({name:w.name+' Warm-up',sub:'Get ready'});updateMobileWuRank();rWuPh();rWuSt();show('warmup');try{await camStart()}catch(e){show('select');setCtx(null)}}
@@ -592,11 +587,113 @@ function rWuSt(){['wsList','wsListM'].forEach(listId=>{const list=$(listId);if(!
 function wuDone(){camStop();toast('Warm-up done! Starting workout...','success');setTimeout(()=>startMain(S.currentWorkout),800)}
 async function startMain(w){S.mode='active';S.reps=0;S.xp=0;S.startXp=S.currentUser.xp;S.startRank=ri(S.currentUser.xp);S.shownRank=S.startRank;S.paused=false;S.fps=0;S.firstResult=true;det=DETS[w.id]();$('activeName').textContent=w.name.toUpperCase();$('activeTip').textContent=w.tip;$('xpPerRep').textContent='+'+w.xp;$('vPerRep').textContent='+'+w.xp;if(mb())$('vsPerRep').style.display='';else $('vsPerRep').style.display='none';$('pauseIco').innerHTML='<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>';$('pauseTxt').textContent='Pause';$('pauseBtn').classList.remove('paused');$('loader').hidden=false;$('feedbackPill').textContent='STARTING...';$('feedbackPill').className='feedback-pill';$('vAngle').textContent='--';$('vState').textContent='--';$('vFps').textContent='--';$('camGroup').classList.remove('paused','warmup-cam');$('videoBorder').classList.remove('paused','warmup-active');$('camLabel').textContent='ANALYZING';setCtx({name:w.name.toUpperCase(),sub:w.tip});uAct();show('active');try{await camStart()}catch(e){show('select');setCtx(null)}}
 function uAct(){$('repCount').textContent=S.reps;$('sessionXp').textContent=S.xp;$('mRepCount').textContent=S.reps;$('mSessionXp').textContent=S.xp;const total=S.startXp+S.xp,p=rp(total),r=RANKS[p.i];$('rcRankName').textContent=p.name.toUpperCase();$('rcRankName').style.color=r.color;$('rcBarFill').style.cssText=`width:${p.pct*100}%;background:${r.color}`;$('rcRankXp').textContent=p.next?`${total} / ${p.max}`:`${total} XP`;$('rcNext').textContent=p.next?p.next.toUpperCase():'MAX';$('mRankName').textContent=p.name.toUpperCase();$('mRankName').style.color=r.color;$('mRankBarFill').style.cssText=`width:${p.pct*100}%;background:${r.color}`;$('mRankXp').textContent=p.next?`${total}/${p.max}`:`${total} XP`;rTopRank(total);if(p.i>S.shownRank){S.shownRank=p.i;toast(`Rank up — ${p.name}!`,'success');const b=$('rankCardSm');b.classList.remove('rankup');void b.offsetWidth;b.classList.add('rankup');setTimeout(()=>b.classList.remove('rankup'),1500)}}
-function endSession(){camStop();setCtx(null);S.mode=null;if(S.reps>0&&S.currentWorkout){const u=S.currentUser;u.xp+=S.xp;if(!u.stats)u.stats={};const st=u.stats[S.currentWorkout.id]||{reps:0,best:0};st.reps+=S.reps;if(S.reps>st.best)st.best=S.reps;u.stats[S.currentWorkout.id]=st;DB.upd(u);const ei=ri(u.xp),er=RANKS[ei];$('ccReps').textContent=S.reps;$('ccXp').textContent=S.xp;$('ccXp').style.color=er.color;if(ei>S.startRank){$('ccRankup').hidden=false;$('ccRankup').style.cssText=`background:${er.bg};border:1px solid ${er.bg}`;$('ccRankupLabel').style.color=er.color;$('ccRankupName').textContent=er.name.toUpperCase();$('ccRankupName').style.color=er.color}else{$('ccRankup').hidden=true}rTopRank(u.xp);det=null;show('complete')}else{det=null;rSelect();show('select')}}
+
+// UPDATED endSession FUNCTION WITH CLOUD SYNC TRIGGER
+function endSession(){
+    camStop();setCtx(null);S.mode=null;
+    if(S.reps>0&&S.currentWorkout){
+        const u=S.currentUser;
+        u.xp+=S.xp;
+        if(!u.stats)u.stats={};
+        const st=u.stats[S.currentWorkout.id]||{reps:0,best:0};
+        st.reps+=S.reps;
+        if(S.reps>st.best)st.best=S.reps;
+        u.stats[S.currentWorkout.id]=st;
+        DB.upd(u); // Save locally
+        
+        // ADDED: Send XP to Cloudflare Worker -> Google Sheet
+        if(!u.guest) {
+            fetch('https://webquestusers.lyonmathprep.workers.dev/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u.name, totalXP: u.xp })
+            }).catch(err => console.log('Cloud sync failed (ignored)'));
+        }
+
+        const ei=ri(u.xp),er=RANKS[ei];
+        $('ccReps').textContent=S.reps;
+        $('ccXp').textContent=S.xp;
+        $('ccXp').style.color=er.color;
+        if(ei>S.startRank){
+            $('ccRankup').hidden=false;
+            $('ccRankup').style.cssText=`background:${er.bg};border:1px solid ${er.bg}`;
+            $('ccRankupLabel').style.color=er.color;
+            $('ccRankupName').textContent=er.name.toUpperCase();
+            $('ccRankupName').style.color=er.color
+        }else{
+            $('ccRankup').hidden=true
+        }
+        rTopRank(u.xp);
+        det=null;
+        show('complete')
+    }else{
+        det=null;rSelect();show('select')
+    }
+}
+
 function togglePause(){S.paused=!S.paused;if(S.paused){$('pauseIco').innerHTML='<polygon points="5 3 19 12 5 21 5 3"/>';$('pauseTxt').textContent='Resume';$('pauseBtn').classList.add('paused');$('camGroup').classList.add('paused');$('videoBorder').classList.add('paused');$('camLabel').textContent='PAUSED';$('feedbackPill').textContent='PAUSED';$('feedbackPill').className='feedback-pill warn'}else{$('pauseIco').innerHTML='<rect x="6" y="4" width="4" height="16" rx="1"/><rect x="14" y="4" width="4" height="16" rx="1"/>';$('pauseTxt').textContent='Pause';$('pauseBtn').classList.remove('paused');$('camGroup').classList.remove('paused');$('videoBorder').classList.remove('paused');$('camLabel').textContent='ANALYZING'}}
 function cancelWU(){camStop();S.mode=null;setCtx(null);rSelect();show('select')}
 function skipWU(){camStop();S.mode=null;WU.done=true;startMain(S.currentWorkout)}
- $('createBtn').addEventListener('click',()=>{const inp=$('newName'),n=inp.value.trim();if(!n){toast('Enter a name.','error');inp.focus();return}if(n.length>16){toast('Too long.','error');return}if(DB.get().some(u=>u.name.toLowerCase()===n.toLowerCase())){toast('Name taken.','error');return}const u=DB.add(n);inp.value='';rAccounts();pickU(u);toast(`Welcome, ${u.name}!`,'success')});
+
+// ADDED GUEST BUTTON LOGIC
+ $('guestBtn').addEventListener('click', () => {
+    S.currentUser = {id:'guest_'+Date.now().toString(36), name:'Guest', xp:0, created:Date.now(), stats:{}, guest:true};
+    rTopRank(0);
+    rSelect();
+    show('select');
+    toast('Playing as Guest. Create an account to save progress!');
+});
+
+// UPDATED SYNC LOGIC TO HIT CLOUDFLARE WORKER
+ $('createBtn').addEventListener('click', async () => {
+    const inp = $('newName');
+    const n = inp.value.trim();
+    if(!n){toast('Enter a name.','error');inp.focus();return}
+    if(n.length>16){toast('Too long.','error');return}
+    
+    if(DB.get().some(u=>u.name.toLowerCase()===n.toLowerCase())){
+        toast('User already exists locally! Select them above.','error');
+        return;
+    }
+
+    const btn = $('createBtn');
+    btn.textContent = 'Checking Cloud...';
+    btn.disabled = true;
+
+    try {
+        // Query the Cloudflare Worker for this specific username
+        const res = await fetch(`https://webquestusers.lyonmathprep.workers.dev/?username=${encodeURIComponent(n)}`);
+        const data = await res.json();
+
+        // Create the local profile
+        const u = DB.add(n);
+        
+        if(data.found) {
+            // User exists in the cloud! Pull their saved XP.
+            u.xp = data.xp || 0;
+            DB.upd(u);
+            toast(`Welcome back, ${u.name}! Cloud sync complete.`,'success');
+        } else {
+            // New user to the cloud.
+            toast(`New user created! Make sure to fill out the form above.`,'success');
+        }
+        
+        inp.value = '';
+        rAccounts();
+        pickU(u);
+    } catch (err) {
+        // Network fails (offline) -> Create locally anyway
+        toast('Network error. Created locally.','error');
+        const u = DB.add(n);
+        inp.value = '';
+        rAccounts();
+        pickU(u);
+    } finally {
+        btn.textContent = 'Sync';
+        btn.disabled = false;
+    }
+});
+
  $('newName').addEventListener('keydown',e=>{if(e.key==='Enter')$('createBtn').click()});
  $('switchUser').addEventListener('click',()=>{setCtx(null);show('account');rAccounts()});
  $('stopBtn').addEventListener('click',endSession);$('pauseBtn').addEventListener('click',togglePause);
