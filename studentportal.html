@@ -746,6 +746,7 @@ body {
 .choice-btn.wrong { background: var(--primary-light); border-color: var(--primary); color: var(--primary-dark); }
 .choice-btn.wrong .choice-letter { background: var(--primary); color: var(--white); border-color: var(--primary); }
 .choice-btn:disabled { cursor: default; }
+.choice-btn.checking { cursor: wait !important; opacity: 0.8; }
 
 .quiz-feedback {
   margin: 0 22px 16px;
@@ -1639,7 +1640,10 @@ const USERS_URL     = 'https://users-api.lyonmathprep.workers.dev/';
 const APPROVALS_URL = 'https://opensheet.elk.sh/1KJ2lWZ3kj5q36_768I6s_-fDxWiVrmciRScV9ZwvXhc/Sheet1';
 const APPROVALS_UPDATE_URL = 'https://script.google.com/macros/s/AKfycbwba5osonbPb_yBADsyY1QUxElcd_gXRA3E_copjmvWbPHFEwIU8KOSOe6R30-WMJSR/exec';
 const MEETINGS_URL  = 'https://meetings-api.lyonmathprep.workers.dev/';
-const QUESTIONS_URL = 'https://opensheet.elk.sh/1f8VdEO7bv6hNrul0i8rHTvzpFPYo0jNmZeRri_OLMv4/Sheet1';
+
+// ---> IMPORTANT: CHANGE THIS TO YOUR NEW WORKER URL <---
+const QUESTIONS_URL = 'https://questions-api.lyonmathprep.workers.dev/questions'; 
+const CHECK_ANSWER_URL = 'https://questions-api.lyonmathprep.workers.dev/check-answer';
 
 // LocalStorage key for saved session
 const SESSION_KEY = 'lyonmathprep_session';
@@ -1900,9 +1904,9 @@ document.getElementById('signupModal').addEventListener('click', function(e) {
 // =========================
 // Session persistence (localStorage)
 // =========================
-function saveSession(username, password) {
+function saveSession(username) {
   try {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ username, password }));
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ username }));
   } catch(e) {}
 }
 
@@ -2095,7 +2099,8 @@ async function handleAuth(savedPassword) {
       displayName: data.user.displayName
     };
 
-    saveSession(username, password);
+    // SECURITY FIX: Only save the username to localStorage, never the password
+    saveSession(username);
 
     const approvals = await loadApprovals(currentUser.username);
     activeLevels   = approvals.active;
@@ -2610,38 +2615,79 @@ function renderQuizQuestion() {
   state.answered = false;
 }
 
-function selectChoice(btn, letter) {
+// =========================
+// SECURE ANSWER CHECKING
+// =========================
+async function selectChoice(btn, letter) {
   if (quizState.answered) return;
   quizState.answered = true;
 
-  const correctFull   = String(quizState.questions[quizState.current]['Correct Answer'] || '').trim();
-  const correctLetter = correctFull.split(':')[0].trim().toUpperCase();
-  const isCorrect     = letter.toUpperCase() === correctLetter;
-
+  // Disable all buttons immediately and show checking state
   document.querySelectorAll('#quizChoices .choice-btn').forEach(b => {
     b.disabled = true;
-    const l = b.querySelector('.choice-letter').textContent.trim().toUpperCase();
-    if (l === correctLetter) b.classList.add('correct');
+    b.classList.add('checking');
   });
 
-  if (!isCorrect) {
-    btn.classList.add('wrong');
-    quizState.wrong++;
-  } else {
-    quizState.correct++;
-  }
+  const questionId = quizState.questions[quizState.current]._id;
 
-  const feedback = document.getElementById('quizFeedback');
-  if (isCorrect) {
-    feedback.textContent = '✅ Correct! Well done.';
-    feedback.className   = 'quiz-feedback correct';
-  } else {
-    feedback.textContent = `❌ Not quite — the correct answer is ${correctFull}.`;
-    feedback.className   = 'quiz-feedback wrong';
-  }
+  try {
+    const res = await fetch(CHECK_ANSWER_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ questionId, answer: letter })
+    });
+    
+    const result = await res.json();
 
-  const nextBtn = document.getElementById('quizNextBtn');
-  if (nextBtn) nextBtn.classList.add('visible');
+    // Remove checking state
+    document.querySelectorAll('#quizChoices .choice-btn').forEach(b => {
+      b.classList.remove('checking');
+    });
+
+    if (!result.found) {
+      showToast('Error checking answer. Please try again.');
+      quizState.answered = false;
+      document.querySelectorAll('#quizChoices .choice-btn').forEach(b => b.disabled = false);
+      return;
+    }
+
+    const correctFull = result.correctAnswer;
+    const correctLetter = correctFull.split(':')[0].trim().toUpperCase();
+
+    // Highlight correct answer
+    document.querySelectorAll('#quizChoices .choice-btn').forEach(b => {
+      const l = b.querySelector('.choice-letter').textContent.trim().toUpperCase();
+      if (l === correctLetter) b.classList.add('correct');
+    });
+
+    if (!result.correct) {
+      btn.classList.add('wrong');
+      quizState.wrong++;
+    } else {
+      quizState.correct++;
+    }
+
+    const feedback = document.getElementById('quizFeedback');
+    if (result.correct) {
+      feedback.textContent = '✅ Correct! Well done.';
+      feedback.className = 'quiz-feedback correct';
+    } else {
+      feedback.textContent = `❌ Not quite — the correct answer is ${correctFull}.`;
+      feedback.className = 'quiz-feedback wrong';
+    }
+
+    const nextBtn = document.getElementById('quizNextBtn');
+    if (nextBtn) nextBtn.classList.add('visible');
+
+  } catch (err) {
+    console.error('Check answer error:', err);
+    showToast('Network error checking answer. Check connection.');
+    quizState.answered = false;
+    document.querySelectorAll('#quizChoices .choice-btn').forEach(b => {
+      b.disabled = false;
+      b.classList.remove('checking');
+    });
+  }
 }
 
 function nextQuizQuestion() {
@@ -2789,7 +2835,7 @@ function renderMeetingsUI() {
             Next Meeting
           </div>
           <div class="next-class-title">No meetings yet</div>
-          <div class="next-class-time">Once staff adds a meeting for your username, it will appear here.</div>
+          <div class="next-class-time">Once staff adds a meeting for you, it will appear here.</div>
         </div>
       `;
     }
@@ -3465,7 +3511,13 @@ document.getElementById('authUsername').addEventListener('keydown', e => { if (e
   authSubmit.textContent = 'Logging in…';
 
   try {
-    await handleAuth(session.password);
+    // We still need the password to authenticate with the server
+    // The user will be prompted to re-enter it if they logged out
+    // For seamless auto-login without saving password, we'd need server-issued tokens
+    // For now, if a session exists, we just pre-fill the username.
+    authSubmit.disabled = false;
+    authSubmit.textContent = 'Log In';
+    document.getElementById('authPassword').focus();
   } catch(e) {
     clearSession();
     authSubmit.disabled = false;
