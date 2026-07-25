@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1637,7 +1638,7 @@ body {
 // CONFIG
 // =========================
 const USERS_URL     = 'https://users-api.lyonmathprep.workers.dev/';
-const APPROVALS_URL = 'https://opensheet.elk.sh/1KJ2lWZ3kj5q36_768I6s_-fDxWiVrmciRScV9ZwvXhc/Sheet1';
+const APPROVALS_URL = 'https://approved-levelsapi.lyonmathprep.workers.dev/';
 const APPROVALS_UPDATE_URL = 'https://script.google.com/macros/s/AKfycbwba5osonbPb_yBADsyY1QUxElcd_gXRA3E_copjmvWbPHFEwIU8KOSOe6R30-WMJSR/exec';
 const MEETINGS_URL  = 'https://meetings-api.lyonmathprep.workers.dev/';
 
@@ -1957,7 +1958,14 @@ async function loadUsers() {
 
 async function loadApprovals(username) {
   try {
-    const rows = await fetchSheet(APPROVALS_URL);
+    // Send a POST request with the username to the Cloudflare Worker
+    const response = await fetch(APPROVALS_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: username })
+    });
+    
+    const rows = await response.json();
     return parseApprovalRows(rows, username);
   } catch (e) {
     return { active: new Set(), finished: new Set() };
