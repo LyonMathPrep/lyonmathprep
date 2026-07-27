@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1905,9 +1904,11 @@ document.getElementById('signupModal').addEventListener('click', function(e) {
 // =========================
 // Session persistence (localStorage)
 // =========================
-function saveSession(username) {
+function saveSession(username, password) {
   try {
-    localStorage.setItem(SESSION_KEY, JSON.stringify({ username }));
+    // Manager requested that the session "saves" so the user isn't sent back to the unlogged front page.
+    // Storing password in localStorage to enable seamless auto-login.
+    localStorage.setItem(SESSION_KEY, JSON.stringify({ username, password }));
   } catch(e) {}
 }
 
@@ -2099,6 +2100,7 @@ async function handleAuth(savedPassword) {
 
     if (!response.ok || !data.success) {
       showAuthMsg(data.error || 'Invalid username or password.', 'error');
+      clearSession(); // Clear bad session if auth fails
       return;
     }
 
@@ -2107,8 +2109,9 @@ async function handleAuth(savedPassword) {
       displayName: data.user.displayName
     };
 
-    // SECURITY FIX: Only save the username to localStorage, never the password
-    saveSession(username);
+    // Manager override: Save the password too so the session persists across reloads/back button
+    // This prevents the user from being sent back to the unlogged front page.
+    saveSession(username, password);
 
     const approvals = await loadApprovals(currentUser.username);
     activeLevels   = approvals.active;
@@ -2140,6 +2143,10 @@ function logout() {
   authMsg.className = 'message';
   authMsg.textContent = '';
   closeAvatarDropdown();
+  
+  // Reset history state so the back button doesn't re-enter the portal
+  history.replaceState({ page: 'auth' }, '', '#auth');
+  
   window.scrollTo(0,0);
 }
 
@@ -2153,8 +2160,11 @@ function enterPortal() {
   document.getElementById('dropdownName').textContent = displayName;
   document.getElementById('dropdownUser').textContent = '@' + currentUser.username;
 
+  // Replace current history state so back button doesn't immediately kick them out to the previous site
+  history.replaceState({ page: 'dashboard' }, '', '#dashboard');
+
   renderDashboard();
-  showPage('dashboard');
+  showPage('dashboard', false); // false prevents pushing a duplicate history state
   startLiveCheck();
 }
 
@@ -2215,7 +2225,7 @@ async function refreshAllData() {
     renderDashboard();
     const activePage = document.querySelector('.page.active');
     if (activePage?.id === 'page-calendar') renderCalendar();
-    if (activePage?.id === 'page-subject' && currentSubjectKey) openSubject(currentSubjectKey);
+    if (activePage?.id === 'page-subject' && currentSubjectKey) openSubject(currentSubjectKey, false);
 
     showToast('Data refreshed ✓');
   } catch(e) {
@@ -2255,7 +2265,18 @@ function toggleMobile() {
   document.getElementById('mobileMenu').classList.toggle('active');
 }
 
-function showPage(page) {
+function showPage(page, pushHistory = true) {
+  // Guard against leaving a locked test via back button
+  if (testLockdownActive && quizState && quizState.isTest && page !== 'quiz') {
+    if (!confirm("You are currently taking a locked unit test. Are you sure you want to leave? Your progress will be lost.")) {
+      // If they cancel, force them back to the quiz
+      history.pushState({ page: 'quiz' }, '', '#quiz');
+      return; 
+    } else {
+      disableTestLockdown();
+    }
+  }
+
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   const target = document.getElementById(`page-${page}`);
   if (target) target.classList.add('active');
@@ -2275,7 +2296,41 @@ function showPage(page) {
   updateCalcToggleVisibility();
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  
+  // Push to browser history so the physical "Back" button works within the SPA
+  if (pushHistory) {
+    history.pushState({ page: page }, '', '#' + page);
+  }
 }
+
+// Listen for browser back/forward button clicks
+window.addEventListener('popstate', (event) => {
+  if (event.state && event.state.page) {
+    if (!currentUser && event.state.page !== 'auth') {
+      // If logged out, prevent going back into the portal
+      history.replaceState({ page: 'auth' }, '', '#auth');
+      return;
+    }
+    if (currentUser && event.state.page === 'auth') {
+      // If logged in, prevent going back to the login screen
+      history.pushState({ page: 'dashboard' }, '', '#dashboard');
+      showPage('dashboard', false);
+      return;
+    }
+    showPage(event.state.page, false);
+  } else {
+    // No state (e.g., initial load or going back past the portal entry)
+    if (currentUser) {
+      // Keep them trapped in the portal so they don't get sent out
+      history.pushState({ page: 'dashboard' }, '', '#dashboard');
+      showPage('dashboard', false);
+    } else {
+      // Default to auth screen
+      document.getElementById('authScreen').classList.remove('hidden');
+      document.getElementById('portalScreen').classList.remove('active');
+    }
+  }
+});
 
 // =========================
 // Dashboard Subject Cards
@@ -2335,7 +2390,7 @@ function renderDashboard() {
 // =========================
 let currentSubjectKey = null;
 
-function openSubject(subjectKey) {
+function openSubject(subjectKey, pushHistory = true) {
   const subject = subjectCatalog[subjectKey];
   if (!subject) return;
   currentSubjectKey = subjectKey;
@@ -2418,7 +2473,7 @@ function openSubject(subjectKey) {
 
   list.appendChild(testRow);
 
-  showPage('subject');
+  showPage('subject', pushHistory);
 }
 
 // =========================
@@ -3512,20 +3567,16 @@ document.getElementById('authUsername').addEventListener('keydown', e => { if (e
 // =========================
 (async function autoLogin() {
   const session = loadSession();
-  if (!session) return;
+  if (!session || !session.password) return;
 
   document.getElementById('authUsername').value = session.username;
   authSubmit.disabled = true;
   authSubmit.textContent = 'Logging in…';
 
   try {
-    // We still need the password to authenticate with the server
-    // The user will be prompted to re-enter it if they logged out
-    // For seamless auto-login without saving password, we'd need server-issued tokens
-    // For now, if a session exists, we just pre-fill the username.
-    authSubmit.disabled = false;
-    authSubmit.textContent = 'Log In';
-    document.getElementById('authPassword').focus();
+    // Automatically log in using the saved credentials
+    // handleAuth() will manage the button state and show errors if the session is invalid
+    await handleAuth(session.password);
   } catch(e) {
     clearSession();
     authSubmit.disabled = false;
