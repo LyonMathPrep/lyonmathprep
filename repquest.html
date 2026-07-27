@@ -60,13 +60,18 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 .create-row{display:flex;gap:8px}
 .create-input{flex:1;background:var(--white);border:1px solid var(--gray-300);border-radius:10px;padding:12px 14px;color:var(--gray-900);font-family:inherit;font-size:16px;outline:none;min-height:48px;transition:border-color .15s}.create-input:focus{border-color:var(--blue-500);box-shadow:0 0 0 2px rgba(59,130,246,.15)}.create-input::placeholder{color:var(--gray-400)}
 .select-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:12px}
-.select-rank-card{display:flex;align-items:center;gap:14px;background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:14px 18px;margin-bottom:24px}
+.stats-row{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap}
+.select-rank-card{display:flex;align-items:center;gap:14px;background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:14px 18px;flex:1;min-width:200px}
 .select-rank-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;flex-shrink:0}
 .select-rank-info{flex:1;min-width:0}.select-rank-name{font-weight:700;font-size:14px;margin-bottom:4px}
 .select-rank-bar-row{display:flex;align-items:center;gap:10px}
 .select-rank-bar{flex:1;height:6px;background:var(--gray-200);border-radius:3px;overflow:hidden}
 .select-rank-bar-fill{height:100%;border-radius:3px;transition:width .3s}
 .select-rank-xp{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--gray-400);flex-shrink:0}
+.streak-card{flex:0 0 140px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;background:var(--white);border:1px solid var(--gray-200);border-radius:12px;padding:14px 18px}
+.streak-icon{font-size:32px;line-height:1;margin-bottom:4px}
+.streak-num{font-weight:800;font-size:24px;color:var(--orange-500);font-family:'JetBrains Mono',monospace;line-height:1.2}
+.streak-label{font-size:10px;letter-spacing:1px;color:var(--gray-400);font-family:'JetBrains Mono',monospace;margin-top:2px}
 .daily-challenge-card{background:linear-gradient(135deg,#fff 0%,var(--blue-50) 100%);border:1.5px solid var(--blue-500);border-radius:14px;padding:18px 20px;margin-bottom:20px;position:relative;overflow:hidden}
 .daily-challenge-card::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(59,130,246,.08) 0%,transparent 70%);pointer-events:none}
 .dc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
@@ -227,7 +232,10 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
 .account-wrap{padding-top:20px}.page-title{font-size:22px}.page-sub{font-size:12px;margin-bottom:20px}
 .create-row{flex-direction:column}.create-input{min-height:52px;border-radius:12px}.create-row .btn{min-height:52px;border-radius:12px;font-size:15px}
 .account-card{border-radius:14px;min-height:62px;padding:12px 14px}.account-avatar{width:38px;height:38px;font-size:14px}
-.select-rank-card{border-radius:14px;padding:14px 16px}
+.stats-row{flex-direction:column}
+.streak-card{flex:1 1 100%;flex-direction:row;justify-content:space-between;padding:14px 16px}
+.streak-card .streak-icon{font-size:28px;margin-bottom:0}
+.streak-info{text-align:right}
 .daily-challenge-card{padding:14px 16px;border-radius:12px}.dc-name{font-size:16px}
 .workout-grid{grid-template-columns:1fr;gap:8px}
 .workout-card{border-radius:14px;padding:16px;display:flex;align-items:center;gap:14px}
@@ -287,7 +295,25 @@ html,body{background:var(--gray-50);color:var(--gray-900);font-family:'Inter',-a
             Friends
         </button>
     </div>
-    <div class="select-rank-card"><div class="select-rank-icon" id="selectRankIcon">R</div><div class="select-rank-info"><div class="select-rank-name" id="selectRankName">ROOKIE</div><div class="select-rank-bar-row"><div class="select-rank-bar"><div class="select-rank-bar-fill" id="selectRankBarFill"></div></div><span class="select-rank-xp" id="selectRankXp">0 / 100</span></div></div></div>
+    <div class="stats-row">
+        <div class="select-rank-card">
+            <div class="select-rank-icon" id="selectRankIcon">R</div>
+            <div class="select-rank-info">
+                <div class="select-rank-name" id="selectRankName">ROOKIE</div>
+                <div class="select-rank-bar-row">
+                    <div class="select-rank-bar"><div class="select-rank-bar-fill" id="selectRankBarFill"></div></div>
+                    <span class="select-rank-xp" id="selectRankXp">0 / 100</span>
+                </div>
+            </div>
+        </div>
+        <div class="streak-card" id="streakCard" hidden>
+            <div class="streak-icon">🔥</div>
+            <div class="streak-info">
+                <div class="streak-num" id="streakNum">0</div>
+                <div class="streak-label">DAY STREAK</div>
+            </div>
+        </div>
+    </div>
     <div class="daily-challenge-card" id="dailyChallengeCard">
         <div class="dc-header">
             <div class="dc-title">
@@ -420,6 +446,12 @@ function todayStr(){
     return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 
+function yesterdayStr(){
+    const d=new Date();
+    d.setDate(d.getDate()-1);
+    return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
 function getDaily(user){
     const today=todayStr();
     if(!user.daily||user.daily.date!==today){
@@ -528,8 +560,8 @@ const DB={
     K:'repquest_v1',
     get(){try{return JSON.parse(localStorage.getItem(this.K)||'[]')}catch{return[]}},
     save(u){localStorage.setItem(this.K,JSON.stringify(u))},
-    add(n){const u=this.get(),o={id:'u_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:n.trim(),xp:0,created:Date.now(),stats:{},friends:[]};u.push(o);this.save(u);return o},
-    upd(o){const u=this.get(),i=u.findIndex(x=>x.id===o.id);if(i>=0){u[i]=o;this.save(u)}},
+    add(n){const u=this.get(),o={id:'u_'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),name:n.trim(),xp:0,created:Date.now(),stats:{},friends:[],streak:0,lastWorkoutDate:null};u.push(o);this.save(u);return o},
+    upd(o){const u=this.get(),i=u.findIndex(x=>x.id===o.id);if(i>=0){u[i]=o;this.save(u)}else{u.push(o);this.save(u);}},
     del(id){this.save(this.get().filter(x=>x.id!==id))}
 };
 
@@ -644,7 +676,7 @@ function rAccounts(){
         const p=rp(u.xp),r=RANKS[p.i],tr=Object.values(u.stats||{}).reduce((s,v)=>s+(v.reps||0),0);
         const d=document.createElement('div');
         d.className='account-card';d.setAttribute('role','button');d.tabIndex=0;
-        d.innerHTML=`<div class="account-avatar" style="background:${r.bg};color:${r.color}">${esc(u.name[0].toUpperCase())}</div><div class="account-info"><div class="account-name">${esc(u.name)}</div><div class="account-meta">${tr} reps · ${u.xp} XP · ${p.name}</div></div><div class="rank-pill" style="color:${r.color};background:${r.bg};font-size:10px;padding:3px 8px">${p.name.toUpperCase()}</div><button class="account-x" data-id="${u.id}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`;
+        d.innerHTML=`<div class="account-avatar" style="background:${r.bg};color:${r.color}">${esc(u.name[0].toUpperCase())}</div><div class="account-info"><div class="account-name">${esc(u.name)}${u.guest?' <span style="color:var(--gray-400);font-size:11px;font-weight:500">(Guest)</span>':''}</div><div class="account-meta">${tr} reps · ${u.xp} XP · ${p.name} · 🔥 ${u.streak||0} day streak</div></div><div class="rank-pill" style="color:${r.color};background:${r.bg};font-size:10px;padding:3px 8px">${p.name.toUpperCase()}</div><button class="account-x" data-id="${u.id}"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>`;
         d.addEventListener('click',e=>{if(e.target.closest('.account-x')){e.stopPropagation();delU(u);return}pickU(u)});
         d.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pickU(u)}});
         el.appendChild(d);
@@ -656,19 +688,22 @@ function delU(u){if(pendingDel===u.id){DB.del(u.id);rAccounts();pendingDel=null;
 /* ===== pickU: sync cloud XP on every login ===== */
 async function pickU(u){
     if(!u.friends)u.friends=[];
+    if(!u.streak) u.streak = 0;
+    // Reset streak if last workout was before yesterday
+    if(u.lastWorkoutDate && u.lastWorkoutDate !== todayStr() && u.lastWorkoutDate !== yesterdayStr()){
+        u.streak = 0;
+        u.lastWorkoutDate = null;
+        DB.upd(u);
+    }
     S.currentUser=u;
-    // Show screen immediately with local data so it feels instant
     rTopRank(u.xp);
     rSelect();
     show('select');
-    // Skip cloud sync for guests
     if(u.guest)return;
-    // Fetch latest XP from cloud in background
     try{
         const res=await fetch(`${CLOUD_URL}?username=${encodeURIComponent(u.name)}`);
         const data=await res.json();
         if(data.found&&typeof data.xp==='number'&&data.xp>u.xp){
-            // Cloud has more XP than local — update local to match
             u.xp=data.xp;
             DB.upd(u);
             S.currentUser=u;
@@ -676,9 +711,7 @@ async function pickU(u){
             rSelect();
             toast('XP synced from cloud!','success');
         }
-    }catch(e){
-        // No internet or cloud down — silently continue with local data
-    }
+    }catch(e){}
 }
 
 function rSelect(){
@@ -690,6 +723,10 @@ function rSelect(){
     $('selectRankName').style.color=r.color;
     $('selectRankBarFill').style.cssText=`width:${p.pct*100}%;background:${r.color}`;
     $('selectRankXp').textContent=p.next?`${u.xp} / ${p.max} XP`:`${u.xp} XP · MAX`;
+    
+    $('streakNum').textContent = u.streak || 0;
+    $('streakCard').hidden = false;
+    
     setCtx(null);
     const g=$('workoutGrid');g.innerHTML='';
     const isMb=mb();
@@ -770,11 +807,26 @@ function endSession(){
         const st=u.stats[S.currentWorkout.id]||{reps:0,best:0};
         st.reps+=S.reps;if(S.reps>st.best)st.best=S.reps;
         u.stats[S.currentWorkout.id]=st;
+        
+        // Update Streak
+        const today = todayStr();
+        if(u.lastWorkoutDate !== today){
+            if(u.lastWorkoutDate === yesterdayStr()){
+                u.streak = (u.streak || 0) + 1;
+            } else {
+                u.streak = 1; // Streak started
+            }
+            u.lastWorkoutDate = today;
+        }
+        
         const daily=getDaily(u);
         daily.repsByWorkout[S.currentWorkout.id]=(daily.repsByWorkout[S.currentWorkout.id]||0)+S.reps;
         daily.totalReps+=S.reps;daily.totalXp+=S.xp;
         if(S.reps>0&&!daily.workoutsCompleted.includes(S.currentWorkout.id))daily.workoutsCompleted.push(S.currentWorkout.id);
-        if(!u.guest)DB.upd(u);
+        
+        // Save to local DB for all users (including guests for persistence)
+        DB.upd(u);
+        
         if(!u.guest){
             fetch(CLOUD_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u.name,totalXP:u.xp})}).catch(()=>{});
         }
@@ -833,19 +885,35 @@ async function fetchAllFriendStats(){
     });
 }
 
-$('guestBtn').addEventListener('click',()=>{
-    S.currentUser={id:'guest_'+Date.now().toString(36),name:'Guest',xp:0,created:Date.now(),stats:{},friends:[],guest:true};
-    rTopRank(0);rSelect();show('select');
-    toast('Playing as Guest. Create an account to save progress!');
+ $('guestBtn').addEventListener('click',()=>{
+    const users = DB.get();
+    let u = users.find(x => x.guest);
+    if(!u){
+        u = {id:'guest_'+Date.now().toString(36), name:'Guest', xp:0, created:Date.now(), stats:{}, friends:[], guest:true, streak:0, lastWorkoutDate:null};
+        DB.save([...users, u]);
+    }
+    if(!u.friends) u.friends=[];
+    if(!u.streak) u.streak = 0;
+    // Reset streak if broken
+    if(u.lastWorkoutDate && u.lastWorkoutDate !== todayStr() && u.lastWorkoutDate !== yesterdayStr()){
+        u.streak = 0;
+        u.lastWorkoutDate = null;
+        DB.upd(u);
+    }
+    S.currentUser = u;
+    rTopRank(u.xp);
+    rSelect();
+    show('select');
+    toast('Playing as Guest. Create an account to sync progress to the cloud!');
 });
 
-$('toggleFormBtn').addEventListener('click',()=>{
+ $('toggleFormBtn').addEventListener('click',()=>{
     const wrapper=$('formWrapper'),chev=$('formChev'),txt=$('toggleFormTxt');
     if(wrapper.classList.contains('open')){wrapper.classList.remove('open');chev.classList.remove('open');txt.textContent='Create New Cloud Account'}
     else{wrapper.classList.add('open');chev.classList.add('open');txt.textContent='Hide Registration Form'}
 });
 
-$('createBtn').addEventListener('click',async()=>{
+ $('createBtn').addEventListener('click',async()=>{
     const inp=$('newName'),n=inp.value.trim();
     if(!n){toast('Enter a name.','error');inp.focus();return}
     if(n.length>16){toast('Too long.','error');return}
@@ -864,27 +932,27 @@ $('createBtn').addEventListener('click',async()=>{
     }finally{btn.textContent='Sync';btn.disabled=false}
 });
 
-$('newName').addEventListener('keydown',e=>{if(e.key==='Enter')$('createBtn').click()});
-$('switchUser').addEventListener('click',()=>{setCtx(null);show('account');rAccounts()});
-$('friendsBtn').addEventListener('click',openFriendsModal);
-$('closeFriendsBtn').addEventListener('click',closeFriendsModal);
-$('addFriendBtn').addEventListener('click',addFriend);
-$('friendNameInput').addEventListener('keydown',e=>{if(e.key==='Enter')addFriend()});
-$('friendsModal').addEventListener('click',e=>{if(e.target===$('friendsModal'))closeFriendsModal()});
-$('dcClaimBtn').addEventListener('click',claimDaily);
-$('dcStartBtn').addEventListener('click',startDailyChallenge);
-$('stopBtn').addEventListener('click',endSession);
-$('pauseBtn').addEventListener('click',togglePause);
-$('ccBack').addEventListener('click',()=>{rSelect();show('select')});
-$('ccAgain').addEventListener('click',async()=>{if(S.currentWorkout)await startWU(S.currentWorkout);else{rSelect();show('select')}});
-$('privAccept').addEventListener('click',async()=>{$('privModal').hidden=true;await startWU(S.currentWorkout)});
-$('privCancel').addEventListener('click',()=>{$('privModal').hidden=true;S.currentWorkout=null;S.activeChallenge=null});
-$('privClose').addEventListener('click',()=>{$('privModal').hidden=true});
-$('privacyBtn').addEventListener('click',()=>showP('info'));
-$('topbarRankArea').addEventListener('click',()=>showP('info'));
-$('privModal').addEventListener('click',e=>{if(e.target===$('privModal')){$('privModal').hidden=true;S.currentWorkout=null;S.activeChallenge=null}});
-$('cancelWarmup').addEventListener('click',cancelWU);$('skipWarmup').addEventListener('click',skipWU);
-$('cancelWarmupM').addEventListener('click',cancelWU);$('skipWarmupM').addEventListener('click',skipWU);
+ $('newName').addEventListener('keydown',e=>{if(e.key==='Enter')$('createBtn').click()});
+ $('switchUser').addEventListener('click',()=>{setCtx(null);show('account');rAccounts()});
+ $('friendsBtn').addEventListener('click',openFriendsModal);
+ $('closeFriendsBtn').addEventListener('click',closeFriendsModal);
+ $('addFriendBtn').addEventListener('click',addFriend);
+ $('friendNameInput').addEventListener('keydown',e=>{if(e.key==='Enter')addFriend()});
+ $('friendsModal').addEventListener('click',e=>{if(e.target===$('friendsModal'))closeFriendsModal()});
+ $('dcClaimBtn').addEventListener('click',claimDaily);
+ $('dcStartBtn').addEventListener('click',startDailyChallenge);
+ $('stopBtn').addEventListener('click',endSession);
+ $('pauseBtn').addEventListener('click',togglePause);
+ $('ccBack').addEventListener('click',()=>{rSelect();show('select')});
+ $('ccAgain').addEventListener('click',async()=>{if(S.currentWorkout)await startWU(S.currentWorkout);else{rSelect();show('select')}});
+ $('privAccept').addEventListener('click',async()=>{$('privModal').hidden=true;await startWU(S.currentWorkout)});
+ $('privCancel').addEventListener('click',()=>{$('privModal').hidden=true;S.currentWorkout=null;S.activeChallenge=null});
+ $('privClose').addEventListener('click',()=>{$('privModal').hidden=true});
+ $('privacyBtn').addEventListener('click',()=>showP('info'));
+ $('topbarRankArea').addEventListener('click',()=>showP('info'));
+ $('privModal').addEventListener('click',e=>{if(e.target===$('privModal')){$('privModal').hidden=true;S.currentWorkout=null;S.activeChallenge=null}});
+ $('cancelWarmup').addEventListener('click',cancelWU);$('skipWarmup').addEventListener('click',skipWU);
+ $('cancelWarmupM').addEventListener('click',cancelWU);$('skipWarmupM').addEventListener('click',skipWU);
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!$('privModal').hidden){$('privModal').hidden=true;S.currentWorkout=null;S.activeChallenge=null}else if(!$('scrActive').hidden&&!S.paused)togglePause()}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&S.cameraOn){if(S.mode==='active'&&!S.paused)togglePause();if(S.mode==='warmup')sWuP(true)}});
 window.addEventListener('beforeunload',camStop);
