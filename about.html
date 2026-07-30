@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -619,6 +620,32 @@
                 max-width: 300px;
             }
         }
+        
+                /* Team Photo */
+        .team-photo-wrapper {
+            max-width: 800px;
+            margin: 0 auto 60px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 6px 6px 0 var(--border);
+            background: var(--white);
+            transition: opacity 0.5s ease;
+        }
+
+        .team-photo-wrapper.animate-on-scroll {
+            opacity: 0;
+        }
+
+        .team-photo-wrapper.animate-on-scroll.visible {
+            opacity: 1;
+        }
+
+        .team-photo {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
 
         /* Scroll animations */
         .animate-on-scroll {
@@ -774,10 +801,21 @@
         </div>
     </section>
 
-    <!-- Subjects We Cover -->
+        <!-- Subjects We Cover -->
     <section class="team-section">
         <div class="section">
+            
+            <!-- New Team Photo Block -->
             <div class="team-intro animate-on-scroll">
+                <h2>Meet the Team</h2>
+                <p>The dedicated students who run Lyon Math Prep and volunteer their time to help you succeed.</p>
+            </div>
+            <div class="team-photo-wrapper animate-on-scroll">
+                <img src="team-photo.jpg" alt="The Lyon Math Prep Tutoring Team" class="team-photo">
+            </div>
+
+            <!-- Existing Subjects List -->
+            <div class="team-intro animate-on-scroll" style="margin-top: 20px;">
                 <h2>Subjects we cover</h2>
                 <p>From foundational algebra to advanced pre-calculus, we're here for the subjects that matter most in middle and high school.</p>
             </div>
@@ -960,3 +998,4 @@
 
 </body>
 </html>
+
