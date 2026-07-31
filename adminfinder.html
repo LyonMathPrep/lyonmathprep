@@ -17,6 +17,38 @@
             <p class="text-gray-500 mt-2">Finds times where 2 or more students are in the <strong>same subject</strong>, on the <strong>same day</strong>, at the <strong>same time</strong>.</p>
         </div>
 
+        <!-- Google Apps Script Config -->
+        <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-6 space-y-4">
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">1. Student Levels Apps Script URL</label>
+                <div class="flex gap-2">
+                    <input id="scriptUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://script.google.com/macros/s/STUDENT_LEVELS_URL/exec">
+                    <button id="saveUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">2. Tutor Sheet Apps Script URL</label>
+                <div class="flex gap-2">
+                    <input id="tutorScriptUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://script.google.com/macros/s/TUTOR_SHEET_URL/exec">
+                    <button id="saveTutorUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">3. Meetings API Apps Script URL</label>
+                <div class="flex gap-2">
+                    <input id="meetingsScriptUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://script.google.com/macros/s/MEETINGS_URL/exec">
+                    <button id="saveMeetingsUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                </div>
+            </div>
+            <div>
+                <label class="block text-sm font-bold text-gray-700 mb-2">4. Meetings API Fetch URL (OpenSheet link to auto-fetch NEW USERs)</label>
+                <div class="flex gap-2">
+                    <input id="meetingsApiUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://opensheet.elk.sh/.../Meetings">
+                    <button id="saveMeetingsApiUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Action Buttons -->
         <div class="flex gap-4 mb-6">
             <button id="fetchBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">
@@ -30,10 +62,16 @@
         <!-- Status / Error Message -->
         <div id="statusMsg" class="hidden mb-6 p-4 rounded-lg"></div>
 
-        <!-- Fallback Textarea -->
-        <div class="mb-8">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Fallback: Paste JSON data here (if live fetch fails)</label>
-            <textarea id="jsonInput" class="w-full h-40 p-3 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder='Paste JSON array here...'></textarea>
+        <!-- Fallback Textareas -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Fallback: Paste Form Responses JSON here</label>
+                <textarea id="jsonInput" class="w-full h-40 p-3 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder='Paste form JSON here...'></textarea>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">2. Paste Meetings API JSON here (Required to find NEW USERs)</label>
+                <textarea id="meetingsJsonInput" class="w-full h-40 p-3 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder='Paste meetings JSON here...'></textarea>
+            </div>
         </div>
 
         <!-- Results Container -->
@@ -46,7 +84,42 @@
     <script>
         const API_URL = "https://opensheet.elk.sh/1abo2cYRAt44q9Q3alwsL5svQJzZeTEsYtHFqgkghsQ8/responses67";
         
-        // Days mapping to handle typos and sort correctly
+        // Load saved URLs
+        if(localStorage.getItem('appsScriptUrl')) document.getElementById('scriptUrl').value = localStorage.getItem('appsScriptUrl');
+        if(localStorage.getItem('tutorScriptUrl')) document.getElementById('tutorScriptUrl').value = localStorage.getItem('tutorScriptUrl');
+        if(localStorage.getItem('meetingsScriptUrl')) document.getElementById('meetingsScriptUrl').value = localStorage.getItem('meetingsScriptUrl');
+        if(localStorage.getItem('meetingsApiUrl')) document.getElementById('meetingsApiUrl').value = localStorage.getItem('meetingsApiUrl');
+        
+        document.getElementById('saveUrlBtn').addEventListener('click', () => {
+            localStorage.setItem('appsScriptUrl', document.getElementById('scriptUrl').value);
+            alert("Student URL Saved!");
+        });
+        document.getElementById('saveTutorUrlBtn').addEventListener('click', () => {
+            localStorage.setItem('tutorScriptUrl', document.getElementById('tutorScriptUrl').value);
+            alert("Tutor URL Saved!");
+        });
+        document.getElementById('saveMeetingsUrlBtn').addEventListener('click', () => {
+            localStorage.setItem('meetingsScriptUrl', document.getElementById('meetingsScriptUrl').value);
+            alert("Meetings Script URL Saved!");
+        });
+        document.getElementById('saveMeetingsApiUrlBtn').addEventListener('click', () => {
+            localStorage.setItem('meetingsApiUrl', document.getElementById('meetingsApiUrl').value);
+            alert("Meetings Fetch URL Saved!");
+        });
+
+        // Pre-fill the Meetings JSON so it works out of the box
+        document.getElementById('meetingsJsonInput').value = JSON.stringify([
+          {" ":"Inbha","Link to meeting":"https://meet.jit.si/DifferentGendersCiteApproximately ","Meeting Topic":"Algebra 1","Date and Time":"1:00 PM – 2:00 PM","User's classes":"Every Sunday, Monday"},
+          {" ":"Inbhamathlyon","Link to meeting":"https://meet.jit.si/DifferentGendersCiteApproximately","Meeting Topic":"Algebra 1","Date and Time":"4:00 PM – 5:00 PM","User's classes":"Every Sunday, Monday"},
+          {" ":"joemumath","Link to meeting":"https://meet.jit.si/DifferentGendersCiteApproximately","Meeting Topic":"Algebra 1","Date and Time":"4:00 PM – 5:00 PM","User's classes":"Every Sunday, Monday"},
+          {" ":"newuser1","Link to meeting":"https://meet.jit.si/DifferentGendersCiteApproximately","Meeting Topic":"Algebra 1","Date and Time":"4:00 PM – 5:00 PM","User's classes":"Every Sunday, Monday"},
+          {" ":"Mightyadvait"},
+          {" ":"PranavN","Link to meeting":"https://meet.jit.si/DifferentGendersCiteApproximately","Meeting Topic":"Algebra 1","Date and Time":"4:00 PM – 5:00 PM","User's classes":"Every Sunday, Monday"},
+          {" ":"user112","Link to meeting":"NEW USER"},
+          {" ":"bobs2","Link to meeting":"NEW USER"},
+          {" ":"ergseg","Link to meeting":"NEW USER"}
+        ], null, 2);
+
         const dayMap = {
             "mon": { name: "Monday", order: 1 },
             "tue": { name: "Tuesday", order: 2 },
@@ -57,7 +130,6 @@
             "sun": { name: "Sunday", order: 7 }
         };
 
-        // Time sorting map
         const timeOrder = [
             "9:00 AM - 10:00 AM (only Saturday)",
             "9:00 AM - 10: 30 AM (only Saturday)",
@@ -72,39 +144,74 @@
             if (!inputDay) return null;
             const lower = inputDay.toLowerCase().trim();
             for (const key in dayMap) {
-                if (lower.startsWith(key)) {
-                    return dayMap[key];
-                }
+                if (lower.startsWith(key)) return dayMap[key];
             }
             return null;
         }
 
-        // Convert string to Title Case (e.g., "Pre-algebra" -> "Pre-Algebra")
         function toTitleCase(str) {
             return str.replace(/\w\S*/g, function(txt){
                 return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
             });
         }
 
-        function processData(data) {
+        function formatTimeForSheet(timeStr) {
+            return timeStr
+                .replace(/\s*\(.*?\)\s*/g, '') 
+                .replace(/\s-\s/g, ' – ');       
+        }
+
+        function processData(formData) {
+            const meetingsDataText = document.getElementById('meetingsJsonInput').value;
+            
+            if (!meetingsDataText) {
+                setStatus("Please paste the Meetings API JSON into the second box so the tool can look for 'NEW USER's.", 'error');
+                return;
+            }
+
+            // Parse Meetings Data and build a Set of ONLY "NEW USER" usernames (case-insensitive)
+            const newUsernames = new Set();
+            try {
+                const meetingsData = JSON.parse(meetingsDataText);
+                meetingsData.forEach(m => {
+                    if (m["Link to meeting"] && String(m["Link to meeting"]).toLowerCase().trim() === 'new user') {
+                        // Account for headers named "Username" or " " (space)
+                        const username = m["Username"] || m[" "];
+                        if (username) newUsernames.add(String(username).toLowerCase().trim());
+                    }
+                });
+            } catch (error) {
+                setStatus("Invalid Meetings JSON format. Cannot filter NEW USERs.", 'error');
+                return;
+            }
+
+            if (newUsernames.size === 0) {
+                setStatus("No users with 'NEW USER' found in the Meetings API data.", 'error');
+                return;
+            }
+
             const scheduleMap = {};
 
-            data.forEach(student => {
+            formData.forEach(student => {
                 const studentName = student["Student's name."];
-                if (!studentName) return;
+                const studentAccount = student["What would you like the student's account name to be? You will be emailed a password (and the username below) as their login credentials. "];
+                
+                const nameLower = studentName ? studentName.toLowerCase().trim() : null;
+                const accountLower = studentAccount ? studentAccount.toLowerCase().trim() : null;
 
-                // Get and format subject
+                // ONLY include them if they are explicitly in the NEW USER list
+                const isNewUser = (nameLower && newUsernames.has(nameLower)) || (accountLower && newUsernames.has(accountLower));
+
+                if (!studentName || !isNewUser) return;
+
                 let subject = student["What subject would the student be attending?"] || "General";
                 subject = subject.trim();
                 const subjectDisplay = toTitleCase(subject);
                 const subjectKey = subject.toLowerCase();
 
-                // Loop through all keys to find availability columns
                 Object.keys(student).forEach(key => {
                     if (key.includes("What Time(s) is your student available for meetings?")) {
                         const selectedDays = student[key];
-                        
-                        // Extract just the time part from the key using regex
                         const timeMatch = key.match(/\[(.*?)\]/);
                         if (!timeMatch) return;
                         const timeSlot = timeMatch[1];
@@ -112,9 +219,7 @@
                         const dayInfo = normalizeDay(selectedDays);
                         
                         if (dayInfo) {
-                            // Create a composite key including Subject, Day, and Time
                             const compositeKey = `${subjectKey}___${dayInfo.name}___${timeSlot}`;
-                            
                             if (!scheduleMap[compositeKey]) {
                                 scheduleMap[compositeKey] = {
                                     subject: subjectDisplay,
@@ -130,19 +235,15 @@
                 });
             });
 
-            // Filter to only show matches where 2 or more students overlap
             const matches = Object.values(scheduleMap).filter(match => match.students.size >= 2);
-
-            // Sort by Subject, then Day, then Time
             matches.sort((a, b) => {
-                if (a.subject.toLowerCase() !== b.subject.toLowerCase()) {
-                    return a.subject.toLowerCase().localeCompare(b.subject.toLowerCase());
-                }
+                if (a.subject.toLowerCase() !== b.subject.toLowerCase()) return a.subject.toLowerCase().localeCompare(b.subject.toLowerCase());
                 if (a.dayOrder !== b.dayOrder) return a.dayOrder - b.dayOrder;
                 return timeOrder.indexOf(a.time) - timeOrder.indexOf(b.time);
             });
 
             displayMatches(matches);
+            setStatus(`Successfully processed! Found ${matches.length} potential matches.`, 'success');
         }
 
         function displayMatches(matches) {
@@ -151,7 +252,7 @@
             list.innerHTML = '';
 
             if (matches.length === 0) {
-                list.innerHTML = '<p class="text-gray-500 col-span-2">No overlapping times found where 2 or more students are in the same subject at the same time.</p>';
+                list.innerHTML = '<p class="text-gray-500 col-span-2">No overlapping times found where 2 or more "NEW USER" students are in the same subject at the same time.</p>';
                 container.classList.remove('hidden');
                 return;
             }
@@ -159,9 +260,10 @@
             matches.forEach(match => {
                 const studentCount = match.students.size;
                 const studentsArray = Array.from(match.students);
+                const safeId = `${match.subject}_${match.day}_${match.time}`.replace(/[^a-zA-Z0-9]/g, '_');
                 
                 const card = document.createElement('div');
-                card.className = 'bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition';
+                card.className = 'bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition flex flex-col';
                 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-3">
@@ -174,66 +276,175 @@
                             ${studentCount} Students
                         </span>
                     </div>
-                    <div class="border-t border-gray-100 pt-3">
+                    <div class="border-t border-gray-100 pt-3 flex-grow">
                         <p class="text-xs uppercase tracking-wide text-gray-400 mb-2">Available Students:</p>
                         <div class="flex flex-wrap gap-2">
                             ${studentsArray.map(name => `<span class="bg-gray-100 text-gray-700 text-sm px-3 py-1 rounded-md">${name}</span>`).join('')}
                         </div>
                     </div>
+                    
+                    <!-- Admin Approval Section -->
+                    <div class="mt-4 pt-4 border-t-2 border-dashed border-gray-100 space-y-2">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input id="level_${safeId}" type="number" min="1" placeholder="Lvl #" class="p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <input id="tutor_${safeId}" type="text" placeholder="Tutor Name" class="p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <input id="pass_${safeId}" type="text" placeholder="Tutor Password" class="p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                            <input id="link_${safeId}" type="text" placeholder="Meeting Link" class="p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <button id="btn_${safeId}" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition mt-2">
+                            Approve Class
+                        </button>
+                    </div>
                 `;
                 
                 list.appendChild(card);
+
+                document.getElementById(`btn_${safeId}`).addEventListener('click', async () => {
+                    const levelInput = document.getElementById(`level_${safeId}`).value;
+                    const tutorInput = document.getElementById(`tutor_${safeId}`).value;
+                    const passInput = document.getElementById(`pass_${safeId}`).value;
+                    const linkInput = document.getElementById(`link_${safeId}`).value;
+                    const btn = document.getElementById(`btn_${safeId}`);
+                    
+                    if (!levelInput || !tutorInput || !passInput || !linkInput) {
+                        alert("Please fill out Lvl #, Tutor Name, Tutor Password, and Meeting Link.");
+                        return;
+                    }
+                    
+                    btn.innerText = "Updating...";
+                    btn.disabled = true;
+
+                    try {
+                        await approveClassAndAssignTutor(match, studentsArray, levelInput, tutorInput, passInput, linkInput, btn);
+                    } catch (error) {
+                        alert("Failed to update: " + error.message);
+                        btn.innerText = "Retry";
+                        btn.disabled = false;
+                    }
+                });
             });
 
             container.classList.remove('hidden');
+        }
+
+        async function approveClassAndAssignTutor(match, studentsArray, levelInput, tutorInput, passInput, linkInput, btn) {
+            const studentScriptUrl = document.getElementById('scriptUrl').value;
+            const tutorScriptUrl = document.getElementById('tutorScriptUrl').value;
+            const meetingsScriptUrl = document.getElementById('meetingsScriptUrl').value;
+
+            if (!studentScriptUrl || !tutorScriptUrl || !meetingsScriptUrl) {
+                throw new Error("Please fill out all 3 Apps Script URLs at the top of the page.");
+            }
+
+            const subjectLevelStr = `${match.subject}-lvl${levelInput}`;
+            const formattedTime = formatTimeForSheet(match.time);
+            const dayString = `Every ${match.day}`;
+            
+            // 1. Update Student Levels
+            const studentPromise = fetch(studentScriptUrl, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    students: studentsArray, 
+                    subjectLevel: subjectLevelStr 
+                }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            }).then(res => res.json());
+
+            // 2. Add to Tutor Sheet
+            const tutorPromise = fetch(tutorScriptUrl, {
+                method: 'POST',
+                body: JSON.stringify({
+                    tutorName: tutorInput,
+                    password: passInput,
+                    students: studentsArray,
+                    meetingTime: formattedTime,
+                    date: dayString,
+                    topic: match.subject,
+                    meetingLink: linkInput
+                }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            }).then(res => res.json());
+
+            // 3. Update Meetings API
+            const meetingsPromise = fetch(meetingsScriptUrl, {
+                method: 'POST',
+                body: JSON.stringify({
+                    students: studentsArray,
+                    meetingLink: linkInput,
+                    topic: match.subject,
+                    time: formattedTime,
+                    day: dayString
+                }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            }).then(res => res.json());
+
+            // Wait for all three to finish
+            const [studentRes, tutorRes, meetingsRes] = await Promise.all([studentPromise, tutorPromise, meetingsPromise]);
+
+            if (studentRes.status === 'success' && tutorRes.status === 'success' && meetingsRes.status === 'success') {
+                btn.innerText = `Approved!`;
+                btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
+                btn.classList.add('bg-green-600', 'cursor-default');
+            } else {a
+                console.error("API Results:", {studentRes, tutorRes, meetingsRes});
+                throw new Error("One of the scripts failed. Check console for details.");
+            }
         }
 
         function setStatus(message, type) {
             const status = document.getElementById('statusMsg');
             status.innerText = message;
             status.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
-            
-            if (type === 'error') {
-                status.classList.add('bg-red-100', 'text-red-700');
-            } else if (type === 'success') {
-                status.classList.add('bg-green-100', 'text-green-700');
-            } else {
-                status.classList.add('bg-blue-100', 'text-blue-700');
-            }
+            if (type === 'error') status.classList.add('bg-red-100', 'text-red-700');
+            else if (type === 'success') status.classList.add('bg-green-100', 'text-green-700');
+            else status.classList.add('bg-blue-100', 'text-blue-700');
         }
 
         async function fetchLiveData() {
             setStatus("Fetching live data...", 'info');
             try {
+                // If they provided a Meetings API URL, fetch it automatically first
+                const meetingsApiUrl = document.getElementById('meetingsApiUrl').value;
+                if (meetingsApiUrl) {
+                    try {
+                        const mResponse = await fetch(meetingsApiUrl);
+                        if (mResponse.ok) {
+                            const mData = await mResponse.json();
+                            document.getElementById('meetingsJsonInput').value = JSON.stringify(mData, null, 2);
+                        }
+                    } catch (e) {
+                        console.error("Could not fetch Meetings API URL", e);
+                    }
+                }
+
                 const response = await fetch(API_URL);
                 if (!response.ok) throw new Error("Network response was not ok");
                 const data = await response.json();
                 setStatus("Successfully fetched live data!", 'success');
                 processData(data);
             } catch (error) {
-                setStatus("Live fetch failed (likely due to browser CORS security). Please paste your JSON data in the box below and click 'Use Pasted Data'.", 'error');
+                setStatus("Live fetch failed (likely due to browser CORS security). Please paste your JSON data in the boxes below and click 'Use Pasted Data'.", 'error');
                 console.error(error);
             }
         }
 
         function parsePastedData() {
             const jsonText = document.getElementById('jsonInput').value;
+            if(!jsonText) {
+                setStatus("Please paste Form JSON data into the first text area first.", 'error');
+                return;
+            }
             try {
                 const data = JSON.parse(jsonText);
                 setStatus("Successfully parsed pasted data!", 'success');
                 processData(data);
             } catch (error) {
                 setStatus("Invalid JSON format. Please check your pasted data.", 'error');
-                console.error(error);
             }
         }
 
-        // Event Listeners
         document.getElementById('fetchBtn').addEventListener('click', fetchLiveData);
         document.getElementById('parseBtn').addEventListener('click', parsePastedData);
-
-        // Pre-fill the text area with the JSON provided in the prompt as a fallback/example
-        document.getElementById('jsonInput').value = JSON.stringify([{"Timestamp":"7/1/2026 21:36:32","Student's name.":"inbha","Parent/Guardian's name.":"advait","Parent/Guardian's email.":"coachinbha@proton.me","Parent/Guardian's phone number (Optional).":"","Student's grade.":"Grade 11","What subject would the student be attending?":"Algebra 2","What is the student's grade in their math subject currently? (Optional).":"A","Does the student have any accommodations/special needs? (Optional).":"","What would you like the student's account name to be? You will be emailed a password (and the username below) as their login credentials. ":"inbhamath8","Students Phone number (Optional).":"","Students Email (Optional).":"","What Time(s) is your student available for meetings? [7:00 PM - 8:00 PM (All Days)]":"Monday","What Time(s) is your student available for meetings? [7:30 PM - 8:30 PM (All Days)]":"Monday","What Time(s) is your student available for meetings? [7:45 PM - 8:45 PM (All Days)]":"","What Time(s) is your student available for meetings? [8:00 PM - 9:00 PM (All Days)]":"","What Time(s) is your student available for meetings? [8:30 PM - 9:30 PM (All Days)]":"","What Time(s) is your student available for meetings? [9:00 AM - 10:00 AM (only Saturday) ]":"","What Time(s) is your student available for meetings? [9:00 AM - 10: 30 AM (only Saturday)]":"","Column 19":"","Email Sent":"Yes"},{"Timestamp":"7/2/2026 8:24:51","Student's name.":"Venkat R","Parent/Guardian's name.":"Test","Parent/Guardian's email.":"ramkumar.venkat11@bloomfield.org","Parent/Guardian's phone number (Optional).":"","Student's grade.":"Grade 10","What subject would the student be attending?":"Pre-Calculus","What is the student's grade in their math subject currently? (Optional).":"","Does the student have any accommodations/special needs? (Optional).":"","What would you like the student's account name to be? You will be emailed a password (and the username below) as their login credentials. ":"venkatr","Students Phone number (Optional).":"","Students Email (Optional).":"","What Time(s) is your student available for meetings? [7:00 PM - 8:00 PM (All Days)]":"","What Time(s) is your student available for meetings? [7:30 PM - 8:30 PM (All Days)]":"","What Time(s) is your student available for meetings? [7:45 PM - 8:45 PM (All Days)]":"","What Time(s) is your student available for meetings? [8:00 PM - 9:00 PM (All Days)]":"","What Time(s) is your student available for meetings? [8:30 PM - 9:30 PM (All Days)]":"","What Time(s) is your student available for meetings? [9:00 AM - 10:00 AM (only Saturday) ]":"","What Time(s) is your student available for meetings? [9:00 AM - 10: 30 AM (only Saturday)]":"Thursday","Column 19":"","Email Sent":"Yes"},{"Timestamp":"7/21/2026 22:28:58","Student's name.":"joe","Parent/Guardian's name.":"mu","Parent/Guardian's email.":"lyonmathprep@gmail.com","Parent/Guardian's phone number (Optional).":"","Student's grade.":"Grade 11","What subject would the student be attending?":"Algebra 2","What is the student's grade in their math subject currently? (Optional).":"","Does the student have any accommodations/special needs? (Optional).":"","What would you like the student's account name to be? You will be emailed a password (and the username below) as their login credentials. ":"joemumath","Students Phone number (Optional).":"","Students Email (Optional).":"","What Time(s) is your student available for meetings? [7:00 PM - 8:00 PM (All Days)]":"Monday","What Time(s) is your student available for meetings? [7:30 PM - 8:30 PM (All Days)]":"Tuesday","What Time(s) is your student available for meetings? [7:45 PM - 8:45 PM (All Days)]":"Tuesday","What Time(s) is your student available for meetings? [8:00 PM - 9:00 PM (All Days)]":"","What Time(s) is your student available for meetings? [8:30 PM - 9:30 PM (All Days)]":"","What Time(s) is your student available for meetings? [9:00 AM - 10:00 AM (only Saturday) ]":"","What Time(s) is your student available for meetings? [9:00 AM - 10: 30 AM (only Saturday)]":"","Column 19":"","Email Sent":"Yes"},{"Timestamp":"7/23/2026 15:41:33","Student's name.":"newuser1","Parent/Guardian's name.":"awsefasef","Parent/Guardian's email.":"lyonmathprep@gmail.com","Parent/Guardian's phone number (Optional).":"","Student's grade.":"Grade 11","What subject would the student be attending?":"Algebra 2","What is the student's grade in their math subject currently? (Optional).":"","Does the student have any accommodations/special needs? (Optional).":"","What would you like the student's account name to be? You will be emailed a password (and the username below) as their login credentials. ":"newuser1","Students Phone number (Optional).":"","Students Email (Optional).":"","What Time(s) is your student available for meetings? [7:00 PM - 8:00 PM (All Days)]":"","What Time(s) is your student available for meetings? [7:30 PM - 8:30 PM (All Days)]":"Monday","What Time(s) is your student available for meetings? [7:45 PM - 8:45 PM (All Days)]":"Tuesday","What Time(s) is your student available for meetings? [8:00 PM - 9:00 PM (All Days)]":"Tuesday","What Time(s) is your student available for meetings? [8:30 PM - 9:30 PM (All Days)]":"Monday","What Time(s) is your student available for meetings? [9:00 AM - 10:00 AM (only Saturday) ]":"","What Time(s) is your student available for meetings? [9:00 AM - 10: 30 AM (only Saturday)]":"","Column 19":"","Email Sent":"Yes"},{"Timestamp":"7/24/2026 14:07:19","Student's name.":"Advait","Parent/Guardian's name.":"Chinnaswamy","Parent/Guardian's email.":"Mightyadvait@gmail.com","Parent/Guardian's phone number (Optional).":"9473360359","Student's grade.":"Grade 10","What subject would the student be attending?":"Pre-algebra","What is the student's grade in their math subject currently? (Optional).":"A","Does the student have any accommodations/special needs? (Optional).":"autistic","What would you like the student's account name to be? You will be emailed a password (and the username below) as their login credentials. ":"Mightyadvait","Students Phone number (Optional).":"9473360359","Students Email (Optional).":"mightyadvait@gmail","What Time(s) is your student available for meetings? [7:00 PM - 8:00 PM (All Days)]":"Monday","What Time(s) is your student available for meetings? [7:30 PM - 8:30 PM (All Days)]":"Tuesday","What Time(s) is your student available for meetings? [7:45 PM - 8:45 PM (All Days)]":"","What Time(s) is your student available for meetings? [8:00 PM - 9:00 PM (All Days)]":"Wensday","What Time(s) is your student available for meetings? [8:30 PM - 9:30 PM (All Days)]":"Thursday","What Time(s) is your student available for meetings? [9:00 AM - 10:00 AM (only Saturday) ]":"Wensday","What Time(s) is your student available for meetings? [9:00 AM - 10: 30 AM (only Saturday)]":"Thursday","Column 19":"","Email Sent":"Yes"},{"Timestamp":"7/24/2026 14:08:10","Student's name.":"Pranav Nimmala","Parent/Guardian's name.":"Subbarao","Parent/Guardian's email.":"subba_rao_n@yahoo.com","Parent/Guardian's phone number (Optional).":"","Student's grade.":"Grade 10","What subject would the student be attending?":"Algebra 1","What is the student's grade in their math subject currently? (Optional).":"","Does the student have any accommodations/special needs? (Optional).":"","What would you like the student's account name to be? You will be emailed a password (and the username below) as their login credentials. ":"PranavN","Students Phone number (Optional).":"248-850-0181","Students Email (Optional).":"nimmala.pranav@gmail.com","What Time(s) is your student available for meetings? [7:00 PM - 8:00 PM (All Days)]":"Monday","What Time(s) is your student available for meetings? [7:30 PM - 8:30 PM (All Days)]":"Tuesday","What Time(s) is your student available for meetings? [7:45 PM - 8:45 PM (All Days)]":"Wensday","What Time(s) is your student available for meetings? [8:00 PM - 9:00 PM (All Days)]":"Thursday","What Time(s) is your student available for meetings? [8:30 PM - 9:30 PM (All Days)]":"Friday","What Time(s) is your student available for meetings? [9:00 AM - 10:00 AM (only Saturday) ]":"Saturday","What Time(s) is your student available for meetings? [9:00 AM - 10: 30 AM (only Saturday)]":"Saturday","Column 19":"","Email Sent":"Yes"},{"Timestamp":"7/25/2026 10:22:01","Student's name.":"testuser","Parent/Guardian's name.":"adfsadf","Parent/Guardian's email.":"dakjfgjkdlf@gmail.com","Parent/Guardian's phone number (Optional).":"","Student's grade.":"Grade 11","What subject would the student be attending?":"Algebra 2","What is the student's grade in their math subject currently? (Optional).":"","Does the student have any accommodations/special needs? (Optional).":"","What would you like the student's account name to be? You will be emailed a password (and the username below) as their login credentials. ":"testuser1","Students Phone number (Optional).":"","Students Email (Optional).":"","What Time(s) is your student available for meetings? [7:00 PM - 8:00 PM (All Days)]":"Wednesday","What Time(s) is your student available for meetings? [7:30 PM - 8:30 PM (All Days)]":"","What Time(s) is your student available for meetings? [7:45 PM - 8:45 PM (All Days)]":"Monday","What Time(s) is your student available for meetings? [8:00 PM - 9:00 PM (All Days)]":"Tuesday","What Time(s) is your student available for meetings? [8:30 PM - 9:30 PM (All Days)]":"","What Time(s) is your student available for meetings? [9:00 AM - 10:00 AM (only Saturday) ]":"Monday","What Time(s) is your student available for meetings? [9:00 AM - 10: 30 AM (only Saturday)]":"","Column 19":"","Email Sent":"Yes"},{"Timestamp":"7/25/2026 10:24:24","Student's name.":"testuser12","Parent/Guardian's name.":"sdfgdfg","Parent/Guardian's email.":"vajkdhfdv@gmail.com","Parent/Guardian's phone number (Optional).":"","Student's grade.":"Grade 10","What subject would the student be attending?":"Pre-Calculus","What is the student's grade in their math subject currently? (Optional).":"","Does the student have any accommodations/special needs? (Optional).":"","What would you like the student's account name to be? You will be emailed a password (and the username below) as their login credentials. ":"testuser2","Students Phone number (Optional).":"","Students Email (Optional).":"","What Time(s) is your student available for meetings? [7:00 PM - 8:00 PM (All Days)]":"Wednesday","What Time(s) is your student available for meetings? [7:30 PM - 8:30 PM (All Days)]":"","What Time(s) is your student available for meetings? [7:45 PM - 8:45 PM (All Days)]":"Monday","What Time(s) is your student available for meetings? [8:00 PM - 9:00 PM (All Days)]":"Tuesday","What Time(s) is your student available for meetings? [8:30 PM - 9:30 PM (All Days)]":"","What Time(s) is your student available for meetings? [9:00 AM - 10:00 AM (only Saturday) ]":"Monday","What Time(s) is your student available for meetings? [9:00 AM - 10: 30 AM (only Saturday)]":"","Column 19":"","Email Sent":"Yes"},{"Timestamp":"7/27/2026 15:01:56","Student's name.":"passwordshashed","Parent/Guardian's name.":"dsfdfg","Parent/Guardian's email.":"lyonmathprep@gmail.com","Parent/Guardian's phone number (Optional).":"","Student's grade.":"Grade 11","What subject would the student be attending?":"Algebra 2","What is the student's grade in their math subject currently? (Optional).":"","Does the student have any accommodations/special needs? (Optional).":"","What would you like the student's account name to be? You will be emailed a password (and the username below) as their login credentials. ":"passwordshashed","Students Phone number (Optional).":"","Students Email (Optional).":"","What Time(s) is your student available for meetings? [7:00 PM - 8:00 PM (All Days)]":"Monday","What Time(s) is your student available for meetings? [7:30 PM - 8:30 PM (All Days)]":"Tuesday","What Time(s) is your student available for meetings? [7:45 PM - 8:45 PM (All Days)]":"","What Time(s) is your student available for meetings? [8:00 PM - 9:00 PM (All Days)]":"","What Time(s) is your student available for meetings? [8:30 PM - 9:30 PM (All Days)]":"","What Time(s) is your student available for meetings? [9:00 AM - 10:00 AM (only Saturday) ]":"","What Time(s) is your student available for meetings? [9:00 AM - 10: 30 AM (only Saturday)]":"Monday","Column 19":"","Email Sent":"Yes"}], null, 2);
     </script>
 </body>
 </html>
