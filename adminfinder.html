@@ -17,46 +17,70 @@
             <p class="text-gray-500 mt-2">Finds times where 2 or more students are in the <strong>same subject</strong>, on the <strong>same day</strong>, at the <strong>same time</strong>.</p>
         </div>
 
-        <!-- Google Apps Script Config -->
+        <!-- Configuration Key Management -->
         <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-200 mb-6 space-y-4">
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">1. Student Levels Apps Script URL</label>
+            <div class="flex justify-between items-center border-b border-gray-100 pb-3">
+                <h2 class="text-lg font-bold text-gray-800">Configuration Key</h2>
                 <div class="flex gap-2">
-                    <input id="scriptUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://script.google.com/macros/s/STUDENT_LEVELS_URL/exec">
-                    <button id="saveUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                    <label class="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-2 px-4 rounded-lg transition">
+                        Upload JSON
+                        <input id="uploadConfigInput" type="file" accept=".json" class="hidden">
+                    </label>
+                    <button id="exportConfigBtn" class="bg-gray-700 hover:bg-gray-800 text-white text-sm font-bold py-2 px-4 rounded-lg transition">Export JSON</button>
                 </div>
             </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">2. Tutor Sheet Apps Script URL</label>
-                <div class="flex gap-2">
-                    <input id="tutorScriptUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://script.google.com/macros/s/TUTOR_SHEET_URL/exec">
-                    <button id="saveTutorUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">1. Form Responses API URL (OpenSheet)</label>
+                    <div class="flex gap-2">
+                        <input id="formApiUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://opensheet.elk.sh/.../responses67">
+                        <button id="saveFormApiBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                    </div>
                 </div>
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">3. Meetings API Apps Script URL</label>
-                <div class="flex gap-2">
-                    <input id="meetingsScriptUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://script.google.com/macros/s/MEETINGS_URL/exec">
-                    <button id="saveMeetingsUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">2. Student Levels Apps Script URL</label>
+                    <div class="flex gap-2">
+                        <input id="scriptUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://script.google.com/macros/s/STUDENT_LEVELS_URL/exec">
+                        <button id="saveUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                    </div>
                 </div>
-            </div>
-            <div>
-                <label class="block text-sm font-bold text-gray-700 mb-2">4. Meetings API Fetch URL (OpenSheet link to auto-fetch NEW USERs)</label>
-                <div class="flex gap-2">
-                    <input id="meetingsApiUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://opensheet.elk.sh/.../Meetings">
-                    <button id="saveMeetingsApiUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">3. Tutor Sheet Apps Script URL</label>
+                    <div class="flex gap-2">
+                        <input id="tutorScriptUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://script.google.com/macros/s/TUTOR_SHEET_URL/exec">
+                        <button id="saveTutorUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">4. Meetings API Apps Script URL</label>
+                    <div class="flex gap-2">
+                        <input id="meetingsScriptUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://script.google.com/macros/s/MEETINGS_URL/exec">
+                        <button id="saveMeetingsUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">5. Meetings API Fetch URL (OpenSheet link to auto-fetch NEW USERs)</label>
+                    <div class="flex gap-2">
+                        <input id="meetingsApiUrl" type="text" class="flex-1 p-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none" placeholder="https://opensheet.elk.sh/.../Meetings">
+                        <button id="saveMeetingsApiUrlBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-2 px-4 rounded-lg transition">Save</button>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex gap-4 mb-6">
+        <!-- Action Buttons & Toggles -->
+        <div class="flex flex-wrap gap-4 items-center mb-6">
             <button id="fetchBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">
                 Fetch Live Data
             </button>
             <button id="parseBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-lg transition">
                 Use Pasted Data
             </button>
+            <div class="flex items-center ml-2">
+                <input id="showNonMatches" type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer">
+                <label for="showNonMatches" class="ml-2 text-sm font-medium text-gray-700 cursor-pointer">Show Non-Matches (1 student)</label>
+            </div>
         </div>
 
         <!-- Status / Error Message -->
@@ -82,31 +106,6 @@
     </div>
 
     <script>
-        const API_URL = "https://opensheet.elk.sh/1abo2cYRAt44q9Q3alwsL5svQJzZeTEsYtHFqgkghsQ8/responses67";
-        
-        // Load saved URLs
-        if(localStorage.getItem('appsScriptUrl')) document.getElementById('scriptUrl').value = localStorage.getItem('appsScriptUrl');
-        if(localStorage.getItem('tutorScriptUrl')) document.getElementById('tutorScriptUrl').value = localStorage.getItem('tutorScriptUrl');
-        if(localStorage.getItem('meetingsScriptUrl')) document.getElementById('meetingsScriptUrl').value = localStorage.getItem('meetingsScriptUrl');
-        if(localStorage.getItem('meetingsApiUrl')) document.getElementById('meetingsApiUrl').value = localStorage.getItem('meetingsApiUrl');
-        
-        document.getElementById('saveUrlBtn').addEventListener('click', () => {
-            localStorage.setItem('appsScriptUrl', document.getElementById('scriptUrl').value);
-            alert("Student URL Saved!");
-        });
-        document.getElementById('saveTutorUrlBtn').addEventListener('click', () => {
-            localStorage.setItem('tutorScriptUrl', document.getElementById('tutorScriptUrl').value);
-            alert("Tutor URL Saved!");
-        });
-        document.getElementById('saveMeetingsUrlBtn').addEventListener('click', () => {
-            localStorage.setItem('meetingsScriptUrl', document.getElementById('meetingsScriptUrl').value);
-            alert("Meetings Script URL Saved!");
-        });
-        document.getElementById('saveMeetingsApiUrlBtn').addEventListener('click', () => {
-            localStorage.setItem('meetingsApiUrl', document.getElementById('meetingsApiUrl').value);
-            alert("Meetings Fetch URL Saved!");
-        });
-
         // Pre-fill the Meetings JSON so it works out of the box
         document.getElementById('meetingsJsonInput').value = JSON.stringify([
           {" ":"Inbha","Link to meeting":"https://meet.jit.si/DifferentGendersCiteApproximately ","Meeting Topic":"Algebra 1","Date and Time":"1:00 PM – 2:00 PM","User's classes":"Every Sunday, Monday"},
@@ -161,8 +160,111 @@
                 .replace(/\s-\s/g, ' – ');       
         }
 
+        function setStatus(message, type) {
+            const status = document.getElementById('statusMsg');
+            status.innerText = message;
+            status.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
+            if (type === 'error') status.classList.add('bg-red-100', 'text-red-700');
+            else if (type === 'success') status.classList.add('bg-green-100', 'text-green-700');
+            else status.classList.add('bg-blue-100', 'text-blue-700');
+        }
+
+        // ==========================================
+        // CONFIGURATION KEY LOGIC
+        // ==========================================
+
+        function loadConfig() {
+            if(localStorage.getItem('formApiUrl')) document.getElementById('formApiUrl').value = localStorage.getItem('formApiUrl');
+            if(localStorage.getItem('appsScriptUrl')) document.getElementById('scriptUrl').value = localStorage.getItem('appsScriptUrl');
+            if(localStorage.getItem('tutorScriptUrl')) document.getElementById('tutorScriptUrl').value = localStorage.getItem('tutorScriptUrl');
+            if(localStorage.getItem('meetingsScriptUrl')) document.getElementById('meetingsScriptUrl').value = localStorage.getItem('meetingsScriptUrl');
+            if(localStorage.getItem('meetingsApiUrl')) document.getElementById('meetingsApiUrl').value = localStorage.getItem('meetingsApiUrl');
+        }
+        loadConfig(); // Load on start
+
+        function saveAllConfigs() {
+            localStorage.setItem('formApiUrl', document.getElementById('formApiUrl').value);
+            localStorage.setItem('appsScriptUrl', document.getElementById('scriptUrl').value);
+            localStorage.setItem('tutorScriptUrl', document.getElementById('tutorScriptUrl').value);
+            localStorage.setItem('meetingsScriptUrl', document.getElementById('meetingsScriptUrl').value);
+            localStorage.setItem('meetingsApiUrl', document.getElementById('meetingsApiUrl').value);
+        }
+
+        document.getElementById('saveFormApiBtn').addEventListener('click', () => {
+            localStorage.setItem('formApiUrl', document.getElementById('formApiUrl').value);
+            alert("Form API URL Saved!");
+        });
+        document.getElementById('saveUrlBtn').addEventListener('click', () => {
+            localStorage.setItem('appsScriptUrl', document.getElementById('scriptUrl').value);
+            alert("Student URL Saved!");
+        });
+        document.getElementById('saveTutorUrlBtn').addEventListener('click', () => {
+            localStorage.setItem('tutorScriptUrl', document.getElementById('tutorScriptUrl').value);
+            alert("Tutor URL Saved!");
+        });
+        document.getElementById('saveMeetingsUrlBtn').addEventListener('click', () => {
+            localStorage.setItem('meetingsScriptUrl', document.getElementById('meetingsScriptUrl').value);
+            alert("Meetings Script URL Saved!");
+        });
+        document.getElementById('saveMeetingsApiUrlBtn').addEventListener('click', () => {
+            localStorage.setItem('meetingsApiUrl', document.getElementById('meetingsApiUrl').value);
+            alert("Meetings Fetch URL Saved!");
+        });
+
+        // Export Config JSON
+        document.getElementById('exportConfigBtn').addEventListener('click', () => {
+            const configData = {
+                formApiUrl: document.getElementById('formApiUrl').value,
+                studentLevelsUrl: document.getElementById('scriptUrl').value,
+                tutorSheetUrl: document.getElementById('tutorScriptUrl').value,
+                meetingsScriptUrl: document.getElementById('meetingsScriptUrl').value,
+                meetingsApiUrl: document.getElementById('meetingsApiUrl').value
+            };
+            
+            const blob = new Blob([JSON.stringify(configData, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'scheduler_config.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // Import Config JSON
+        document.getElementById('uploadConfigInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const config = JSON.parse(e.target.result);
+                    
+                    if (config.formApiUrl) document.getElementById('formApiUrl').value = config.formApiUrl;
+                    if (config.studentLevelsUrl) document.getElementById('scriptUrl').value = config.studentLevelsUrl;
+                    if (config.tutorSheetUrl) document.getElementById('tutorScriptUrl').value = config.tutorSheetUrl;
+                    if (config.meetingsScriptUrl) document.getElementById('meetingsScriptUrl').value = config.meetingsScriptUrl;
+                    if (config.meetingsApiUrl) document.getElementById('meetingsApiUrl').value = config.meetingsApiUrl;
+
+                    saveAllConfigs();
+                    setStatus("Configuration uploaded and saved successfully!", 'success');
+                } catch (err) {
+                    setStatus("Failed to parse JSON config file. Make sure it is valid.", 'error');
+                }
+            };
+            reader.readAsText(file);
+        });
+
+
+        // ==========================================
+        // DATA PROCESSING LOGIC
+        // ==========================================
+
         function processData(formData) {
             const meetingsDataText = document.getElementById('meetingsJsonInput').value;
+            const showNonMatches = document.getElementById('showNonMatches').checked;
             
             if (!meetingsDataText) {
                 setStatus("Please paste the Meetings API JSON into the second box so the tool can look for 'NEW USER's.", 'error');
@@ -175,7 +277,6 @@
                 const meetingsData = JSON.parse(meetingsDataText);
                 meetingsData.forEach(m => {
                     if (m["Link to meeting"] && String(m["Link to meeting"]).toLowerCase().trim() === 'new user') {
-                        // Account for headers named "Username" or " " (space)
                         const username = m["Username"] || m[" "];
                         if (username) newUsernames.add(String(username).toLowerCase().trim());
                     }
@@ -235,24 +336,27 @@
                 });
             });
 
-            const matches = Object.values(scheduleMap).filter(match => match.students.size >= 2);
+            // Filter based on whether we want matches (2+) or non-matches (1)
+            const minStudents = showNonMatches ? 1 : 2;
+            const matches = Object.values(scheduleMap).filter(match => match.students.size >= minStudents);
+            
             matches.sort((a, b) => {
                 if (a.subject.toLowerCase() !== b.subject.toLowerCase()) return a.subject.toLowerCase().localeCompare(b.subject.toLowerCase());
                 if (a.dayOrder !== b.dayOrder) return a.dayOrder - b.dayOrder;
                 return timeOrder.indexOf(a.time) - timeOrder.indexOf(b.time);
             });
 
-            displayMatches(matches);
-            setStatus(`Successfully processed! Found ${matches.length} potential matches.`, 'success');
+            displayMatches(matches, showNonMatches);
+            setStatus(`Successfully processed! Found ${matches.length} ${showNonMatches ? 'records (including 1-student non-matches)' : 'potential matches'}.`, 'success');
         }
 
-        function displayMatches(matches) {
+        function displayMatches(matches, showNonMatches) {
             const container = document.getElementById('resultsContainer');
             const list = document.getElementById('resultsList');
             list.innerHTML = '';
 
             if (matches.length === 0) {
-                list.innerHTML = '<p class="text-gray-500 col-span-2">No overlapping times found where 2 or more "NEW USER" students are in the same subject at the same time.</p>';
+                list.innerHTML = `<p class="text-gray-500 col-span-2">No ${showNonMatches ? 'unmatched students' : 'overlapping times'} found for "NEW USER" students.</p>`;
                 container.classList.remove('hidden');
                 return;
             }
@@ -263,7 +367,9 @@
                 const safeId = `${match.subject}_${match.day}_${match.time}`.replace(/[^a-zA-Z0-9]/g, '_');
                 
                 const card = document.createElement('div');
-                card.className = 'bg-white p-5 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition flex flex-col';
+                // Add a yellow border to non-matches to distinguish them visually
+                const borderClass = studentCount === 1 ? 'border-yellow-300 bg-yellow-50' : 'border-gray-100 bg-white';
+                card.className = `p-5 rounded-xl shadow-sm border ${borderClass} hover:shadow-md transition flex flex-col`;
                 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-3">
@@ -273,7 +379,7 @@
                             <p class="text-blue-600 font-medium">${match.time}</p>
                         </div>
                         <span class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">
-                            ${studentCount} Students
+                            ${studentCount} Student${studentCount > 1 ? 's' : ''}
                         </span>
                     </div>
                     <div class="border-t border-gray-100 pt-3 flex-grow">
@@ -385,22 +491,19 @@
                 btn.innerText = `Approved!`;
                 btn.classList.remove('bg-indigo-600', 'hover:bg-indigo-700');
                 btn.classList.add('bg-green-600', 'cursor-default');
-            } else {a
+            } else {
                 console.error("API Results:", {studentRes, tutorRes, meetingsRes});
                 throw new Error("One of the scripts failed. Check console for details.");
             }
         }
 
-        function setStatus(message, type) {
-            const status = document.getElementById('statusMsg');
-            status.innerText = message;
-            status.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700', 'bg-blue-100', 'text-blue-700');
-            if (type === 'error') status.classList.add('bg-red-100', 'text-red-700');
-            else if (type === 'success') status.classList.add('bg-green-100', 'text-green-700');
-            else status.classList.add('bg-blue-100', 'text-blue-700');
-        }
-
         async function fetchLiveData() {
+            const formApiUrl = document.getElementById('formApiUrl').value;
+            if (!formApiUrl) {
+                setStatus("Please enter the Form Responses API URL in the Configuration section.", 'error');
+                return;
+            }
+
             setStatus("Fetching live data...", 'info');
             try {
                 // If they provided a Meetings API URL, fetch it automatically first
@@ -417,7 +520,7 @@
                     }
                 }
 
-                const response = await fetch(API_URL);
+                const response = await fetch(formApiUrl);
                 if (!response.ok) throw new Error("Network response was not ok");
                 const data = await response.json();
                 setStatus("Successfully fetched live data!", 'success');
