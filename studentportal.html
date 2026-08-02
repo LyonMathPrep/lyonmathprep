@@ -1051,8 +1051,9 @@ body {
 
 /* Graph tab */
 .calc-graph { padding: 12px; gap: 10px; }
+.graph-input-list { display: flex; flex-direction: column; gap: 6px; }
 .graph-input { display: flex; gap: 6px; align-items: center; }
-.graph-input span { font-weight: 900; font-size: 16px; flex-shrink: 0; }
+.graph-input .graph-y-label { font-weight: 900; font-size: 14px; flex-shrink: 0; width: 30px; text-align: right; }
 .graph-input input {
   flex: 1;
   min-width: 0;
@@ -1064,26 +1065,17 @@ body {
   outline: none;
 }
 .graph-input input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-light); }
-.graph-input button {
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  background: var(--primary);
-  color: var(--white);
-  padding: 8px 14px;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  flex-shrink: 0;
-}
-.graph-input button:hover { background: var(--primary-dark); }
 #graphCanvas {
   width: 100%;
+  height: 220px;
   border: 2px solid var(--border);
   border-radius: 8px;
   background: #fff;
   display: block;
+  cursor: grab;
+  touch-action: none; /* Allows dragging on mobile without scrolling */
 }
+#graphCanvas:active { cursor: grabbing; }
 .graph-controls { display: flex; gap: 6px; justify-content: center; }
 .graph-controls button {
   border: 2px solid var(--border);
@@ -1692,18 +1684,27 @@ body {
 
   <!-- Graph Tab -->
   <div class="calc-body calc-graph" id="calcGraph" style="display:none;">
-    <div class="graph-input">
-      <span>y =</span>
-      <input type="text" id="graphExpr" placeholder="sin(x)" value="sin(x)" autocomplete="off" spellcheck="false" />
-      <button onclick="plotGraph()">Plot</button>
+    <div class="graph-input-list">
+      <div class="graph-input">
+        <span class="graph-y-label" style="color: var(--primary);">y1=</span>
+        <input type="text" id="graphExpr1" placeholder="sin(x)" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="graph-input">
+        <span class="graph-y-label" style="color: var(--green);">y2=</span>
+        <input type="text" id="graphExpr2" placeholder="x^2 - 4" autocomplete="off" spellcheck="false" />
+      </div>
+      <div class="graph-input">
+        <span class="graph-y-label" style="color: #0055ff;">y3=</span>
+        <input type="text" id="graphExpr3" placeholder="1/x" autocomplete="off" spellcheck="false" />
+      </div>
     </div>
     <canvas id="graphCanvas" width="310" height="220"></canvas>
     <div class="graph-controls">
-      <button onclick="zoomGraph(0.8)">Zoom +</button>
-      <button onclick="zoomGraph(1.25)">Zoom −</button>
+      <button onclick="zoomGraph(1.2)">Zoom +</button>
+      <button onclick="zoomGraph(0.8)">Zoom −</button>
       <button onclick="resetGraph()">Reset</button>
     </div>
-    <div class="graph-hint">Try: sin(x), x^2, 2*x-3, sqrt(x), 1/x, tan(x)</div>
+    <div class="graph-hint">Scroll to zoom · Drag to pan · Try: e^x, ln(x), (x-1)/(x+1)</div>
   </div>
 </div>
 
@@ -1802,9 +1803,6 @@ function extractTimeRange(text) {
 // =========================
 // Eastern Time Conversion
 // =========================
-// Returns a Date whose getHours/getMinutes/getDay reflect the current
-// America/New_York wall-clock time (EST in winter, EDT in summer).
-// This way "12:00 PM" in the API always matches 12:00 PM on the Eastern clock.
 function getNowInEST() {
   const now = new Date();
   const parts = new Intl.DateTimeFormat('en-US', {
@@ -1817,7 +1815,6 @@ function getNowInEST() {
   return new Date(g('year'), g('month') - 1, g('day'), g('hour'), g('minute'), g('second'));
 }
 
-// Parse a single time like "12:00 PM" or "1:00 PM" into { h (0-23), min }
 function parseTimeToHM(text) {
   const m = String(text||'').match(/(\d{1,2}):(\d{2})\s*([AP]M)/i);
   if (!m) return {h:12,min:0};
@@ -1827,25 +1824,19 @@ function parseTimeToHM(text) {
   return {h,min};
 }
 
-// Parse a time range like "12:00 PM – 1:00 PM" into { startH, startMin, endH, endMin }
 function parseTimeRange(text) {
   const str = String(text || '');
-  // Match patterns like "12:00 PM – 1:00 PM" or "12:00 PM - 1:00 PM"
   const rangeMatch = str.match(/(\d{1,2}:\d{2}\s*[AP]M)\s*[\u2013\u2014\-–—]\s*(\d{1,2}:\d{2}\s*[AP]M)/i);
   if (rangeMatch) {
     const start = parseTimeToHM(rangeMatch[1]);
     const end   = parseTimeToHM(rangeMatch[2]);
     return { startH: start.h, startMin: start.min, endH: end.h, endMin: end.min };
   }
-  // Fallback: just parse the first time found and assume 1 hour duration
   const single = parseTimeToHM(str);
   return { startH: single.h, startMin: single.min, endH: single.h + 1, endMin: single.min };
 }
 
-// Check meeting status: returns 'live', 'soon' (within 15 min), or null.
-// Meeting times are in EST (fixed UTC-5, no DST).
-// We convert the user's system clock to EST and compare.
-const SOON_MINUTES = 15; // minutes before start to show "starting soon"
+const SOON_MINUTES = 15; 
 
 function getMeetingStatus(meeting) {
   const estNow = getNowInEST();
@@ -1854,18 +1845,15 @@ function getMeetingStatus(meeting) {
   const currentMin  = estNow.getMinutes();
   const currentTotalMin = currentH * 60 + currentMin;
 
-  // Check if today matches the meeting's schedule
   const meetingDays = meeting.weekdays || [];
   const hasSpecific = meeting.specificDate;
 
   let dayMatches = false;
 
-  // Check recurring weekday match
   if (meetingDays.length > 0) {
     dayMatches = meetingDays.some(d => d.toLowerCase() === currentDayName.toLowerCase());
   }
 
-  // Check specific date match
   if (hasSpecific) {
     const specDate = meeting.specificDate;
     if (specDate.getFullYear() === estNow.getFullYear() &&
@@ -1877,17 +1865,14 @@ function getMeetingStatus(meeting) {
 
   if (!dayMatches) return null;
 
-  // Parse the time range from the meeting's dateAndTime field
   const timeRange = parseTimeRange(meeting.dateAndTime);
   const startTotalMin = timeRange.startH * 60 + timeRange.startMin;
   const endTotalMin   = timeRange.endH * 60 + timeRange.endMin;
 
-  // Currently within the meeting window
   if (currentTotalMin >= startTotalMin && currentTotalMin < endTotalMin) {
     return 'live';
   }
 
-  // Within SOON_MINUTES before start
   if (currentTotalMin >= (startTotalMin - SOON_MINUTES) && currentTotalMin < startTotalMin) {
     return 'soon';
   }
@@ -1895,12 +1880,10 @@ function getMeetingStatus(meeting) {
   return null;
 }
 
-// Backwards-compatible wrapper
 function isMeetingLiveNow(meeting) {
   return getMeetingStatus(meeting) === 'live';
 }
 
-// Check if ANY of the user's meetings is live right now
 function getAnyLiveMeeting() {
   const meetings = getUserMeetings();
   for (const m of meetings) {
@@ -1909,7 +1892,6 @@ function getAnyLiveMeeting() {
   return null;
 }
 
-// Get the best meeting to highlight (live > soon)
 function getBestActiveMeeting() {
   const meetings = getUserMeetings();
   let best = null;
@@ -1923,7 +1905,6 @@ function getBestActiveMeeting() {
   return null;
 }
 
-// Returns minutes until meeting starts (for "Starting in X min" text)
 function minutesUntilMeetingStart(meeting) {
   const estNow = getNowInEST();
   const currentTotalMin = estNow.getHours() * 60 + estNow.getMinutes();
@@ -1932,7 +1913,6 @@ function minutesUntilMeetingStart(meeting) {
   return startTotalMin - currentTotalMin;
 }
 
-// Generate a unique key for a meeting to use as a data attribute for targeting
 function meetingUniqueKey(meeting) {
   return norm(meeting.topic) + '|' + norm(meeting.link);
 }
@@ -1977,12 +1957,10 @@ document.getElementById('signupModal').addEventListener('click', function(e) {
 });
 
 // =========================
-// Session persistence (localStorage)
+// Session persistence
 // =========================
 function saveSession(username, password) {
   try {
-    // Manager requested that the session "saves" so the user isn't sent back to the unlogged front page.
-    // Storing password in localStorage to enable seamless auto-login.
     localStorage.setItem(SESSION_KEY, JSON.stringify({ username, password }));
   } catch(e) {}
 }
@@ -2019,7 +1997,7 @@ function makeApprovalKey(sheetKey, level) {
 }
 
 // =========================
-// Google Sheets Data Loaders
+// Data Loaders
 // =========================
 async function fetchSheet(url) {
   const res = await fetch(url);
@@ -2034,7 +2012,6 @@ async function loadUsers() {
 
 async function loadApprovals(username) {
   try {
-    // Send a POST request with the username to the Cloudflare Worker
     const response = await fetch(APPROVALS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -2175,7 +2152,7 @@ async function handleAuth(savedPassword) {
 
     if (!response.ok || !data.success) {
       showAuthMsg(data.error || 'Invalid username or password.', 'error');
-      clearSession(); // Clear bad session if auth fails
+      clearSession(); 
       return;
     }
 
@@ -2184,8 +2161,6 @@ async function handleAuth(savedPassword) {
       displayName: data.user.displayName
     };
 
-    // Manager override: Save the password too so the session persists across reloads/back button
-    // This prevents the user from being sent back to the unlogged front page.
     saveSession(username, password);
 
     const approvals = await loadApprovals(currentUser.username);
@@ -2219,7 +2194,6 @@ function logout() {
   authMsg.textContent = '';
   closeAvatarDropdown();
   
-  // Reset history state so the back button doesn't re-enter the portal
   history.replaceState({ page: 'auth' }, '', '#auth');
   
   window.scrollTo(0,0);
@@ -2235,11 +2209,10 @@ function enterPortal() {
   document.getElementById('dropdownName').textContent = displayName;
   document.getElementById('dropdownUser').textContent = '@' + currentUser.username;
 
-  // Replace current history state so back button doesn't immediately kick them out to the previous site
   history.replaceState({ page: 'dashboard' }, '', '#dashboard');
 
   renderDashboard();
-  showPage('dashboard', false); // false prevents pushing a duplicate history state
+  showPage('dashboard', false); 
   startLiveCheck();
 }
 
@@ -2248,7 +2221,6 @@ function enterPortal() {
 // =========================
 function startLiveCheck() {
   stopLiveCheck();
-  // Check every 15 seconds to update live meeting status
   liveCheckInterval = setInterval(function() {
     updateLiveHighlights();
   }, 15000);
@@ -2261,12 +2233,9 @@ function stopLiveCheck() {
   }
 }
 
-// Update live/soon highlights — does a full re-render of meetings UI
-// to keep badges, countdown text, and classes in sync.
 function updateLiveHighlights() {
   if (!currentUser) return;
 
-  // Re-render the meetings UI to pick up status changes
   const activePage = document.querySelector('.page.active');
   if (activePage) {
     if (activePage.id === 'page-dashboard') {
@@ -2341,10 +2310,8 @@ function toggleMobile() {
 }
 
 function showPage(page, pushHistory = true) {
-  // Guard against leaving a locked test via back button
   if (testLockdownActive && quizState && quizState.isTest && page !== 'quiz') {
     if (!confirm("You are currently taking a locked unit test. Are you sure you want to leave? Your progress will be lost.")) {
-      // If they cancel, force them back to the quiz
       history.pushState({ page: 'quiz' }, '', '#quiz');
       return; 
     } else {
@@ -2372,35 +2339,28 @@ function showPage(page, pushHistory = true) {
 
   window.scrollTo({ top: 0, behavior: 'smooth' });
   
-  // Push to browser history so the physical "Back" button works within the SPA
   if (pushHistory) {
     history.pushState({ page: page }, '', '#' + page);
   }
 }
 
-// Listen for browser back/forward button clicks
 window.addEventListener('popstate', (event) => {
   if (event.state && event.state.page) {
     if (!currentUser && event.state.page !== 'auth') {
-      // If logged out, prevent going back into the portal
       history.replaceState({ page: 'auth' }, '', '#auth');
       return;
     }
     if (currentUser && event.state.page === 'auth') {
-      // If logged in, prevent going back to the login screen
       history.pushState({ page: 'dashboard' }, '', '#dashboard');
       showPage('dashboard', false);
       return;
     }
     showPage(event.state.page, false);
   } else {
-    // No state (e.g., initial load or going back past the portal entry)
     if (currentUser) {
-      // Keep them trapped in the portal so they don't get sent out
       history.pushState({ page: 'dashboard' }, '', '#dashboard');
       showPage('dashboard', false);
     } else {
-      // Default to auth screen
       document.getElementById('authScreen').classList.remove('hidden');
       document.getElementById('portalScreen').classList.remove('active');
     }
@@ -2760,7 +2720,6 @@ async function selectChoice(btn, letter) {
   if (quizState.answered) return;
   quizState.answered = true;
 
-  // Disable all buttons immediately and show checking state
   document.querySelectorAll('#quizChoices .choice-btn').forEach(b => {
     b.disabled = true;
     b.classList.add('checking');
@@ -2777,7 +2736,6 @@ async function selectChoice(btn, letter) {
     
     const result = await res.json();
 
-    // Remove checking state
     document.querySelectorAll('#quizChoices .choice-btn').forEach(b => {
       b.classList.remove('checking');
     });
@@ -2792,7 +2750,6 @@ async function selectChoice(btn, letter) {
     const correctFull = result.correctAnswer;
     const correctLetter = correctFull.split(':')[0].trim().toUpperCase();
 
-    // Highlight correct answer
     document.querySelectorAll('#quizChoices .choice-btn').forEach(b => {
       const l = b.querySelector('.choice-letter').textContent.trim().toUpperCase();
       if (l === correctLetter) b.classList.add('correct');
@@ -2906,7 +2863,6 @@ function renderMeetingsUI() {
     .filter(m => m.next)
     .sort((a,b) => a.next - b.next);
 
-  // Check best active meeting (live takes priority over soon)
   const bestActive = getBestActiveMeeting();
 
   const nextCard = document.getElementById('nextClassCard');
@@ -2915,7 +2871,6 @@ function renderMeetingsUI() {
       const next = upcoming[0];
       const nextStatus = getMeetingStatus(next);
 
-      // Determine what to display: active meeting (live/soon) or next upcoming
       let displayMeeting, displayStatus;
       if (bestActive) {
         displayMeeting = bestActive.meeting;
@@ -2946,7 +2901,7 @@ function renderMeetingsUI() {
         joinText = 'Get Ready';
       } else {
         timeText = `<strong>${esc(formatShortDay(next.next))}</strong> · ${esc(extractTimeRange(next.dateAndTime))}`;
-        displayMeeting = next; // fallback to next upcoming
+        displayMeeting = next; 
       }
 
       nextCard.className = cardClass;
@@ -3096,7 +3051,6 @@ function renderCalendar() {
     const isToday = today.getFullYear()===calendarYear&&today.getMonth()===calendarMonth&&today.getDate()===day;
     const hasCls  = !!(calendarEventMap[dateStr]?.length);
 
-    // Check if this is today and any meeting is live or starting soon
     let todayMeetingClass = '';
     if (isToday) {
       const bestActive = getBestActiveMeeting();
@@ -3223,6 +3177,13 @@ const CalcEngine = (function() {
   }
 
   function parseFactor() {
+    // Handle unary minus/plus BEFORE exponents (e.g., -x^2 = -(x^2))
+    if (peek() && peek().type === 'op' && (peek().value === '-' || peek().value === '+')) {
+      const sign = next().value;
+      const v = parseFactor();
+      return sign === '-' ? -v : v;
+    }
+    
     let b = parseBase();
     if (peek() && peek().type === 'op' && peek().value === '^') {
       next();
@@ -3277,6 +3238,9 @@ const CalcEngine = (function() {
       case 'asin': return fromR(Math.asin(arg));
       case 'acos': return fromR(Math.acos(arg));
       case 'atan': return fromR(Math.atan(arg));
+      case 'sinh': return Math.sinh(arg);
+      case 'cosh': return Math.cosh(arg);
+      case 'tanh': return Math.tanh(arg);
       case 'sqrt': return Math.sqrt(arg);
       case 'cbrt': return Math.cbrt(arg);
       case 'log':  return Math.log10(arg);
@@ -3305,7 +3269,6 @@ const CalcEngine = (function() {
 // CALCULATOR UI
 // =========================
 let calcMode = 'DEG';
-let graphZoom = 1;
 
 function toggleCalculator() {
   document.getElementById('calcPanel').classList.toggle('open');
@@ -3382,6 +3345,7 @@ function calcEquals() {
 
 document.addEventListener('DOMContentLoaded', function() {
   initCalcDrag();
+  initGraphInteraction();
 
   const calcExpr = document.getElementById('calcExpr');
   if (calcExpr) {
@@ -3392,14 +3356,24 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
-  const graphExpr = document.getElementById('graphExpr');
-  if (graphExpr) {
-    graphExpr.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        plotGraph();
-      }
-    });
+  
+  let graphDebounce = null;
+  const scheduleGraphPlot = () => {
+    clearTimeout(graphDebounce);
+    graphDebounce = setTimeout(plotGraph, 300);
+  };
+  
+  for (let i = 1; i <= 3; i++) {
+    const graphExpr = document.getElementById(`graphExpr${i}`);
+    if (graphExpr) {
+      graphExpr.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          plotGraph();
+        }
+      });
+      graphExpr.addEventListener('input', scheduleGraphPlot);
+    }
   }
 });
 
@@ -3505,113 +3479,210 @@ function calcClampToViewport() {
 // =========================
 // GRAPHING
 // =========================
+let graphZoom = 1;
+let graphOffsetX = 0;
+let graphOffsetY = 0;
+const graphColors = ['#e63946', '#2d7a3a', '#0055ff'];
+
 function plotGraph() {
-  const exprStr = document.getElementById('graphExpr').value.trim();
   const canvas = document.getElementById('graphCanvas');
   const ctx = canvas.getContext('2d');
   const w = canvas.width;
   const h = canvas.height;
   ctx.clearRect(0, 0, w, h);
 
-  if (!exprStr) return;
-
-  const range = 10 / graphZoom;
-  const xMin = -range, xMax = range;
-  const yMin = -range, yMax = range;
+  const baseRange = 10;
+  const xRange = baseRange / graphZoom;
+  const yRange = baseRange / graphZoom;
+  const xMin = graphOffsetX - xRange / 2;
+  const xMax = graphOffsetX + xRange / 2;
+  const yMin = graphOffsetY - yRange / 2;
+  const yMax = graphOffsetY + yRange / 2;
 
   const xToPx = x => (x - xMin) / (xMax - xMin) * w;
   const yToPx = y => h - (y - yMin) / (yMax - yMin) * h;
 
+  // Dynamic Grid Step (keeps grid lines reasonable at any zoom)
+  let gridStep = xRange / 10;
+  const pow10 = Math.pow(10, Math.floor(Math.log10(gridStep)));
+  gridStep = gridStep / pow10;
+  if (gridStep < 1.5) gridStep = 1;
+  else if (gridStep < 3.5) gridStep = 2;
+  else if (gridStep < 7.5) gridStep = 5;
+  else gridStep = 10;
+  gridStep *= pow10;
+
+  // Draw Grid
   ctx.strokeStyle = '#eee';
   ctx.lineWidth = 1;
-  const gridStep = graphZoom > 2 ? 0.5 : 1;
+  ctx.beginPath();
   for (let i = Math.ceil(xMin / gridStep) * gridStep; i <= xMax; i += gridStep) {
     const px = xToPx(i);
-    ctx.beginPath();
-    ctx.moveTo(px, 0);
-    ctx.lineTo(px, h);
-    ctx.stroke();
+    ctx.moveTo(px, 0); ctx.lineTo(px, h);
   }
   for (let i = Math.ceil(yMin / gridStep) * gridStep; i <= yMax; i += gridStep) {
     const py = yToPx(i);
-    ctx.beginPath();
-    ctx.moveTo(0, py);
-    ctx.lineTo(w, py);
-    ctx.stroke();
+    ctx.moveTo(0, py); ctx.lineTo(w, py);
   }
+  ctx.stroke();
 
+  // Draw Axes
   ctx.strokeStyle = '#000';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
-  ctx.moveTo(0, yToPx(0));
-  ctx.lineTo(w, yToPx(0));
-  ctx.moveTo(xToPx(0), 0);
-  ctx.lineTo(xToPx(0), h);
+  const xAxisPx = yToPx(0);
+  if (xAxisPx >= 0 && xAxisPx <= h) { ctx.moveTo(0, xAxisPx); ctx.lineTo(w, xAxisPx); }
+  const yAxisPx = xToPx(0);
+  if (yAxisPx >= 0 && yAxisPx <= w) { ctx.moveTo(yAxisPx, 0); ctx.lineTo(yAxisPx, h); }
   ctx.stroke();
 
-  ctx.fillStyle = '#555';
+  // Draw Axis Labels
+  ctx.fillStyle = '#333';
   ctx.font = '10px sans-serif';
-  const labelStep = graphZoom > 2 ? 2 : (graphZoom > 1 ? 1 : 2);
-  for (let i = Math.ceil(xMin); i <= Math.floor(xMax); i += labelStep) {
-    if (i === 0) continue;
-    ctx.fillText(i, xToPx(i) - 4, yToPx(0) + 12);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  for (let i = Math.ceil(xMin / gridStep) * gridStep; i <= xMax; i += gridStep) {
+    if (Math.abs(i) < 1e-9) continue;
+    const px = xToPx(i);
+    if (px > 10 && px < w - 10) ctx.fillText(parseFloat(i.toFixed(3)), px, xAxisPx + 2);
   }
-  for (let i = Math.ceil(yMin); i <= Math.floor(yMax); i += labelStep) {
-    if (i === 0) continue;
-    ctx.fillText(i, xToPx(0) + 4, yToPx(i) + 3);
+  ctx.textAlign = 'right';
+  ctx.textBaseline = 'middle';
+  for (let i = Math.ceil(yMin / gridStep) * gridStep; i <= yMax; i += gridStep) {
+    if (Math.abs(i) < 1e-9) continue;
+    const py = yToPx(i);
+    if (py > 10 && py < h - 10) ctx.fillText(parseFloat(i.toFixed(3)), yAxisPx - 4, py);
   }
 
-  ctx.strokeStyle = '#e63946';
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  let started = false;
-  let lastPy = null;
+  // Plot Functions
+  for (let f = 1; f <= 3; f++) {
+    const exprStr = document.getElementById(`graphExpr${f}`).value.trim();
+    if (!exprStr) continue;
 
-  for (let px = 0; px <= w; px++) {
-    const x = xMin + (px / w) * (xMax - xMin);
-    try {
-      const y = CalcEngine.evaluate(exprStr, calcMode, { x: x });
-      if (!isFinite(y)) {
+    ctx.strokeStyle = graphColors[f - 1];
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    
+    let started = false;
+    let lastPy = null;
+    
+    for (let px = 0; px <= w; px += 0.5) {
+      const x = xMin + (px / w) * (xMax - xMin);
+      try {
+        const y = CalcEngine.evaluate(exprStr, calcMode, { x: x });
+        if (!isFinite(y)) { started = false; lastPy = null; continue; }
+        const py = yToPx(y);
+
+        // Detect asymptotes/jumps to avoid drawing vertical lines straight across
+        if (lastPy !== null && Math.abs(py - lastPy) > h * 0.5) {
+          started = false;
+        }
+
+        if (!started) { ctx.moveTo(px, py); started = true; } 
+        else { ctx.lineTo(px, py); }
+        lastPy = py;
+      } catch (e) {
         started = false;
         lastPy = null;
-        continue;
       }
-      const py = yToPx(y);
-
-      if (lastPy !== null && Math.abs(py - lastPy) > h * 0.6) {
-        started = false;
-      }
-
-      if (py < -1000 || py > h + 1000) {
-        started = false;
-        lastPy = py;
-        continue;
-      }
-
-      if (!started) {
-        ctx.moveTo(px, py);
-        started = true;
-      } else {
-        ctx.lineTo(px, py);
-      }
-      lastPy = py;
-    } catch (e) {
-      started = false;
-      lastPy = null;
     }
+    ctx.stroke();
   }
-  ctx.stroke();
 }
 
 function zoomGraph(factor) {
   graphZoom *= factor;
-  graphZoom = Math.max(0.2, Math.min(20, graphZoom));
+  graphZoom = Math.max(0.05, Math.min(50, graphZoom));
   plotGraph();
 }
 
 function resetGraph() {
   graphZoom = 1;
+  graphOffsetX = 0;
+  graphOffsetY = 0;
   plotGraph();
+}
+
+// Panning and Scrolling
+function initGraphInteraction() {
+  const canvas = document.getElementById('graphCanvas');
+  let isDragging = false;
+  let lastX, lastY;
+
+  const handleStart = (clientX, clientY) => {
+    isDragging = true;
+    lastX = clientX;
+    lastY = clientY;
+  };
+
+  const handleMove = (clientX, clientY) => {
+    if (!isDragging) return;
+    const dx = clientX - lastX;
+    const dy = clientY - lastY;
+    lastX = clientX;
+    lastY = clientY;
+
+    const xRange = 10 / graphZoom;
+    const yRange = 10 / graphZoom;
+    const w = canvas.width;
+    const h = canvas.height;
+
+    // Adjust graph center based on pixel drag
+    graphOffsetX -= (dx / w) * xRange;
+    graphOffsetY += (dy / h) * yRange;
+    plotGraph();
+  };
+
+  const handleEnd = () => { isDragging = false; };
+
+  canvas.addEventListener('mousedown', e => handleStart(e.clientX, e.clientY));
+  window.addEventListener('mousemove', e => handleMove(e.clientX, e.clientY));
+  window.addEventListener('mouseup', handleEnd);
+
+  canvas.addEventListener('touchstart', e => {
+    if (e.touches.length === 1) handleStart(e.touches[0].clientX, e.touches[0].clientY);
+  }, { passive: true });
+  
+  canvas.addEventListener('touchmove', e => {
+    if (e.touches.length === 1) {
+      e.preventDefault(); // prevent screen scroll
+      handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, { passive: false });
+  
+  canvas.addEventListener('touchend', handleEnd);
+
+  // Mouse wheel zoom
+  canvas.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const zoomFactor = e.deltaY < 0 ? 1.15 : 0.85;
+    
+    // Zoom centered on mouse position
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    const xRange = 10 / graphZoom;
+    const yRange = 10 / graphZoom;
+    const w = canvas.width;
+    const h = canvas.height;
+    
+    // Graph coords under mouse before zoom
+    const gx = graphOffsetX + (mouseX / w - 0.5) * xRange;
+    const gy = graphOffsetY - (mouseY / h - 0.5) * yRange;
+    
+    graphZoom *= zoomFactor;
+    graphZoom = Math.max(0.05, Math.min(50, graphZoom));
+    
+    const newXRange = 10 / graphZoom;
+    const newYRange = 10 / graphZoom;
+    
+    // Adjust offset to keep mouse position stable
+    graphOffsetX = gx - (mouseX / w - 0.5) * newXRange;
+    graphOffsetY = gy + (mouseY / h - 0.5) * newYRange;
+    
+    plotGraph();
+  }, { passive: false });
 }
 
 // =========================
@@ -3649,8 +3720,6 @@ document.getElementById('authUsername').addEventListener('keydown', e => { if (e
   authSubmit.textContent = 'Logging in…';
 
   try {
-    // Automatically log in using the saved credentials
-    // handleAuth() will manage the button state and show errors if the session is invalid
     await handleAuth(session.password);
   } catch(e) {
     clearSession();
