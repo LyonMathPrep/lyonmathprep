@@ -1,9 +1,13 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lyon Math Prep | Free Math Tutoring for Students</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,19 +17,23 @@
 
         :root {
             --primary: #e63946;
-            --primary-light: #fde8ea;
-            --primary-dark: #c1121f;
-            --text: #000000;
-            --text-light: #555555;
+            --primary-light: #fff1f2;
+            --primary-hover: #d90429;
+            --primary-dark: #9b111e;
+            --text: #0f172a;
+            --text-light: #475569;
             --bg: #ffffff;
             --white: #ffffff;
-            --border: #000000;
-            --border-light: #e8e8e8;
-            --accent: #c1121f;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(230, 57, 70, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            --radius: 14px;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             background: transparent;
             color: var(--text);
             line-height: 1.6;
@@ -55,28 +63,28 @@
             will-change: transform;
         }
 
-        /* Fine graph paper grid - barely visible */
+        /* Fine graph paper grid - subtle */
         .layer-grid-fine {
             background-image:
-                linear-gradient(to right, rgba(17, 17, 17, 0.035) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(17, 17, 17, 0.035) 1px, transparent 1px);
-            background-size: 28px 28px;
+                linear-gradient(to right, rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(15, 23, 42, 0.025) 1px, transparent 1px);
+            background-size: 32px 32px;
         }
 
-        /* Bold red-tinted grid - larger spacing */
+        /* Bold red-tinted grid */
         .layer-grid-bold {
             background-image:
-                linear-gradient(to right, rgba(230, 57, 70, 0.08) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(230, 57, 70, 0.08) 1px, transparent 1px);
-            background-size: 168px 168px;
+                linear-gradient(to right, rgba(230, 57, 70, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(230, 57, 70, 0.04) 1px, transparent 1px);
+            background-size: 192px 192px;
         }
 
         /* SVG function graphs */
         .layer-graphs svg {
             position: absolute;
             fill: none;
-            stroke: rgba(230, 57, 70, 0.16);
-            stroke-width: 1.6;
+            stroke: rgba(230, 57, 70, 0.12);
+            stroke-width: 1.5;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
@@ -84,91 +92,86 @@
         /* Math equations layer */
         .math-eq {
             position: absolute;
-            font-family: 'Cambria Math', 'STIX Two Math', 'Latin Modern Math', Georgia, serif;
-            color: rgba(230, 57, 70, 0.14);
+            font-family: 'Cambria Math', 'STIX Two Math', Georgia, serif;
+            color: rgba(230, 57, 70, 0.1);
             font-weight: 500;
             white-space: nowrap;
             user-select: none;
             will-change: transform;
-            animation: floatEq 14s ease-in-out infinite;
-            letter-spacing: 0.3px;
+            animation: floatEq 16s ease-in-out infinite;
         }
 
-        .math-eq.dark { color: rgba(17, 17, 17, 0.10); }
-        .math-eq.bold { font-weight: 700; color: rgba(230, 57, 70, 0.22); }
-        .math-eq.lg { font-size: 32px; }
-        .math-eq.md { font-size: 24px; }
-        .math-eq.sm { font-size: 18px; }
+        .math-eq.dark { color: rgba(15, 23, 42, 0.07); }
+        .math-eq.bold { font-weight: 700; color: rgba(230, 57, 70, 0.16); }
+        .math-eq.lg { font-size: 30px; }
+        .math-eq.md { font-size: 22px; }
+        .math-eq.sm { font-size: 16px; }
 
         @keyframes floatEq {
             0%, 100% { transform: translate(0, 0) rotate(var(--rot, 0deg)); }
-            50% { transform: translate(2px, -8px) rotate(calc(var(--rot, 0deg) + 0.6deg)); }
+            50% { transform: translate(4px, -10px) rotate(calc(var(--rot, 0deg) + 1deg)); }
         }
 
         /* Math symbols layer */
         .math-symbol {
             position: absolute;
             font-family: 'Cambria Math', Georgia, serif;
-            color: rgba(17, 17, 17, 0.12);
+            color: rgba(15, 23, 42, 0.08);
             font-weight: 400;
             user-select: none;
             will-change: transform;
-            animation: floatSym 18s ease-in-out infinite;
+            animation: floatSym 20s ease-in-out infinite;
             line-height: 1;
         }
 
-        .math-symbol.accent { color: rgba(230, 57, 70, 0.24); }
+        .math-symbol.accent { color: rgba(230, 57, 70, 0.18); }
         .math-symbol.greek { font-style: italic; }
-        .math-symbol.lg { font-size: 56px; }
-        .math-symbol.md { font-size: 38px; }
-        .math-symbol.sm { font-size: 28px; }
+        .math-symbol.lg { font-size: 52px; }
+        .math-symbol.md { font-size: 36px; }
+        .math-symbol.sm { font-size: 26px; }
 
         @keyframes floatSym {
             0%, 100% { transform: translate(0, 0) rotate(var(--rot, 0deg)) scale(1); }
-            50% { transform: translate(-3px, 6px) rotate(calc(var(--rot, 0deg) - 1deg)) scale(1.06); }
+            50% { transform: translate(-5px, 8px) rotate(calc(var(--rot, 0deg) - 1.5deg)) scale(1.05); }
         }
 
         /* Pulsing particle dots */
         .math-particle {
             position: absolute;
-            width: 5px;
-            height: 5px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
-            background: rgba(230, 57, 70, 0.45);
+            background: rgba(230, 57, 70, 0.35);
             will-change: transform;
-            animation: pulseDot 7s ease-in-out infinite;
+            animation: pulseDot 8s ease-in-out infinite;
         }
 
-        .math-particle.dark { background: rgba(17, 17, 17, 0.28); }
-        .math-particle.large { width: 8px; height: 8px; }
+        .math-particle.dark { background: rgba(15, 23, 42, 0.2); }
+        .math-particle.large { width: 9px; height: 9px; }
         .math-particle.small { width: 3px; height: 3px; }
 
         @keyframes pulseDot {
-            0%, 100% { transform: scale(1); opacity: 0.45; }
-            50% { transform: scale(1.9); opacity: 1; }
+            0%, 100% { transform: scale(1); opacity: 0.4; }
+            50% { transform: scale(1.8); opacity: 0.8; }
         }
 
         @media (max-width: 768px) {
-            .math-eq.lg { font-size: 24px; }
-            .math-eq.md { font-size: 18px; }
-            .math-eq.sm { font-size: 14px; }
-            .math-symbol.lg { font-size: 38px; }
-            .math-symbol.md { font-size: 28px; }
-            .math-symbol.sm { font-size: 20px; }
-            .layer-particles { opacity: 0.5; }
+            .math-eq.lg { font-size: 22px; }
+            .math-eq.md { font-size: 16px; }
+            .math-eq.sm { font-size: 13px; }
+            .math-symbol.lg { font-size: 34px; }
+            .math-symbol.md { font-size: 24px; }
+            .math-symbol.sm { font-size: 18px; }
+            .layer-particles { opacity: 0.4; }
         }
 
         @media (prefers-reduced-motion: reduce) {
             .parallax-layer { transform: none !important; }
             .math-eq, .math-symbol, .math-particle { animation: none !important; }
         }
-        
-        .nav-links .btn-primary {
-    width: 120px; /* Change this value to your desired width */
-}
 
         /* ============================================
-           ORIGINAL STYLES
+           COMPONENT STYLES
            ============================================ */
 
         /* Top Bar */
@@ -177,21 +180,24 @@
             top: 0;
             left: 0;
             right: 0;
-            background: var(--white);
-            border-bottom: 2px solid var(--border);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
             z-index: 1000;
-            padding: 0 24px;
-            height: 64px;
+            padding: 0 32px;
+            height: 72px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            transition: all 0.3s ease;
         }
 
         .logo {
             display: flex;
             align-items: center;
             text-decoration: none;
-            height: 48px;
+            height: 40px;
         }
 
         .logo img {
@@ -203,22 +209,17 @@
         .nav-links {
             display: flex;
             align-items: center;
-            gap: 32px;
+            gap: 36px;
             list-style: none;
         }
 
         .nav-links a {
             text-decoration: none;
-            color: var(--text);
+            color: var(--text-light);
             font-size: 15px;
             font-weight: 500;
-            transition: color 0.2s;
+            transition: color 0.2s ease;
             padding: 8px 0;
-        }
-
-        .nav-links a.highlight {
-            color: var(--primary);
-            font-weight: 600;
         }
 
         .nav-links a:hover {
@@ -229,54 +230,56 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            padding: 10px 24px;
-            border-radius: 8px;
+            padding: 10px 22px;
+            border-radius: var(--radius);
             font-size: 15px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             cursor: pointer;
-            border: 2px solid var(--border);
+            border: 1px solid transparent;
             min-height: 44px;
-            min-width: 44px;
         }
 
         .btn-primary {
             background: var(--primary);
             color: var(--white);
-            border-color: var(--border);
+            box-shadow: 0 2px 4px rgba(230, 57, 70, 0.2);
         }
 
         .btn-primary:hover {
-            background: var(--primary-dark);
+            background: var(--primary-hover);
             transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
         }
 
         .btn-secondary {
             background: var(--primary-light);
             color: var(--primary);
-            border-color: var(--border);
         }
 
         .btn-secondary:hover {
-            background: #fbd5d9;
+            background: #ffe4e6;
         }
 
         .btn-outline {
-            background: transparent;
+            background: var(--white);
             color: var(--text);
-            border: 2px solid var(--border);
+            border-color: var(--border);
+            box-shadow: var(--shadow-sm);
         }
 
         .btn-outline:hover {
-            background: var(--text);
-            color: var(--white);
+            background: var(--primary-light);
+            color: var(--primary);
+            border-color: rgba(230, 57, 70, 0.3);
+            transform: translateY(-1px);
         }
 
         .hamburger {
             display: none;
             flex-direction: column;
-            gap: 5px;
+            gap: 6px;
             background: none;
             border: none;
             cursor: pointer;
@@ -288,7 +291,7 @@
         }
 
         .hamburger span {
-            width: 22px;
+            width: 24px;
             height: 2px;
             background: var(--text);
             transition: all 0.3s;
@@ -298,14 +301,16 @@
         .mobile-menu {
             display: none;
             position: fixed;
-            top: 64px;
+            top: 72px;
             left: 0;
             right: 0;
-            background: var(--white);
-            border-bottom: 2px solid var(--border);
-            padding: 16px 24px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border);
+            padding: 20px 24px;
             z-index: 999;
-            animation: slideDown 0.25s ease;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .mobile-menu.active {
@@ -319,42 +324,44 @@
             color: var(--text);
             font-size: 16px;
             font-weight: 500;
-            border-bottom: 1px solid var(--border-light);
+            border-bottom: 1px solid var(--border);
         }
 
         .mobile-menu a:last-child {
             border-bottom: none;
+            margin-top: 8px;
+            text-align: center;
         }
 
         @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-8px); }
+            from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         /* Hero */
         .hero {
-            margin-top: 64px;
-            padding: 80px 24px 40px;
+            margin-top: 72px;
+            padding: 90px 24px 50px;
             text-align: center;
-            max-width: 760px;
+            max-width: 800px;
             margin-left: auto;
             margin-right: auto;
-            animation: fadeUp 0.6s ease;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
             position: relative;
             z-index: 1;
         }
 
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(24px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .hero-mascot {
-            width: 240px;
-            height: 240px;
-            margin: 0 auto 24px;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 28px;
             display: block;
-            animation: bounce 2.5s ease-in-out infinite;
+            animation: bounce 3s ease-in-out infinite;
             position: relative;
             z-index: 2;
         }
@@ -364,257 +371,35 @@
             height: 100%;
             object-fit: contain;
             display: block;
-            filter: drop-shadow(0 8px 24px rgba(230, 57, 70, 0.18));
+            filter: drop-shadow(0 12px 24px rgba(230, 57, 70, 0.15));
         }
 
         @keyframes bounce {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-12px); }
         }
 
         .hero-badge {
-            display: inline-block;
-            background: var(--white);
+            display: inline-flex;
+            align-items: center;
+            background: var(--primary-light);
             color: var(--primary);
             padding: 6px 16px;
-            border: 2px solid var(--border);
-            border-radius: 20px;
+            border-radius: 50px;
             font-size: 13px;
-            font-weight: 700;
-            margin-bottom: 24px;
-            letter-spacing: 0.3px;
-            box-shadow: 3px 3px 0 var(--border);
-        }
-
-        /* Mission Section */
-        .mission-section {
-            background: var(--primary);
-            color: var(--white);
-            border-top: 2px solid var(--border);
-            border-bottom: 2px solid var(--border);
-            position: relative;
-            z-index: 1;
-        }
-
-        .mission-content {
-            max-width: 720px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .mission-section h2 {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 16px;
-            letter-spacing: -0.5px;
-        }
-
-        .mission-section p {
-            font-size: 17px;
-            line-height: 1.8;
-            opacity: 0.95;
-        }
-
-        /* Tutors Section */
-        .tutors-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 24px;
-        }
-
-        .tutor-card {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 28px 24px;
-            text-align: center;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            will-change: transform;
-        }
-
-        .tutor-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 5px 5px 0 var(--border);
-        }
-
-        .tutor-avatar {
-            width: 80px;
-            height: 80px;
-            background: var(--primary-light);
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            margin: 0 auto 16px;
-        }
-        
-        .tutor-avatar svg {
-            color: var(--primary);
-        }
-
-        .tutor-card h3 {
-            font-size: 17px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .tutor-grade {
-            font-size: 13px;
-            color: var(--primary);
             font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .tutor-subjects {
-            font-size: 13px;
-            color: var(--text-light);
-            line-height: 1.5;
-        }
-
-        /* Dual CTA Section */
-        .dual-cta-section {
-            background: var(--primary-light);
-            border-top: 2px solid var(--border);
-            border-bottom: 2px solid var(--border);
-        }
-
-        .dual-cta-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 32px;
-        }
-
-        .cta-box {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 16px;
-            padding: 40px 32px;
-            text-align: center;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .cta-box:hover {
-            transform: translateY(-4px);
-            box-shadow: 8px 8px 0 var(--border);
-        }
-
-        .cta-icon {
-            width: 64px;
-            height: 64px;
-            background: var(--primary-light);
-            border: 2px solid var(--border);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            margin: 0 auto 20px;
-        }
-
-        .cta-box h3 {
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 12px;
-            letter-spacing: -0.3px;
-        }
-
-        .cta-box p {
-            color: var(--text-light);
             margin-bottom: 24px;
-            line-height: 1.6;
-        }
-
-        /* FAQ Section */
-        .faq-list {
-            max-width: 720px;
-            margin: 0 auto;
-        }
-
-        .faq-item {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            padding: 24px 28px;
-            margin-bottom: 16px;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .faq-item:hover {
-            transform: translateX(4px);
-            box-shadow: 4px 4px 0 var(--border);
-        }
-
-        .faq-item h3 {
-            font-size: 16px;
-            font-weight: 700;
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-
-        .faq-item p {
-            font-size: 14px;
-            color: var(--text-light);
-            line-height: 1.7;
-        }
-
-        /* Impact Stats */
-        .impact-section {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: var(--white);
-            border-top: 2px solid var(--border);
-            border-bottom: 2px solid var(--border);
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .impact-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
-            max-width: 960px;
-            margin: 40px auto 0;
-        }
-
-        .impact-stat {
-            text-align: center;
-        }
-
-        .impact-number {
-            font-size: 42px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            letter-spacing: -1.5px;
-        }
-
-        .impact-label {
-            font-size: 15px;
-            opacity: 0.9;
-            font-weight: 500;
-        }
-
-        .impact-section h2 {
-            font-size: 32px;
-            font-weight: 800;
-            margin-bottom: 12px;
-        }
-
-        .impact-section .section-sub {
-            color: var(--white);
-            opacity: 0.9;
-            margin-bottom: 0;
+            letter-spacing: -0.2px;
+            border: 1px solid rgba(230, 57, 70, 0.15);
         }
 
         .hero h1 {
-            font-size: clamp(32px, 6vw, 52px);
+            font-size: clamp(36px, 6vw, 56px);
             font-weight: 800;
-            line-height: 1.15;
+            line-height: 1.1;
             letter-spacing: -1.5px;
             margin-bottom: 20px;
             color: var(--text);
-            text-shadow: 0 2px 30px rgba(255, 255, 255, 0.8);
         }
 
         .hero h1 .accent {
@@ -624,15 +409,14 @@
         .hero p {
             font-size: 18px;
             color: var(--text-light);
-            max-width: 520px;
+            max-width: 580px;
             margin: 0 auto 36px;
             line-height: 1.7;
-            text-shadow: 0 1px 20px rgba(255, 255, 255, 0.9);
         }
 
         .hero-buttons {
             display: flex;
-            gap: 12px;
+            gap: 14px;
             justify-content: center;
             flex-wrap: wrap;
         }
@@ -641,11 +425,11 @@
         .stats {
             display: flex;
             justify-content: center;
-            gap: 48px;
-            padding: 40px 24px 60px;
-            max-width: 600px;
+            gap: 64px;
+            padding: 30px 24px 60px;
+            max-width: 650px;
             margin: 0 auto;
-            animation: fadeUp 0.6s ease 0.15s both;
+            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
             position: relative;
             z-index: 1;
         }
@@ -655,14 +439,14 @@
         }
 
         .stat-number {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 800;
             color: var(--primary);
             letter-spacing: -1px;
         }
 
         .stat-label {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-light);
             margin-top: 4px;
             font-weight: 500;
@@ -670,145 +454,187 @@
 
         /* Sections */
         .section {
-            padding: 60px 24px;
-            max-width: 960px;
+            padding: 80px 24px;
+            max-width: 1040px;
             margin: 0 auto;
             position: relative;
             z-index: 1;
         }
 
         .section-title {
-            font-size: 32px;
+            font-size: clamp(28px, 4vw, 38px);
             font-weight: 800;
             text-align: center;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 24px rgba(255, 255, 255, 0.85);
+            margin-bottom: 12px;
+            letter-spacing: -0.8px;
         }
 
         .section-sub {
             text-align: center;
             color: var(--text-light);
-            margin-bottom: 48px;
-            font-size: 16px;
-            text-shadow: 0 1px 16px rgba(255, 255, 255, 0.85);
+            margin-bottom: 56px;
+            font-size: 17px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Mission Section */
+        .mission-section {
+            background: linear-gradient(135deg, var(--primary) 0%, #c1121f 100%);
+            color: var(--white);
+            padding: 80px 24px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 10px 30px rgba(230, 57, 70, 0.15);
+        }
+
+        .mission-content {
+            max-width: 760px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .mission-section h2 {
+            font-size: clamp(28px, 4vw, 38px);
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.8px;
+        }
+
+        .mission-section p {
+            font-size: 18px;
+            line-height: 1.8;
+            opacity: 0.95;
         }
 
         /* Feature Cards */
         .features-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
             gap: 28px;
         }
 
         .feature-card {
             background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 32px 28px;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 36px 30px;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: transform;
+            box-shadow: var(--shadow);
             position: relative;
-            z-index: 1;
+            overflow: hidden;
         }
 
         .feature-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 6px 6px 0 var(--border);
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(230, 57, 70, 0.3);
         }
 
         .feature-icon {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             background: var(--primary-light);
-            border: 2px solid var(--border);
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            margin-bottom: 16px;
-        }
-        
-        .feature-icon svg {
+            font-size: 24px;
+            margin-bottom: 20px;
             color: var(--primary);
         }
 
         .feature-card h3 {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            letter-spacing: -0.3px;
         }
 
         .feature-card p {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--text-light);
             line-height: 1.6;
         }
 
         /* Subjects */
         .subjects-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 24px;
         }
 
         .subject-card {
             background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            padding: 24px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 30px 24px;
             text-align: center;
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-            cursor: default;
-            will-change: transform;
-            width: 200px;
-            flex-shrink: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: var(--shadow);
             position: relative;
-            z-index: 1;
         }
 
         .subject-card:hover {
             background: var(--primary-light);
-            transform: translateY(-3px);
-            box-shadow: 4px 4px 0 var(--border);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: rgba(230, 57, 70, 0.3);
         }
 
         .subject-card .emoji {
-            font-size: 30px;
-            margin-bottom: 10px;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            margin: 0 auto 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        
-        .subject-card .emoji svg {
             color: var(--primary);
+            transition: background 0.3s ease;
+        }
+
+        .subject-card:hover .emoji {
+            background: var(--white);
         }
 
         .subject-card h3 {
-            font-size: 15px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            letter-spacing: -0.2px;
         }
 
         .subject-card p {
-            font-size: 13px;
+            font-size: 14px;
             color: var(--text-light);
+            font-weight: 500;
         }
 
         /* How it Works */
         .steps {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 32px;
-            counter-reset: step;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 36px;
         }
 
         .step {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 36px 28px;
             text-align: center;
+            box-shadow: var(--shadow);
             position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
         }
 
         .step-number {
@@ -816,173 +642,146 @@
             height: 48px;
             background: var(--primary);
             color: var(--white);
-            border: 2px solid var(--border);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 800;
             font-size: 18px;
-            margin: 0 auto 16px;
-            box-shadow: 3px 3px 0 var(--border);
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 10px rgba(230, 57, 70, 0.25);
         }
 
         .step h3 {
-            font-size: 17px;
+            font-size: 18px;
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            letter-spacing: -0.2px;
         }
 
         .step p {
-            font-size: 14px;
+            font-size: 15px;
             color: var(--text-light);
             line-height: 1.6;
         }
 
-        /* Testimonial */
-        .testimonial-section {
-            background: var(--primary-light);
-            border-top: 2px solid var(--border);
-            border-bottom: 2px solid var(--border);
+        /* Impact Stats */
+        .impact-section {
+            background: linear-gradient(135deg, #0f172a 1-0%, #1e293b 100%);
+            color: var(--white);
+            padding: 90px 24px;
+            text-align: center;
             position: relative;
             z-index: 1;
         }
 
-        .testimonials-grid {
+        .impact-section .section-sub {
+            color: #94a3b8;
+        }
+
+        .impact-stats {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 28px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 40px;
+            max-width: 900px;
+            margin: 50px auto 0;
         }
 
-        .testimonial-card {
-            background: var(--white);
-            border: 2px solid var(--border);
-            border-radius: 12px;
-            padding: 28px;
-            transition: transform 0.25s ease, box-shadow 0.25s ease;
-            will-change: transform;
+        .impact-stat {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            backdrop-filter: blur(8px);
         }
 
-        .testimonial-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 6px 6px 0 var(--border);
-        }
-
-        .testimonial-card p {
-            font-size: 15px;
-            color: var(--text);
-            line-height: 1.7;
-            margin-bottom: 16px;
-            font-style: italic;
-        }
-
-        .testimonial-author {
-            font-size: 14px;
-            font-weight: 700;
+        .impact-number {
+            font-size: 44px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -1.5px;
             color: var(--primary);
         }
 
-        .testimonial-role {
-            font-size: 13px;
-            color: var(--text-light);
+        .impact-label {
+            font-size: 15px;
+            color: #cbd5e1;
+            font-weight: 500;
+        }
+
+        .impact-section h2 {
+            font-size: clamp(28px, 4vw, 38px);
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.8px;
         }
 
         /* CTA */
         .cta-section {
             text-align: center;
-            padding: 80px 24px;
-            max-width: 560px;
+            padding: 90px 24px;
+            max-width: 640px;
             margin: 0 auto;
             position: relative;
             z-index: 1;
+            background: var(--primary-light);
+            border-radius: 24px;
+            margin-top: 40px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(230, 57, 70, 0.15);
         }
 
         .cta-section h2 {
-            font-size: 32px;
+            font-size: clamp(28px, 4vw, 38px);
             font-weight: 800;
-            margin-bottom: 12px;
-            letter-spacing: -0.5px;
-            text-shadow: 0 2px 24px rgba(255, 255, 255, 0.85);
+            margin-bottom: 14px;
+            letter-spacing: -0.8px;
         }
 
         .cta-section p {
             color: var(--text-light);
             margin-bottom: 32px;
-            font-size: 16px;
-            text-shadow: 0 1px 16px rgba(255, 255, 255, 0.85);
+            font-size: 17px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        /* Footer */
-        .footer {
-            border-top: 2px solid var(--border);
-            padding: 40px 24px;
-            text-align: center;
-            background: var(--white);
-            position: relative;
-            z-index: 1;
-        }
-
-        .footer-content {
-            max-width: 960px;
+        /* FAQ Section */
+        .faq-list {
+            max-width: 760px;
             margin: 0 auto;
-        }
-
-        .footer-links {
             display: flex;
-            justify-content: center;
-            gap: 24px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        .footer-links a {
-            color: var(--text);
-            text-decoration: none;
-            font-size: 14px;
-            padding: 4px;
-            font-weight: 500;
-        }
-
-        .footer-links a:hover {
-            color: var(--primary);
-        }
-
-        /* Instagram Social Button */
-        .footer-social {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 20px;
-            color: var(--text);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
-            padding: 8px 16px;
-            border: 2px solid var(--border);
-            border-radius: 20px;
-            transition: all 0.2s ease;
+        .faq-item {
             background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px 32px;
+            transition: all 0.25s ease;
+            box-shadow: var(--shadow-sm);
         }
 
-        .footer-social svg {
-            color: var(--primary);
-            transition: color 0.2s ease;
+        .faq-item:hover {
+            border-color: rgba(230, 57, 70, 0.3);
+            box-shadow: var(--shadow);
         }
 
-        .footer-social:hover {
-            background: var(--primary);
-            color: var(--white);
-            transform: translateY(-2px);
-            box-shadow: 3px 3px 0 var(--border);
+        .faq-item h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text);
+            letter-spacing: -0.2px;
         }
 
-        .footer-social:hover svg {
-            color: var(--white);
-        }
-
-        .footer-copy {
-            font-size: 13px;
+        .faq-item p {
+            font-size: 15px;
             color: var(--text-light);
+            line-height: 1.7;
         }
 
         /* Contact List */
@@ -997,16 +796,16 @@
             display: inline-flex;
             align-items: center;
             gap: 12px;
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 600;
             color: var(--text);
             text-decoration: none;
-            transition: color 0.2s;
+            transition: all 0.2s ease;
             background: var(--white);
-            padding: 12px 20px;
-            border: 2px solid var(--border);
-            border-radius: 10px;
-            box-shadow: 3px 3px 0 var(--border);
+            padding: 16px 28px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
         }
 
         .contact-list-item svg {
@@ -1015,8 +814,84 @@
 
         .contact-list-item:hover {
             color: var(--primary);
-            transform: translate(-1px, -1px);
-            box-shadow: 4px 4px 0 var(--border);
+            border-color: rgba(230, 57, 70, 0.3);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Footer */
+        .footer {
+            border-top: 1px solid var(--border);
+            padding: 60px 24px;
+            text-align: center;
+            background: var(--white);
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer-content {
+            max-width: 960px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+
+        .footer-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        /* Instagram Social Button */
+        .footer-social {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 24px;
+            color: var(--text);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            transition: all 0.2s ease;
+            background: var(--white);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .footer-social svg {
+            color: var(--primary);
+            transition: color 0.2s ease;
+        }
+
+        .footer-social:hover {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+        }
+
+        .footer-social:hover svg {
+            color: var(--white);
+        }
+
+        .footer-copy {
+            font-size: 14px;
+            color: var(--text-light);
         }
 
         .footer-copy .heart {
@@ -1033,86 +908,62 @@
                 display: flex;
             }
 
+            .topbar {
+                padding: 0 20px;
+                height: 64px;
+            }
+
             .logo {
-                height: 40px;
+                height: 36px;
+            }
+
+            .mobile-menu {
+                top: 64px;
             }
 
             .hero {
-                padding: 60px 20px 20px;
+                margin-top: 64px;
+                padding: 60px 20px 30px;
             }
 
             .hero-mascot {
-                width: 120px;
-                height: 120px;
+                width: 140px;
+                height: 140px;
             }
 
             .stats {
-                gap: 24px;
+                gap: 32px;
+                padding: 20px 20px 40px;
             }
 
             .stat-number {
-                font-size: 26px;
+                font-size: 28px;
             }
 
             .section {
-                padding: 48px 20px;
-            }
-
-            .section-title {
-                font-size: 26px;
+                padding: 60px 20px;
             }
 
             .hero-buttons {
                 flex-direction: column;
-                align-items: center;
+                align-items: stretch;
             }
 
             .hero-buttons .btn {
                 width: 100%;
-                max-width: 300px;
             }
         }
 
         /* Scroll animations */
         .animate-on-scroll {
             opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .animate-on-scroll.visible {
             opacity: 1;
-        }
-        
-        .feature-card.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, opacity 0.5s ease;
-        }
-        
-        .subject-card.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, opacity 0.5s ease;
-        }
-        
-        .testimonial-card.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
-        }
-        
-        .section-title.animate-on-scroll,
-        .section-sub.animate-on-scroll,
-        .step.animate-on-scroll,
-        .cta-section.animate-on-scroll,
-        .mission-content.animate-on-scroll,
-        .impact-stat.animate-on-scroll {
-            transition: opacity 0.5s ease;
-        }
-
-        .tutor-card.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
-        }
-
-        .cta-box.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
-        }
-
-        .faq-item.animate-on-scroll {
-            transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.5s ease;
+            transform: translateY(0);
         }
     </style>
 </head>
@@ -1120,9 +971,9 @@
 
     <!-- Parallax Math Background -->
     <div class="parallax-bg" aria-hidden="true">
-        <div class="parallax-layer layer-grid-fine" data-speed="0.04"></div>
-        <div class="parallax-layer layer-grid-bold" data-speed="0.07"></div>
-        <div class="parallax-layer layer-graphs" data-speed="0.11">
+        <div class="parallax-layer layer-grid-fine" data-speed="0.03"></div>
+        <div class="parallax-layer layer-grid-bold" data-speed="0.06"></div>
+        <div class="parallax-layer layer-graphs" data-speed="0.10">
             <svg viewBox="0 0 200 60" style="top: 12%; left: 4%; width: 280px;">
                 <path d="M 0 30 Q 25 5 50 30 T 100 30 T 150 30 T 200 30" />
             </svg>
@@ -1146,7 +997,7 @@
                 <circle cx="60" cy="20" r="3" fill="rgba(230,57,70,0.4)" stroke="none" />
             </svg>
         </div>
-        <div class="parallax-layer layer-equations" data-speed="0.15">
+        <div class="parallax-layer layer-equations" data-speed="0.14">
             <span class="math-eq lg" style="top: 3%; left: 5%; --rot: -2deg;">E = mc²</span>
             <span class="math-eq dark sm" style="top: 7%; right: 8%; --rot: 1deg;">∫₀^∞ e^(-x²) dx = √π/2</span>
             <span class="math-eq sm" style="top: 11%; left: 32%; --rot: -1deg;">sin²θ + cos²θ = 1</span>
@@ -1173,7 +1024,7 @@
             <span class="math-eq dark sm" style="top: 95%; left: 45%;">P(A|B) = P(A∩B)/P(B)</span>
             <span class="math-eq md" style="top: 98%; left: 8%;">∮ E·dA = Q/ε₀</span>
         </div>
-        <div class="parallax-layer layer-symbols" data-speed="0.22">
+        <div class="parallax-layer layer-symbols" data-speed="0.20">
             <span class="math-symbol accent lg" style="top: 2%; left: 18%;">π</span>
             <span class="math-symbol md" style="top: 6%; left: 55%;">∞</span>
             <span class="math-symbol greek md" style="top: 10%; right: 30%;">θ</span>
@@ -1200,7 +1051,7 @@
             <span class="math-symbol md" style="top: 94%; right: 8%;">≈</span>
             <span class="math-symbol greek sm" style="top: 97%; left: 40%;">ψ</span>
         </div>
-        <div class="parallax-layer layer-particles" data-speed="0.30"></div>
+        <div class="parallax-layer layer-particles" data-speed="0.26"></div>
     </div>
 
     <!-- Top Bar -->
@@ -1213,7 +1064,7 @@
                 <li><a href="about.html">About</a></li>
                 <li><a href="#faq">FAQ</a></li>
                 <li><a href="#contact">Contact</a></li>
-                <li><a href="studentportal.html" class="btn btn-primary">Student Portal</a></li>
+                <li><a href="studentportal.html" class="btn btn-primary" style="padding: 8px 20px; min-height: 40px;">Student Portal</a></li>
             </ul>
         </nav>
         <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">
@@ -1227,14 +1078,14 @@
         <a href="about.html" onclick="toggleMenu()">About</a>
         <a href="#faq" onclick="toggleMenu()">FAQ</a>
         <a href="#contact" onclick="toggleMenu()">Contact</a>
-        <a href="studentportal.html" onclick="toggleMenu()">Student Portal</a>
+        <a href="studentportal.html" onclick="toggleMenu()" class="btn btn-primary" style="width: 100%;">Student Portal</a>
     </div>
 
     <!-- Hero -->
     <section class="hero">
         <div class="hero-mascot"><img src="compass.png" alt="Compass mascot"></div>
         <div class="hero-badge">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 4px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;">
                 <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
                 <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
             </svg>
@@ -1245,7 +1096,7 @@
         <div class="hero-buttons">
             <a href="studentportal.html" class="btn btn-primary">
                 Open Student Portal 
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-left: 4px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-left: 6px;">
                     <line x1="5" y1="12" x2="19" y2="12"></line>
                     <polyline points="12 5 19 12 12 19"></polyline>
                 </svg>
@@ -1268,11 +1119,9 @@
 
     <!-- Mission Section -->
     <section class="mission-section" id="mission">
-        <div class="section">
-            <div class="mission-content animate-on-scroll">
-                <h2>Built by students, for students.</h2>
-                <p>Lyon Math Prep is a 100% student-run, non-profit organization dedicated to making high-quality math education accessible to everyone. Our volunteer tutors are high school and college students who are passionate about helping their peers succeed. We believe that when students teach students, everyone wins.</p>
-            </div>
+        <div class="mission-content animate-on-scroll">
+            <h2>Built by students, for students.</h2>
+            <p>Lyon Math Prep is a 100% student-run, non-profit organization dedicated to making high-quality math education accessible to everyone. Our volunteer tutors are high school and college students who are passionate about helping their peers succeed. We believe that when students teach students, everyone wins.</p>
         </div>
     </section>
 
@@ -1283,7 +1132,7 @@
         <div class="features-grid">
             <div class="feature-card animate-on-scroll">
                 <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M23 7l-7 5 7 5V7z"></path>
                         <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
                     </svg>
@@ -1293,7 +1142,7 @@
             </div>
             <div class="feature-card animate-on-scroll">
                 <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                         <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                     </svg>
@@ -1303,7 +1152,7 @@
             </div>
             <div class="feature-card animate-on-scroll">
                 <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="18" y1="20" x2="18" y2="10"></line>
                         <line x1="12" y1="20" x2="12" y2="4"></line>
                         <line x1="6" y1="20" x2="6" y2="14"></line>
@@ -1314,7 +1163,7 @@
             </div>
             <div class="feature-card animate-on-scroll">
                 <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                     </svg>
                 </div>
@@ -1323,7 +1172,7 @@
             </div>
             <div class="feature-card animate-on-scroll">
                 <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
                         <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -1335,7 +1184,7 @@
             </div>
             <div class="feature-card animate-on-scroll">
                 <div class="feature-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
                         <circle cx="9" cy="7" r="4"></circle>
                         <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -1355,7 +1204,7 @@
         <div class="subjects-grid">
             <div class="subject-card animate-on-scroll">
                 <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="9" x2="19" y2="9"></line>
                         <line x1="5" y1="15" x2="19" y2="15"></line>
                         <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -1366,7 +1215,7 @@
             </div>
             <div class="subject-card animate-on-scroll">
                 <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 3v18h18"></path>
                         <path d="M18.7 8c-1.2-2.3-3.7-4-6.7-4s-5.5 1.7-6.7 4L3 12"></path>
                     </svg>
@@ -1376,7 +1225,7 @@
             </div>
             <div class="subject-card animate-on-scroll">
                 <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <polygon points="4 8 4 20 16 20 16 8"></polygon>
                         <polygon points="4 8 10 4 22 4 16 8"></polygon>
                         <polygon points="16 8 22 4 22 16 16 20"></polygon>
@@ -1387,7 +1236,7 @@
             </div>
             <div class="subject-card animate-on-scroll">
                 <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="3" y1="21" x2="3" y2="3"></line>
                         <line x1="3" y1="21" x2="21" y2="21"></line>
                         <path d="M4 18 Q7 2 12 10 Q17 18 20 4" fill="none"></path>
@@ -1398,7 +1247,7 @@
             </div>
             <div class="subject-card animate-on-scroll">
                 <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="12" y1="20" x2="12" y2="10"></line>
                         <line x1="18" y1="20" x2="18" y2="4"></line>
                         <line x1="6" y1="20" x2="6" y2="16"></line>
@@ -1409,7 +1258,7 @@
             </div>
             <div class="subject-card animate-on-scroll">
                 <div class="emoji">
-                    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M15 3c-1.5 0-2.5 1-2.8 2.5L9.8 18.5C9.5 20 8.5 21 7 21" fill="none"></path>
                         <path d="M13 3h4" fill="none"></path>
                         <path d="M5 21h4" fill="none"></path>
@@ -1446,64 +1295,38 @@
 
     <!-- Impact Stats -->
     <section class="impact-section">
-        <div class="section">
-            <h2 class="animate-on-scroll">Our impact so far</h2>
-            <p class="section-sub animate-on-scroll">Together, we're changing lives through education.</p>
-            <div class="impact-stats">
-                <div class="impact-stat animate-on-scroll">
-                    <div class="impact-number">4</div>
-                    <div class="impact-label">Districts We Work With</div>
-                </div>
-                <div class="impact-stat animate-on-scroll">
-                    <div class="impact-number">20+</div>
-                    <div class="impact-label">Volunteer Tutors</div>
-                </div>
-                <div class="impact-stat animate-on-scroll">
-                    <div class="impact-number">500+</div>
-                    <div class="impact-label">Quizzes and Tests We've Looked At</div>
-                </div>
+        <h2 class="animate-on-scroll">Our impact so far</h2>
+        <p class="section-sub animate-on-scroll">Together, we're changing lives through education.</p>
+        <div class="impact-stats">
+            <div class="impact-stat animate-on-scroll">
+                <div class="impact-number">4</div>
+                <div class="impact-label">Districts We Work With</div>
+            </div>
+            <div class="impact-stat animate-on-scroll">
+                <div class="impact-number">20+</div>
+                <div class="impact-label">Volunteer Tutors</div>
+            </div>
+            <div class="impact-stat animate-on-scroll">
+                <div class="impact-number">500+</div>
+                <div class="impact-label">Quizzes and Tests We've Looked At</div>
             </div>
         </div>
     </section>
-
-   <!-- Testimonials 
-<section class="testimonial-section">
-    <div class="section">
-        <h2 class="section-title animate-on-scroll">What students say</h2>
-        <p class="section-sub animate-on-scroll">Real stories from real students.</p>
-        <div class="testimonials-grid">
-            <div class="testimonial-card animate-on-scroll">
-                <p>"I went from a C- to a B+ in Algebra. My tutor explains things in a way that actually makes sense."</p>
-                <div class="testimonial-author">Sarah M.</div>
-                <div class="testimonial-role">8th Grade · Algebra I</div>
-            </div>
-            <div class="testimonial-card animate-on-scroll">
-                <p>"I was scared of math before. Now I actually enjoy doing the practice problems. It feels like a game."</p>
-                <div class="testimonial-author">James K.</div>
-                <div class="testimonial-role">7th Grade · Pre-Algebra</div>
-            </div>
-            <div class="testimonial-card animate-on-scroll">
-                <p>"The fact that this is free is amazing. My family couldn't afford a tutor and this changed everything for me."</p>
-                <div class="testimonial-author">Maria L.</div>
-                <div class="testimonial-role">10th Grade · Geometry</div>
-            </div>
-        </div>
-    </div>
-</section>
--->   
 
     <!-- CTA -->
-    <section class="cta-section animate-on-scroll">
-        <h2>Ready to get started?</h2>
-        <p>Join hundreds of students who are building confidence in math — completely free.</p>
-        <a href="studentportal.html" class="btn btn-primary">
-            Go to Student Portal 
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-left: 4px;">
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-                <polyline points="12 5 19 12 12 19"></polyline>
-            </svg>
-        </a>
-    </section>
+    <div style="max-width: 1040px; margin: 0 auto; padding: 0 24px;">
+        <section class="cta-section animate-on-scroll">
+            <h2>Ready to get started?</h2>
+            <p>Join hundreds of students who are building confidence in math — completely free.</p>
+            <a href="studentportal.html" class="btn btn-primary">
+                Go to Student Portal 
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-left: 6px;">
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+            </a>
+        </section>
+    </div>
 
     <!-- FAQ -->
     <section class="section" id="faq">
@@ -1534,7 +1357,7 @@
     </section>
 
     <!-- Contact Section -->
-    <section class="section" id="contact">
+    <section class="section" id="contact" style="padding-top: 20px;">
         <h2 class="section-title animate-on-scroll">Contact us</h2>
         <p class="section-sub animate-on-scroll">Have a question? Reach out anytime.</p>
         <div class="contact-list animate-on-scroll">
@@ -1548,7 +1371,7 @@
         </div>
     </section>
 
-        <!-- Footer -->
+    <!-- Footer -->
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-links">
@@ -1574,7 +1397,7 @@
                 </svg>
                 by students, for students.
             </p>
-            <p style="font-size: 10px; color: #999; margin-top: 12px; opacity: 0.8;">
+            <p style="font-size: 11px; color: #94a3b8; margin-top: 12px; opacity: 0.9;">
                 Disclaimer: Lyon Math Prep is a non-profit organization, but is not currently a 501(c)(3) tax-exempt entity.
             </p>
         </div>
@@ -1637,8 +1460,8 @@
                     p.className = cls;
                     p.style.top = (Math.random() * 100) + '%';
                     p.style.left = (Math.random() * 100) + '%';
-                    p.style.animationDelay = (-Math.random() * 7) + 's';
-                    p.style.animationDuration = (5 + Math.random() * 5) + 's';
+                    p.style.animationDelay = (-Math.random() * 8) + 's';
+                    p.style.animationDuration = (6 + Math.random() * 6) + 's';
                     particleLayer.appendChild(p);
                 }
             }
@@ -1648,9 +1471,8 @@
                 parallaxLayers.forEach(layer => {
                     const speed = parseFloat(layer.dataset.speed);
                     const yPos = -(scrollY * speed);
-                    // Mouse-based parallax: faster layers shift more (closer to viewer)
-                    const xOffset = -mouseX * speed * 35;
-                    const yOffset = -mouseY * speed * 35;
+                    const xOffset = -mouseX * speed * 30;
+                    const yOffset = -mouseY * speed * 30;
                     layer.style.transform = `translate3d(${xOffset}px, ${yPos + yOffset}px, 0)`;
                 });
                 pending = false;
@@ -1676,3 +1498,4 @@
 
 </body>
 </html>
+```
